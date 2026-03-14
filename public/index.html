@@ -1590,7 +1590,7 @@
 
     <!-- Footer -->
     <footer class="footer" id="footer" style="display: none;">
-        <span>Developed by MBNT Development Team | © 2026 Vietcombank</span>
+        <span>Developed by Forex Development Team | © 2026 Vietcombank</span>
     </footer>
 
     <!-- Modal Thêm User -->
@@ -2088,514 +2088,635 @@
         }
 
         // ==========================================
-        // PNV FUNCTIONS
-        // ==========================================
-        function lookupCustomerName() {
-            const cif = document.getElementById('cif').value.trim();
-            const nameInput = document.getElementById('customerName');
-            
-            if (mockCIF[cif]) {
-                nameInput.value = mockCIF[cif];
-                nameInput.style.color = 'green';
-            } else {
-                nameInput.value = 'Không tìm thấy KH - Vui lòng kiểm tra lại CIF';
-                nameInput.style.color = 'red';
-            }
-        }
+// PNV FUNCTIONS - ĐÚNG NGUYÊN TẮC GIAO DỊCH
+// ==========================================
 
-        function updatePurposeLabel() {
-            const type = document.getElementById('transactionType').value;
-            const label = document.getElementById('purposeLabel');
-            label.textContent = type === 'buy' ? 'Nguồn (1-12)' : 'Mục đích (1-12)';
-        }
+function lookupCustomerName() {
+    const cif = document.getElementById('cif').value.trim();
+    const nameInput = document.getElementById('customerName');
+    
+    if (mockCIF[cif]) {
+        nameInput.value = mockCIF[cif];
+        nameInput.style.color = 'green';
+    } else {
+        nameInput.value = 'Không tìm thấy KH - Vui lòng kiểm tra lại CIF';
+        nameInput.style.color = 'red';
+    }
+}
 
-        function submitAskPrice(e) {
-            e.preventDefault();
-            
-            // Validate currencies
-            const buyCurr = document.getElementById('buyCurrency').value;
-            const sellCurr = document.getElementById('sellCurrency').value;
-            
-            if (buyCurr === sellCurr) {
-                showNotification('Đồng tiền mua và bán không được giống nhau!', 'error');
-                return;
-            }
+function updatePurposeLabel() {
+    const type = document.getElementById('transactionType').value;
+    const label = document.getElementById('purposeLabel');
+    label.textContent = type === 'buy' ? 'Nguồn (1-12)' : 'Mục đích (1-12)';
+}
 
-            const cif = document.getElementById('cif').value.trim();
-            if (!mockCIF[cif]) {
-                showNotification('CIF không tồn tại trong hệ thống!', 'error');
-                return;
-            }
+// PNV GỬI YÊU CẦU HỎI GIÁ - CHỜ PQL PHẢN HỒI
+function submitAskPrice(e) {
+    e.preventDefault();
+    
+    const buyCurr = document.getElementById('buyCurrency').value;
+    const sellCurr = document.getElementById('sellCurrency').value;
+    
+    if (buyCurr === sellCurr) {
+        showNotification('Đồng tiền mua và bán không được giống nhau!', 'error');
+        return;
+    }
 
-            // Create quote request
-            const quoteRequest = {
-                id: generateId(),
-                pnv: currentUser.id,
-                pnvName: currentUser.name,
-                cif: cif,
-                customerName: document.getElementById('customerName').value,
-                direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
-                date: formatDate(new Date()),
-                effectiveDate: document.getElementById('effectiveDate').value,
-                currency: document.getElementById('currencyCode').value,
-                buyCurr: buyCurr,
-                sellCurr: sellCurr,
-                amount: parseFloat(document.getElementById('amount').value),
-                purpose: document.getElementById('purpose').value,
-                status: 'pending',
-                timestamp: new Date().toISOString()
-            };
+    const cif = document.getElementById('cif').value.trim();
+    if (!mockCIF[cif]) {
+        showNotification('CIF không tồn tại trong hệ thống!', 'error');
+        return;
+    }
 
-            pendingQuotes.push(quoteRequest);
-            saveToLocalStorage();
+    // Tạo yêu cầu hỏi giá - CHỜ PQL CHÀO
+    const quoteRequest = {
+        id: generateId(),
+        pnv: currentUser.id,
+        pnvName: currentUser.name,
+        cif: cif,
+        customerName: document.getElementById('customerName').value,
+        direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
+        date: formatDate(new Date()),
+        effectiveDate: document.getElementById('effectiveDate').value,
+        currency: document.getElementById('currencyCode').value,
+        buyCurr: buyCurr,
+        sellCurr: sellCurr,
+        amount: parseFloat(document.getElementById('amount').value),
+        purpose: document.getElementById('purpose').value,
+        status: 'pending', // CHỜ PQL CHÀO GIÁ
+        interrupted: false,
+        timestamp: new Date().toISOString()
+    };
 
-            showNotification('Đã gửi yêu cầu hỏi giá đến PQL!');
-            
-            // Reset form except date fields
-            const effDate = document.getElementById('effectiveDate').value;
-            document.getElementById('askPriceForm').reset();
-            document.getElementById('transactionDate').value = formatDate(new Date());
-            document.getElementById('effectiveDate').value = effDate;
-        }
+    pendingQuotes.push(quoteRequest);
+    saveToLocalStorage();
 
-        function startQuoteTimer(seconds, quoteId) {
-            quoteExpiryTime = Date.now() + (seconds * 1000);
-            currentQuoteId = quoteId;
-            const timerDisplay = document.getElementById('quoteTimer');
-            
-            if (quoteTimer) clearInterval(quoteTimer);
-            
-            quoteTimer = setInterval(() => {
-                const remaining = Math.ceil((quoteExpiryTime - Date.now()) / 1000);
-                
-                if (remaining <= 0) {
-                    clearInterval(quoteTimer);
-                    timerDisplay.textContent = '00:00';
-                    document.getElementById('quoteResponse').classList.add('hidden');
-                    showNotification('Tỷ giá đã hết hiệu lực!', 'error');
-                    currentQuoteId = null;
-                    return;
-                }
-                
-                const mins = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
+    // Lưu form data để dùng khi accept sau này
+    localStorage.setItem('pnv_pending_form_' + quoteRequest.id, JSON.stringify({
+        quoteId: quoteRequest.id,
+        cif: cif,
+        customerName: document.getElementById('customerName').value,
+        transactionType: document.getElementById('transactionType').value,
+        effectiveDate: document.getElementById('effectiveDate').value,
+        buyCurrency: buyCurr,
+        sellCurrency: sellCurr,
+        amount: document.getElementById('amount').value,
+        purpose: document.getElementById('purpose').value
+    }));
 
-        function acceptPrice() {
-            if (!currentQuoteId) return;
-            
-            clearInterval(quoteTimer);
-            
-            // Get quote data from localStorage or memory
-            const quoteData = JSON.parse(localStorage.getItem('currentQuoteData') || '{}');
-            
-            // Create transaction
-            const transaction = {
-                id: generateId(),
-                pnv: currentUser.id,
-                pnvName: currentUser.name,
-                date: formatDate(new Date()),
-                effectiveDate: document.getElementById('effectiveDate').value,
-                cif: document.getElementById('cif').value,
-                customerName: document.getElementById('customerName').value,
-                direction: document.getElementById('transactionType').value === 'buy' ? 'MUA' : 'BÁN',
-                buyCurr: document.getElementById('buyCurrency').value,
-                sellCurr: document.getElementById('sellCurrency').value,
-                amount: parseFloat(document.getElementById('amount').value),
-                rate: quoteData.rate || 0,
-                equivalent: 0,
-                type: calculateTransactionType(document.getElementById('effectiveDate').value, formatDate(new Date())),
-                status: 'Thành công',
-                purpose: document.getElementById('purpose').value,
-                editedBy: null,
-                editTime: null
-            };
-            
-            // Calculate equivalent amount
-            if (transaction.direction === 'MUA') {
-                transaction.equivalent = transaction.amount * transaction.rate;
-            } else {
-                transaction.equivalent = transaction.amount * transaction.rate;
-            }
-            
-            mockTransactions.push(transaction);
-            saveToLocalStorage();
-            
-            // Hide quote and reset
-            document.getElementById('quoteResponse').classList.add('hidden');
-            document.getElementById('askPriceForm').reset();
-            document.getElementById('transactionDate').value = formatDate(new Date());
-            currentQuoteId = null;
-            
-            showNotification('Giao dịch thành công!');
-            loadPnvBlotter();
-        }
+    showNotification('Đã gửi yêu cầu hỏi giá đến PQL! Đang chờ phản hồi...', 'info');
+    
+    // Reset form
+    document.getElementById('askPriceForm').reset();
+    document.getElementById('transactionDate').value = formatDate(new Date());
+}
 
-        function rejectPrice() {
-            clearInterval(quoteTimer);
-            document.getElementById('quoteResponse').classList.add('hidden');
-            currentQuoteId = null;
-            showNotification('Đã từ chối tỷ giá', 'warning');
-        }
+// PNV NHẬN GIÁ TỪ PQL - HIỂN THỊ TIMER
+function showQuoteToPnv(quoteData) {
+    const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + quoteData.quoteId) || '{}');
+    
+    // Hiển thị giá chào
+    document.getElementById('quoteResponse').classList.remove('hidden');
+    document.getElementById('quotePrice').textContent = quoteData.rate.toLocaleString('vi-VN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 4
+    });
+    document.getElementById('quotePair').textContent = `${formData.buyCurrency}/${formData.sellCurrency}`;
+    
+    // Tính thời gian còn lại
+    const now = new Date().getTime();
+    const expiry = new Date(quoteData.expiryTime).getTime();
+    const remainingSeconds = Math.max(0, Math.floor((expiry - now) / 1000));
+    
+    // Bắt đầu đếm ngược
+    startQuoteTimer(remainingSeconds, quoteData.quoteId, quoteData.rate);
+    
+    showNotification('PQL đã chào giá! Vui lòng chấp nhận trong thời gian quy định.', 'warning');
+}
 
-        function loadPnvBlotter() {
-            const tbody = document.getElementById('pnvBlotterBody');
-            tbody.innerHTML = '';
-            
-            const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
-            
-            userTrans.forEach(t => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${t.date}</td>
-                    <td>${t.effectiveDate}</td>
-                    <td>${t.cif}</td>
-                    <td>${t.customerName}</td>
-                    <td>${t.direction}</td>
-                    <td>${t.buyCurr}</td>
-                    <td>${t.sellCurr}</td>
-                    <td>${t.amount.toLocaleString('vi-VN')}</td>
-                    <td>${t.rate.toLocaleString('vi-VN')}</td>
-                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
-                    <td><span class="badge badge-success">${t.type}</span></td>
-                    <td class="status-success">${t.status}</td>
-                `;
-            });
-        }
-
-        function filterPnvBlotter() {
-            loadPnvBlotter();
-            // Apply filters
-            const fromDate = document.getElementById('pnvFilterFromDate').value;
-            const toDate = document.getElementById('pnvFilterToDate').value;
-            const currency = document.getElementById('pnvFilterCurrency').value;
-            
-            // Implementation would filter the displayed data
-            showNotification('Đã áp dụng bộ lọc');
-        }
-
-        function exportPnvBlotter(format) {
-            showNotification(`Đang xuất file ${format.toUpperCase()}...`);
-            // Implementation would generate and download file
-            setTimeout(() => {
-                showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
-            }, 1000);
-        }
-
-        // ==========================================
-        // PQL FUNCTIONS
-        // ==========================================
-        function loadCifTable() {
-            const tbody = document.getElementById('cifTableBody');
-            tbody.innerHTML = '';
-            
-            Object.entries(mockCIF).forEach(([cif, name]) => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${cif}</td>
-                    <td>${name}</td>
-                    <td>
-                        <button class="btn btn-small btn-danger" onclick="deleteCif('${cif}')">Xóa</button>
-                    </td>
-                `;
-            });
-        }
-
-        function deleteCif(cif) {
-            if (confirm('Xóa CIF này?')) {
-                delete mockCIF[cif];
-                saveToLocalStorage();
-                loadCifTable();
-                showNotification('Đã xóa CIF');
-            }
-        }
-
-        function uploadCIFData(e) {
-            e.preventDefault();
-            const manualData = document.getElementById('cifManualData').value.trim();
-            
-            if (manualData) {
-                const lines = manualData.split('\n');
-                lines.forEach(line => {
-                    const parts = line.split(',');
-                    if (parts.length >= 2) {
-                        const cif = parts[0].trim();
-                        const name = parts[1].trim();
-                        if (cif && name) {
-                            mockCIF[cif] = name;
-                        }
-                    }
-                });
-                saveToLocalStorage();
-                loadCifTable();
-                document.getElementById('cifManualData').value = '';
-                showNotification('Đã lưu dữ liệu CIF!');
-            }
-        }
-
-        function loadPendingQuotes() {
-            const container = document.getElementById('pendingQuotes');
-            const pending = pendingQuotes.filter(q => q.status === 'pending');
-            
-            if (pending.length === 0) {
-                container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            pending.forEach(quote => {
-                const div = document.createElement('div');
-                div.className = 'pending-quote';
-                div.onclick = () => selectQuote(quote.id);
-                div.innerHTML = `
-                    <div class="pending-quote-header">
-                        <span class="pending-quote-title">${quote.pnvName} (${quote.pnv})</span>
-                        <span class="pending-quote-time">${new Date(quote.timestamp).toLocaleTimeString()}</span>
-                    </div>
-                    <div class="pending-quote-details">
-                        CIF: ${quote.cif} | ${quote.customerName}<br>
-                        Chiều: ${quote.direction} | ${quote.buyCurr} → ${quote.sellCurr}<br>
-                        Số lượng: ${quote.amount.toLocaleString()} | Ngày hiệu lực: ${quote.effectiveDate}
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function selectQuote(quoteId) {
-            const quote = pendingQuotes.find(q => q.id === quoteId);
-            if (!quote) return;
-            
-            document.getElementById('quoteFormCard').classList.remove('hidden');
-            document.getElementById('quoteRequestId').value = quoteId;
-            document.getElementById('quotePnv').value = `${quote.pnvName} (${quote.pnv})`;
-            document.getElementById('quoteCif').value = quote.cif;
-            document.getElementById('quoteCifName').value = quote.customerName;
-            document.getElementById('quoteDirection').value = quote.direction;
-            document.getElementById('quoteBuyCurr').value = quote.buyCurr;
-            document.getElementById('quoteSellCurr').value = quote.sellCurr;
-            document.getElementById('quoteAmount').value = quote.amount.toLocaleString();
-            document.getElementById('quoteEffDate').value = quote.effectiveDate;
-            
-            // Reset quote inputs
-            document.getElementById('quoteRate').value = '';
-            document.getElementById('quoteDuration').value = '2';
-        }
-
-        function cancelQuote() {
-            document.getElementById('quoteFormCard').classList.add('hidden');
-        }
-
-        function submitQuote(e) {
-            e.preventDefault();
-            const quoteId = document.getElementById('quoteRequestId').value;
-            const rate = parseFloat(document.getElementById('quoteRate').value);
-            const duration = parseInt(document.getElementById('quoteDuration').value);
-            
-            if (!rate || rate <= 0) {
-                showNotification('Vui lòng nhập tỷ giá hợp lệ!', 'error');
-                return;
-            }
-            
-            // Update quote status
-            const quoteIndex = pendingQuotes.findIndex(q => q.id === quoteId);
-            if (quoteIndex > -1) {
-                pendingQuotes[quoteIndex].status = 'quoted';
-                pendingQuotes[quoteIndex].rate = rate;
-                pendingQuotes[quoteIndex].duration = duration;
-                pendingQuotes[quoteIndex].quoteTime = new Date().toISOString();
-                saveToLocalStorage();
-            }
-            
-            // Store current quote data for PNV to retrieve
-            localStorage.setItem('currentQuoteData', JSON.stringify({
-                quoteId: quoteId,
-                rate: rate,
-                duration: duration,
-                timestamp: new Date().toISOString()
-            }));
-            
-            // Simulate sending to PNV (in real app, this would be a push notification)
-            showNotification(`Đã chào giá ${rate} cho ${duration} phút!`);
-            
-            document.getElementById('quoteFormCard').classList.add('hidden');
-            loadPendingQuotes();
-        }
-
-        function interruptCurrent() {
-            if (currentQuoteId) {
+// TIMER ĐẾM NGƯỢC - KIỂM TRA INTERRUPT MỖI GIÂY
+function startQuoteTimer(seconds, quoteId, rate) {
+    quoteExpiryTime = Date.now() + (seconds * 1000);
+    currentQuoteId = quoteId;
+    const timerDisplay = document.getElementById('quoteTimer');
+    
+    if (quoteTimer) clearInterval(quoteTimer);
+    
+    quoteTimer = setInterval(() => {
+        // KIỂM TRA INTERRUPT MỖI GIÂY
+        const storedQuote = localStorage.getItem('pql_quote_' + quoteId);
+        if (storedQuote) {
+            const quoteData = JSON.parse(storedQuote);
+            if (quoteData.interrupted) {
                 clearInterval(quoteTimer);
-                document.getElementById('quoteResponse')?.classList.add('hidden');
+                timerDisplay.textContent = '00:00';
+                document.getElementById('quoteResponse').classList.add('hidden');
+                showNotification('⛔ Giao dịch đã bị PQL Interrupt! Không thể chấp nhận giá.', 'error');
                 currentQuoteId = null;
-                showNotification('Đã Interrupt giao dịch hiện tại', 'warning');
+                localStorage.removeItem('pnv_pending_form_' + quoteId);
+                return;
             }
         }
-
-        function interruptAll() {
-            // Clear all active quotes
-            pendingQuotes.forEach(q => {
-                if (q.status === 'quoted') {
-                    q.status = 'interrupted';
-                }
-            });
-            saveToLocalStorage();
-            
+        
+        const remaining = Math.ceil((quoteExpiryTime - Date.now()) / 1000);
+        
+        // HẾT HẠN
+        if (remaining <= 0) {
             clearInterval(quoteTimer);
-            document.getElementById('quoteResponse')?.classList.add('hidden');
+            timerDisplay.textContent = '00:00';
+            document.getElementById('quoteResponse').classList.add('hidden');
+            showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
             currentQuoteId = null;
-            
-            showNotification('Đã Interrupt ALL tất cả giao dịch đang chào giá!', 'error');
+            localStorage.removeItem('pnv_pending_form_' + quoteId);
+            return;
         }
+        
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }, 1000);
+}
 
-        function loadPqlBlotter() {
-            const tbody = document.getElementById('pqlBlotterBody');
-            tbody.innerHTML = '';
-            
-            mockTransactions.forEach(t => {
-                const row = tbody.insertRow();
-                const editInfo = t.editedBy ? `<br><small style="color: orange;">Sửa bởi: ${t.editedBy}</small>` : '';
-                
-                row.innerHTML = `
-                    <td>${t.pnv}<br><small>${t.pnvName}</small></td>
-                    <td>${t.date}</td>
-                    <td>${t.effectiveDate}</td>
-                    <td>${t.cif}</td>
-                    <td>${t.customerName}</td>
-                    <td>${t.direction}</td>
-                    <td>${t.buyCurr}</td>
-                    <td>${t.sellCurr}</td>
-                    <td>${t.amount.toLocaleString('vi-VN')}</td>
-                    <td>${t.rate.toLocaleString('vi-VN')}</td>
-                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
-                    <td><span class="badge ${t.type === 'GN' ? 'badge-success' : 'badge-warning'}">${t.type}</span></td>
-                    <td>${t.editedBy || '-'}</td>
-                    <td>
-                        <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
-                    </td>
-                `;
-            });
+// PNV CHẤP NHẬN GIÁ - KIỂM TRA INTERRUPT TRƯỚC
+function acceptPrice() {
+    if (!currentQuoteId) return;
+    
+    // KIỂM TRA INTERRUPT TRƯỚC KHI ACCEPT
+    const storedQuote = localStorage.getItem('pql_quote_' + currentQuoteId);
+    if (storedQuote) {
+        const quoteData = JSON.parse(storedQuote);
+        if (quoteData.interrupted) {
+            showNotification('⛔ Không thể chấp nhận - Giao dịch đã bị Interrupt!', 'error');
+            clearInterval(quoteTimer);
+            document.getElementById('quoteResponse').classList.add('hidden');
+            currentQuoteId = null;
+            localStorage.removeItem('pnv_pending_form_' + currentQuoteId);
+            return;
         }
+    }
+    
+    clearInterval(quoteTimer);
+    
+    const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
+    const quoteData = storedQuote ? JSON.parse(storedQuote) : {};
+    
+    // Tạo giao dịch thành công
+    const transaction = {
+        id: generateId(),
+        pnv: currentUser.id,
+        pnvName: currentUser.name,
+        date: formatDate(new Date()),
+        effectiveDate: formData.effectiveDate,
+        cif: formData.cif,
+        customerName: formData.customerName,
+        direction: formData.transactionType === 'buy' ? 'MUA' : 'BÁN',
+        buyCurr: formData.buyCurrency,
+        sellCurr: formData.sellCurrency,
+        amount: parseFloat(formData.amount),
+        rate: quoteData.rate || 0,
+        equivalent: parseFloat(formData.amount) * (quoteData.rate || 0),
+        type: calculateTransactionType(formData.effectiveDate, formatDate(new Date())),
+        status: 'Thành công',
+        purpose: formData.purpose,
+        editedBy: null,
+        editTime: null
+    };
+    
+    mockTransactions.push(transaction);
+    saveToLocalStorage();
+    
+    // Cleanup
+    document.getElementById('quoteResponse').classList.add('hidden');
+    document.getElementById('askPriceForm').reset();
+    document.getElementById('transactionDate').value = formatDate(new Date());
+    currentQuoteId = null;
+    localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
+    localStorage.removeItem('pql_quote_' + formData.quoteId);
+    
+    showNotification('✅ Giao dịch thành công!');
+    loadPnvBlotter();
+}
 
-        function filterPqlBlotter() {
-            loadPqlBlotter();
-            showNotification('Đã áp dụng bộ lọc');
-        }
+// PNV TỪ CHỐI GIÁ
+function rejectPrice() {
+    clearInterval(quoteTimer);
+    document.getElementById('quoteResponse').classList.add('hidden');
+    
+    const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
+    if (formData.quoteId) {
+        localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
+        localStorage.removeItem('pql_quote_' + formData.quoteId);
+    }
+    
+    currentQuoteId = null;
+    showNotification('Đã từ chối tỷ giá', 'warning');
+}
 
-        function exportPqlBlotter(format) {
-            showNotification(`Đang xuất file ${format.toUpperCase()}...`);
-            setTimeout(() => {
-                showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
-            }, 1000);
-        }
+function loadPnvBlotter() {
+    const tbody = document.getElementById('pnvBlotterBody');
+    tbody.innerHTML = '';
+    
+    const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
+    
+    userTrans.forEach(t => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${t.date}</td>
+            <td>${t.effectiveDate}</td>
+            <td>${t.cif}</td>
+            <td>${t.customerName}</td>
+            <td>${t.direction}</td>
+            <td>${t.buyCurr}</td>
+            <td>${t.sellCurr}</td>
+            <td>${t.amount.toLocaleString('vi-VN')}</td>
+            <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+            <td>${t.equivalent.toLocaleString('vi-VN')}</td>
+            <td><span class="badge badge-success">${t.type}</span></td>
+            <td class="status-success">${t.status}</td>
+        `;
+    });
+}
 
-        function openEditTransaction(transId) {
-            const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
-            if (!t) {
-                showNotification('Không tìm thấy giao dịch!', 'error');
-                return;
+function filterPnvBlotter() {
+    loadPnvBlotter();
+    showNotification('Đã áp dụng bộ lọc');
+}
+
+function exportPnvBlotter(format) {
+    showNotification(`Đang xuất file ${format.toUpperCase()}...`);
+    setTimeout(() => {
+        showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
+    }, 1000);
+}
+        // ==========================================
+// PQL FUNCTIONS - ĐÚNG NGUYÊN TẮC GIAO DỊCH
+// ==========================================
+
+function loadCifTable() {
+    const tbody = document.getElementById('cifTableBody');
+    tbody.innerHTML = '';
+    
+    Object.entries(mockCIF).forEach(([cif, name]) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${cif}</td>
+            <td>${name}</td>
+            <td>
+                <button class="btn btn-small btn-danger" onclick="deleteCif('${cif}')">Xóa</button>
+            </td>
+        `;
+    });
+}
+
+function deleteCif(cif) {
+    if (confirm('Xóa CIF này?')) {
+        delete mockCIF[cif];
+        saveToLocalStorage();
+        loadCifTable();
+        showNotification('Đã xóa CIF');
+    }
+}
+
+function uploadCIFData(e) {
+    e.preventDefault();
+    const manualData = document.getElementById('cifManualData').value.trim();
+    
+    if (manualData) {
+        const lines = manualData.split('\n');
+        lines.forEach(line => {
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+                const cif = parts[0].trim();
+                const name = parts[1].trim();
+                if (cif && name) {
+                    mockCIF[cif] = name;
+                }
             }
-            
-            editingTransactionId = t.id;
-            document.getElementById('editTransId').value = t.id;
-            document.getElementById('editCif').value = t.cif;
-            document.getElementById('editCifName').value = t.customerName;
-            document.getElementById('editEffDate').value = t.effectiveDate;
-            document.getElementById('editBuyCurr').value = t.buyCurr;
-            document.getElementById('editSellCurr').value = t.sellCurr;
-            document.getElementById('editAmount').value = t.amount;
-            document.getElementById('editRate').value = t.rate;
-            document.getElementById('editType').value = t.type;
-            
-            document.getElementById('editTransactionModal').classList.add('active');
-        }
+        });
+        saveToLocalStorage();
+        loadCifTable();
+        document.getElementById('cifManualData').value = '';
+        showNotification('Đã lưu dữ liệu CIF!');
+    }
+}
 
-        function closeEditModal() {
-            document.getElementById('editTransactionModal').classList.remove('active');
-            editingTransactionId = null;
-        }
+// PQL XEM DANH SÁCH YÊU CẦU CHỜ CHÀO GIÁ
+function loadPendingQuotes() {
+    const container = document.getElementById('pendingQuotes');
+    const pending = pendingQuotes.filter(q => q.status === 'pending' && !q.interrupted);
+    
+    if (pending.length === 0) {
+        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
+        return;
+    }
+    
+    container.innerHTML = '';
+    pending.forEach(quote => {
+        const div = document.createElement('div');
+        div.className = 'pending-quote';
+        div.onclick = () => selectQuote(quote.id);
+        div.innerHTML = `
+            <div class="pending-quote-header">
+                <span class="pending-quote-title">${quote.pnvName} (${quote.pnv})</span>
+                <span class="pending-quote-time">${new Date(quote.timestamp).toLocaleTimeString()}</span>
+            </div>
+            <div class="pending-quote-details">
+                CIF: ${quote.cif} | ${quote.customerName}<br>
+                Chiều: ${quote.direction} | ${quote.buyCurr} → ${quote.sellCurr}<br>
+                Số lượng: ${quote.amount.toLocaleString()} | Ngày hiệu lực: ${quote.effectiveDate}
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
 
-        function saveEditTransaction(e) {
-            e.preventDefault();
-            const t = mockTransactions.find(tr => tr.id === editingTransactionId);
-            if (!t) return;
-            
-            t.cif = document.getElementById('editCif').value;
-            t.customerName = document.getElementById('editCifName').value;
-            t.effectiveDate = document.getElementById('editEffDate').value;
-            t.buyCurr = document.getElementById('editBuyCurr').value;
-            t.sellCurr = document.getElementById('editSellCurr').value;
-            t.amount = parseFloat(document.getElementById('editAmount').value);
-            t.rate = parseFloat(document.getElementById('editRate').value);
-            t.type = document.getElementById('editType').value;
-            t.editedBy = currentUser.id;
-            t.editTime = new Date().toISOString();
-            
-            // Recalculate equivalent
-            t.equivalent = t.amount * t.rate;
-            
-            saveToLocalStorage();
-            closeEditModal();
-            loadPqlBlotter();
-            showNotification('Đã cập nhật giao dịch!');
-        }
+// PQL CHỌN YÊU CẦU ĐỂ CHÀO GIÁ
+function selectQuote(quoteId) {
+    const quote = pendingQuotes.find(q => q.id === quoteId);
+    if (!quote || quote.interrupted) return;
+    
+    document.getElementById('quoteFormCard').classList.remove('hidden');
+    document.getElementById('quoteRequestId').value = quoteId;
+    document.getElementById('quotePnv').value = `${quote.pnvName} (${quote.pnv})`;
+    document.getElementById('quoteCif').value = quote.cif;
+    document.getElementById('quoteCifName').value = quote.customerName;
+    document.getElementById('quoteDirection').value = quote.direction;
+    document.getElementById('quoteBuyCurr').value = quote.buyCurr;
+    document.getElementById('quoteSellCurr').value = quote.sellCurr;
+    document.getElementById('quoteAmount').value = quote.amount.toLocaleString();
+    document.getElementById('quoteEffDate').value = quote.effectiveDate;
+    
+    // Reset và focus vào nhập giá
+    document.getElementById('quoteRate').value = '';
+    document.getElementById('quoteDuration').value = '2';
+    document.getElementById('quoteRate').focus();
+}
 
-        function generateReport() {
-            const fromDate = document.getElementById('reportTransFrom').value;
-            const toDate = document.getElementById('reportTransTo').value;
-            const pnv = document.getElementById('reportPnv').value;
+function cancelQuote() {
+    document.getElementById('quoteFormCard').classList.add('hidden');
+}
+
+// PQL SUBMIT CHÀO GIÁ - LƯU VÀO STORAGE ĐỂ PNV NHẬN
+function submitQuote(e) {
+    e.preventDefault();
+    const quoteId = document.getElementById('quoteRequestId').value;
+    const rate = parseFloat(document.getElementById('quoteRate').value);
+    const duration = parseInt(document.getElementById('quoteDuration').value);
+    
+    if (!rate || rate <= 0) {
+        showNotification('Vui lòng nhập tỷ giá hợp lệ!', 'error');
+        return;
+    }
+    
+    // Tính thời gian hết hạn
+    const now = new Date();
+    const expiryTime = new Date(now.getTime() + duration * 60000);
+    
+    // Cập nhật quote
+    const quoteIndex = pendingQuotes.findIndex(q => q.id === quoteId);
+    if (quoteIndex > -1) {
+        pendingQuotes[quoteIndex].status = 'quoted';
+        pendingQuotes[quoteIndex].rate = rate;
+        pendingQuotes[quoteIndex].duration = duration;
+        pendingQuotes[quoteIndex].quoteTime = now.toISOString();
+        pendingQuotes[quoteIndex].expiryTime = expiryTime.toISOString();
+        pendingQuotes[quoteIndex].interrupted = false;
+        saveToLocalStorage();
+        
+        // LƯU VÀO STORAGE ĐỂ PNV NHẬN ĐƯỢC
+        localStorage.setItem('pql_quote_' + quoteId, JSON.stringify({
+            quoteId: quoteId,
+            rate: rate,
+            duration: duration,
+            pnv: pendingQuotes[quoteIndex].pnv,
+            expiryTime: expiryTime.toISOString(),
+            interrupted: false,
+            timestamp: now.toISOString()
+        }));
+        
+        showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
+    }
+    
+    document.getElementById('quoteFormCard').classList.add('hidden');
+    loadPendingQuotes();
+}
+
+// INTERRUPT MỘT GIAO DỊCH CỤ THỂ
+function interruptCurrent() {
+    // Tìm quote đang active (vừa chào gần nhất)
+    const activeQuotes = pendingQuotes.filter(q => 
+        q.status === 'quoted' && 
+        !q.interrupted && 
+        new Date(q.expiryTime) > new Date()
+    );
+    
+    if (activeQuotes.length === 0) {
+        showNotification('Không có giao dịch nào đang chào giá để Interrupt!', 'warning');
+        return;
+    }
+    
+    // Lấy quote mới nhất
+    const latestQuote = activeQuotes.sort((a, b) => 
+        new Date(b.quoteTime) - new Date(a.quoteTime)
+    )[0];
+    
+    // Đánh dấu interrupt
+    latestQuote.interrupted = true;
+    latestQuote.status = 'interrupted';
+    saveToLocalStorage();
+    
+    // Cập nhật storage để PNV biết
+    const stored = localStorage.getItem('pql_quote_' + latestQuote.id);
+    if (stored) {
+        const data = JSON.parse(stored);
+        data.interrupted = true;
+        localStorage.setItem('pql_quote_' + latestQuote.id, JSON.stringify(data));
+    }
+    
+    showNotification(`⛔ Đã Interrupt giao dịch của ${latestQuote.pnvName}!`, 'error');
+    loadPendingQuotes();
+}
+
+// INTERRUPT TẤT CẢ GIAO DỊCH ĐANG CHÀO
+function interruptAll() {
+    let interruptedCount = 0;
+    
+    pendingQuotes.forEach(q => {
+        if (q.status === 'quoted' && !q.interrupted && new Date(q.expiryTime) > new Date()) {
+            q.interrupted = true;
+            q.status = 'interrupted';
+            interruptedCount++;
             
-            // Filter transactions
-            let filtered = mockTransactions;
-            if (pnv) {
-                filtered = filtered.filter(t => t.pnv.includes(pnv));
+            // Cập nhật từng quote trong storage
+            const stored = localStorage.getItem('pql_quote_' + q.id);
+            if (stored) {
+                const data = JSON.parse(stored);
+                data.interrupted = true;
+                localStorage.setItem('pql_quote_' + q.id, JSON.stringify(data));
             }
-            
-            const container = document.getElementById('reportResult');
-            if (filtered.length === 0) {
-                container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
-                return;
-            }
-            
-            let html = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>PNV</th>
-                            <th>Ngày GD</th>
-                            <th>CIF</th>
-                            <th>Chiều</th>
-                            <th>Số tiền</th>
-                            <th>Tỷ giá</th>
-                            <th>Loại</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            filtered.forEach(t => {
-                html += `
-                    <tr>
-                        <td>${t.pnv}</td>
-                        <td>${t.date}</td>
-                        <td>${t.cif}</td>
-                        <td>${t.direction}</td>
-                        <td>${t.amount.toLocaleString()}</td>
-                        <td>${t.rate.toLocaleString()}</td>
-                        <td>${t.type}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-            showNotification(`Báo cáo có ${filtered.length} giao dịch`);
         }
+    });
+    
+    saveToLocalStorage();
+    
+    if (interruptedCount > 0) {
+        showNotification(`⛔⛔⛔ Đã Interrupt ALL ${interruptedCount} giao dịch đang chào giá!`, 'error');
+    } else {
+        showNotification('Không có giao dịch nào đang chào giá.', 'warning');
+    }
+    
+    loadPendingQuotes();
+}
 
-        function exportReport(format) {
-            showNotification(`Xuất báo cáo dạng ${format.toUpperCase()}...`);
-        }
+function loadPqlBlotter() {
+    const tbody = document.getElementById('pqlBlotterBody');
+    tbody.innerHTML = '';
+    
+    mockTransactions.forEach(t => {
+        const row = tbody.insertRow();
+        const editInfo = t.editedBy ? `<br><small style="color: orange;">Sửa: ${t.editedBy}</small>` : '';
+        
+        row.innerHTML = `
+            <td>${t.pnv}<br><small>${t.pnvName}</small></td>
+            <td>${t.date}</td>
+            <td>${t.effectiveDate}</td>
+            <td>${t.cif}</td>
+            <td>${t.customerName}</td>
+            <td>${t.direction}</td>
+            <td>${t.buyCurr}</td>
+            <td>${t.sellCurr}</td>
+            <td>${t.amount.toLocaleString('vi-VN')}</td>
+            <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+            <td>${t.equivalent.toLocaleString('vi-VN')}</td>
+            <td><span class="badge ${t.type === 'GN' ? 'badge-success' : t.type === 'KH' ? 'badge-warning' : 'badge-info'}">${t.type}</span></td>
+            <td>${t.editedBy || '-'}</td>
+            <td>
+                <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
+            </td>
+        `;
+    });
+}
+
+function filterPqlBlotter() {
+    loadPqlBlotter();
+    showNotification('Đã áp dụng bộ lọc');
+}
+
+function exportPqlBlotter(format) {
+    showNotification(`Đang xuất file ${format.toUpperCase()}...`);
+    setTimeout(() => {
+        showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
+    }, 1000);
+}
+
+function openEditTransaction(transId) {
+    const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
+    if (!t) {
+        showNotification('Không tìm thấy giao dịch!', 'error');
+        return;
+    }
+    
+    editingTransactionId = t.id;
+    document.getElementById('editTransId').value = t.id;
+    document.getElementById('editCif').value = t.cif;
+    document.getElementById('editCifName').value = t.customerName;
+    document.getElementById('editEffDate').value = t.effectiveDate;
+    document.getElementById('editBuyCurr').value = t.buyCurr;
+    document.getElementById('editSellCurr').value = t.sellCurr;
+    document.getElementById('editAmount').value = t.amount;
+    document.getElementById('editRate').value = t.rate;
+    document.getElementById('editType').value = t.type;
+    
+    document.getElementById('editTransactionModal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('editTransactionModal').classList.remove('active');
+    editingTransactionId = null;
+}
+
+function saveEditTransaction(e) {
+    e.preventDefault();
+    const t = mockTransactions.find(tr => tr.id === editingTransactionId);
+    if (!t) return;
+    
+    t.cif = document.getElementById('editCif').value;
+    t.customerName = document.getElementById('editCifName').value;
+    t.effectiveDate = document.getElementById('editEffDate').value;
+    t.buyCurr = document.getElementById('editBuyCurr').value;
+    t.sellCurr = document.getElementById('editSellCurr').value;
+    t.amount = parseFloat(document.getElementById('editAmount').value);
+    t.rate = parseFloat(document.getElementById('editRate').value);
+    t.type = document.getElementById('editType').value;
+    t.editedBy = currentUser.id;
+    t.editTime = new Date().toISOString();
+    
+    t.equivalent = t.amount * t.rate;
+    
+    saveToLocalStorage();
+    closeEditModal();
+    loadPqlBlotter();
+    showNotification('Đã cập nhật giao dịch!');
+}
+
+function generateReport() {
+    const fromDate = document.getElementById('reportTransFrom').value;
+    const toDate = document.getElementById('reportTransTo').value;
+    const pnv = document.getElementById('reportPnv').value;
+    const type = document.getElementById('reportType').value;
+    
+    let filtered = mockTransactions;
+    if (pnv) filtered = filtered.filter(t => t.pnv.includes(pnv));
+    if (type) filtered = filtered.filter(t => t.type === type);
+    
+    const container = document.getElementById('reportResult');
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
+        return;
+    }
+    
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>PNV</th>
+                    <th>Ngày GD</th>
+                    <th>CIF</th>
+                    <th>Chiều</th>
+                    <th>Mua</th>
+                    <th>Bán</th>
+                    <th>Số tiền</th>
+                    <th>Tỷ giá</th>
+                    <th>Loại</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    filtered.forEach(t => {
+        html += `
+            <tr>
+                <td>${t.pnv}</td>
+                <td>${t.date}</td>
+                <td>${t.cif}</td>
+                <td>${t.direction}</td>
+                <td>${t.buyCurr}</td>
+                <td>${t.sellCurr}</td>
+                <td>${t.amount.toLocaleString()}</td>
+                <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                <td>${t.type}</td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+    showNotification(`Báo cáo có ${filtered.length} giao dịch`);
+}
+
+function exportReport(format) {
+    showNotification(`Xuất báo cáo dạng ${format.toUpperCase()}...`);
+}
 
         // ==========================================
         // BGĐ FUNCTIONS
