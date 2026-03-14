@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -16,17 +17,21 @@ const pool = new Pool({
 
 // Tạo bảng nếu chưa có
 async function initDB() {
-    await pool.query(`
-        CREATE TABLE IF NOT EXISTS mbnt_data (
-            id SERIAL PRIMARY KEY,
-            data_type VARCHAR(50) NOT NULL,
-            data_json JSONB NOT NULL,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-        
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_data_type ON mbnt_data(data_type);
-    `);
-    console.log('✅ Database ready');
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS mbnt_data (
+                id SERIAL PRIMARY KEY,
+                data_type VARCHAR(50) NOT NULL,
+                data_json JSONB NOT NULL,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_data_type ON mbnt_data(data_type);
+        `);
+        console.log('✅ Database ready');
+    } catch (err) {
+        console.error('❌ Database error:', err.message);
+    }
 }
 initDB();
 
@@ -61,6 +66,11 @@ app.post('/api/data/:type', async (req, res) => {
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'OK' }));
+
+// Fallback cho SPA - đặt SAU tất cả API routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
