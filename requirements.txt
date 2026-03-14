@@ -1,0 +1,6 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.8.0
+python-multipart>=0.0.9          # nếu có form upload/file
+jinja2>=3.1.4                     # nếu dùng template HTML
+python-dotenv>=1.0.1
