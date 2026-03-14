@@ -5,888 +5,2780 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ - MBNT</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}:root{--primary-green:#1a5f3f;--secondary-green:#2ecc71;--light-green:#d5f5e3;--dark-green:#0e3d28;--accent-green:#27ae60;--white:#ffffff;--gray:#f5f5f5;--dark-gray:#333;--border:#ddd;--error:#e74c3c;--warning:#f39c12;--success:#27ae60}body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#f0f9f4 0%,#e8f5e9 100%);min-height:100vh;display:flex;flex-direction:column}.header{background:linear-gradient(135deg,var(--primary-green) 0%,var(--dark-green) 100%);color:white;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,0.15);position:fixed;top:0;left:0;right:0;z-index:1000;height:70px}.header-left{display:flex;align-items:center;gap:15px}.logo{width:50px;height:50px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;color:var(--primary-green);font-size:12px;text-align:center;line-height:1.2;box-shadow:0 2px 10px rgba(0,0,0,0.2)}.header-title{font-size:18px;font-weight:600;letter-spacing:0.5px}.header-right{display:flex;align-items:center;gap:20px}.user-info{text-align:right;font-size:14px}.user-name{font-weight:600}.user-dept{font-size:12px;opacity:0.9}.logout-btn{background:rgba(255,255,255,0.2);border:1px solid white;color:white;padding:8px 16px;border-radius:20px;cursor:pointer;transition:all 0.3s;font-size:13px}.logout-btn:hover{background:white;color:var(--primary-green)}.main-container{margin-top:70px;flex:1;display:flex;min-height:calc(100vh - 110px)}.sidebar{width:250px;background:white;border-right:1px solid var(--border);padding:20px 0;box-shadow:2px 0 10px rgba(0,0,0,0.05)}.nav-item{padding:15px 25px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent;display:flex;align-items:center;gap:12px;color:var(--dark-gray)}.nav-item:hover{background:var(--light-green);border-left-color:var(--secondary-green);color:var(--primary-green)}.nav-item.active{background:var(--light-green);border-left-color:var(--primary-green);color:var(--primary-green);font-weight:600}.nav-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center}.content{flex:1;padding:30px;overflow-y:auto}.page-title{font-size:24px;color:var(--primary-green);margin-bottom:25px;padding-bottom:10px;border-bottom:3px solid var(--secondary-green);display:flex;align-items:center;gap:10px}.card{background:white;border-radius:12px;padding:25px;margin-bottom:25px;box-shadow:0 4px 15px rgba(0,0,0,0.08);border:1px solid #e0e0e0}.card-header{font-size:18px;font-weight:600;color:var(--primary-green);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}.form-group{display:flex;flex-direction:column;gap:8px}.form-group label{font-weight:600;color:var(--dark-gray);font-size:14px}.form-control{padding:12px 15px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;transition:all 0.3s;background:white}.form-control:focus{outline:none;border-color:var(--secondary-green);box-shadow:0 0 0 3px rgba(46,204,113,0.1)}select.form-control{cursor:pointer}.btn{padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;font-size:14px;display:inline-flex;align-items:center;gap:8px}.btn-primary{background:linear-gradient(135deg,var(--secondary-green) 0%,var(--accent-green) 100%);color:white;box-shadow:0 4px 15px rgba(39,174,96,0.3)}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(39,174,96,0.4)}.btn-danger{background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:white}.btn-warning{background:linear-gradient(135deg,#f39c12 0%,#e67e22 100%);color:white}.btn-success{background:linear-gradient(135deg,#27ae60 0%,#229954 100%);color:white}.btn-secondary{background:#95a5a6;color:white}.btn-group{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}.table-container{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}table{width:100%;border-collapse:collapse;font-size:13px}th{background:linear-gradient(135deg,var(--primary-green) 0%,var(--dark-green) 100%);color:white;padding:14px;text-align:left;font-weight:600;white-space:nowrap}td{padding:12px 14px;border-bottom:1px solid #eee;color:var(--dark-gray)}tr:hover{background:#f8f9fa}.status-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;display:inline-block}.status-pending{background:#fff3cd;color:#856404}.status-success{background:#d4edda;color:#155724}.status-expired{background:#f8d7da;color:#721c24}.status-interrupted{background:#e2e3e5;color:#383d41}.login-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary-green) 0%,var(--dark-green) 100%);position:relative;overflow:hidden}.login-container::before{content:'';position:absolute;width:200%;height:200%;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,0.03) 10px,rgba(255,255,255,0.03) 20px);animation:slide 20s linear infinite}@keyframes slide{0%{transform:translate(-50%,-50%)}100%{transform:translate(0,0)}}.login-box{background:white;padding:40px;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);width:100%;max-width:450px;position:relative;z-index:1}.login-header{text-align:center;margin-bottom:30px}.login-logo{width:80px;height:80px;background:linear-gradient(135deg,var(--primary-green) 0%,var(--secondary-green) 100%);border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:24px;box-shadow:0 10px 30px rgba(26,95,63,0.3)}.login-title{font-size:24px;color:var(--primary-green);margin-bottom:10px}.login-subtitle{color:#666;font-size:14px}.login-form .form-group{margin-bottom:20px}.login-form input{width:100%}.password-hint{font-size:12px;color:#666;margin-top:5px;font-style:italic}.error-message{color:var(--error);font-size:13px;margin-top:5px;display:none}.chat-container{height:500px;display:flex;flex-direction:column;background:white;border-radius:12px;overflow:hidden;border:1px solid var(--border)}.chat-header{background:var(--primary-green);color:white;padding:15px;display:flex;justify-content:space-between;align-items:center}.chat-messages{flex:1;overflow-y:auto;padding:20px;background:#f8f9fa;display:flex;flex-direction:column}.message{margin-bottom:15px;max-width:70%;padding:12px 16px;border-radius:15px;position:relative;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.message-received{background:white;border:1px solid #e0e0e0;align-self:flex-start;border-bottom-left-radius:5px}.message-sent{background:linear-gradient(135deg,var(--secondary-green) 0%,var(--accent-green) 100%);color:white;align-self:flex-end;margin-left:auto;border-bottom-right-radius:5px}.message-time{font-size:11px;opacity:0.7;margin-top:5px}.chat-input-area{padding:15px;background:white;border-top:1px solid #eee;display:flex;gap:10px}.chat-input{flex:1;padding:12px;border:2px solid #e0e0e0;border-radius:25px;outline:none}.chat-input:focus{border-color:var(--secondary-green)}.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:20px}.user-card{background:white;border-radius:12px;padding:20px;border:1px solid var(--border);transition:all 0.3s}.user-card:hover{box-shadow:0 5px 20px rgba(0,0,0,0.1);transform:translateY(-2px)}.user-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.user-role{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}.role-admin{background:#e74c3c;color:white}.role-pnv{background:#3498db;color:white}.role-pql{background:#9b59b6;color:white}.role-bgd{background:#f39c12;color:white}.quote-panel{background:linear-gradient(135deg,#fff9e6 0%,#fff3cd 100%);border:2px solid #ffc107;border-radius:12px;padding:20px;margin-bottom:20px;position:relative;overflow:hidden}.quote-panel::before{content:'⚡';position:absolute;top:-10px;right:-10px;font-size:60px;opacity:0.1}.quote-header{font-size:16px;font-weight:600;color:#856404;margin-bottom:15px;display:flex;align-items:center;gap:10px}.countdown{font-size:24px;font-weight:bold;color:var(--error);font-family:monospace}.price-display{font-size:32px;font-weight:bold;color:var(--primary-green);text-align:center;margin:20px 0;font-family:'Courier New',monospace;text-shadow:2px 2px 4px rgba(0,0,0,0.1)}.footer{background:var(--dark-green);color:white;text-align:center;padding:15px;font-size:13px}.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center}.modal-overlay.active{display:flex}.modal{background:white;border-radius:16px;width:90%;max-width:800px;max-height:90vh;overflow-y:auto;animation:modalSlide 0.3s ease}@keyframes modalSlide{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}.modal-header{background:linear-gradient(135deg,var(--primary-green) 0%,var(--dark-green) 100%);color:white;padding:20px;border-radius:16px 16px 0 0}.modal-body{padding:25px}.modal-footer{padding:20px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:10px}.hidden{display:none !important}.text-center{text-align:center}.mt-20{margin-top:20px}.mb-20{margin-bottom:20px}.flex{display:flex}.flex-between{justify-content:space-between}.gap-10{gap:10px}.alert{padding:15px;border-radius:8px;margin-bottom:20px}.alert-info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}.alert-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}.alert-warning{background:#fff3cd;color:#856404;border:1px solid #ffeeba}.alert-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}.filter-section{background:#f8f9fa;padding:20px;border-radius:8px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:15px;align-items:end}.filter-group{display:flex;flex-direction:column;gap:5px}.filter-group label{font-size:13px;font-weight:600;color:#666}.filter-input{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px}@media(max-width:768px){.sidebar{width:100%;position:fixed;bottom:0;left:0;right:0;z-index:999;display:flex;overflow-x:auto;padding:0}.nav-item{flex-direction:column;padding:10px;min-width:80px;text-align:center;border-left:none;border-top:3px solid transparent}.nav-item.active{border-left:none;border-top-color:var(--primary-green)}.content{margin-bottom:80px;padding:15px}.header-title{font-size:14px}.form-grid{grid-template-columns:1fr}}@keyframes highlight{0%{background:var(--light-green)}100%{background:transparent}}.new-item{animation:highlight 2s ease}.spinner{border:3px solid #f3f3f3;border-top:3px solid var(--primary-green);border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin:20px auto}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;z-index:3000}.badge{position:absolute;top:-5px;right:-5px;background:var(--error);color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold}.nav-item{position:relative}.empty-state{text-align:center;padding:40px;color:#666}.empty-state-icon{font-size:48px;margin-bottom:15px}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #2E7D32;
+            --light-green: #4CAF50;
+            --dark-green: #1B5E20;
+            --bg-light: #E8F5E9;
+            --text-dark: #212121;
+            --white: #ffffff;
+            --gray: #757575;
+            --border: #C8E6C9;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --success: #4CAF50;
+            --info: #2196F3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--primary-green) 100%);
+            color: var(--white);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 70px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-green);
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .logo-text {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .page-title {
+            flex: 1;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .user-dept {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 70px;
+            margin-bottom: 50px;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-green);
+            color: var(--white);
+            text-align: center;
+            padding: 15px;
+            font-size: 13px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 120px);
+            padding: 20px;
+        }
+
+        .login-box {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            border-top: 5px solid var(--primary-green);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .login-header p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .password-hint {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-title {
+            font-size: 18px;
+            color: var(--primary-green);
+            font-weight: 700;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary-green);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-green);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab:hover {
+            color: var(--primary-green);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-info {
+            background: var(--info);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            color: var(--dark-green);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: var(--bg-light);
+        }
+
+        .status-success {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .status-pending {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .status-expired {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        /* Chat Styles */
+        .chat-container {
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .chat-message.sent {
+            background: var(--primary-green);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-message.received {
+            background: white;
+            color: var(--text-dark);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .chat-send {
+            width: auto;
+            padding: 12px 24px;
+            border-radius: 25px;
+        }
+
+        /* Admin Panel */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .user-card h4 {
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+
+        .user-info-text {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .user-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            color: var(--primary-green);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Price Quote Box */
+        .quote-box {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+            border: 2px solid var(--warning);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .quote-timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        .quote-price {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-green);
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .quote-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        /* Edit Form */
+        .edit-form {
+            background: #FFF8E1;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--warning);
+            margin-top: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+            }
+
+            .page-title {
+                font-size: 14px;
+                margin: 10px 0;
+            }
+
+            .main-content {
+                margin-top: 120px;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Interrupt Buttons */
+        .interrupt-bar {
+            background: #FFEBEE;
+            border: 2px solid var(--danger);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .interrupt-title {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        /* Pending Quote Item */
+        .pending-quote {
+            background: white;
+            border: 2px solid var(--info);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pending-quote:hover {
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+        }
+
+        .pending-quote-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .pending-quote-title {
+            font-weight: 700;
+            color: var(--info);
+        }
+
+        .pending-quote-time {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .pending-quote-details {
+            font-size: 13px;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay hidden">
-        <div class="spinner"></div>
-    </div>
-
-    <!-- Login Page -->
-    <div id="loginPage" class="login-container">
-        <div class="login-box">
-            <div class="login-header">
-                <div class="login-logo">VCB</div>
-                <h2 class="login-title">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</h2>
-                <p class="login-subtitle">Hệ thống quản lý giao dịch ngoại tệ</p>
+    <!-- Header -->
+    <header class="header" id="header" style="display: none;">
+        <div class="logo-section">
+            <div class="logo">VCB</div>
+            <div class="logo-text">NGÂN HÀNG<br>TMCP NGOẠI THƯƠNG</div>
+        </div>
+        <div class="page-title" id="pageTitle">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</div>
+        <div class="user-info">
+            <div class="user-details">
+                <div class="user-name" id="displayUserName">User Name</div>
+                <div class="user-dept" id="displayUserDept">Department</div>
             </div>
-            <form class="login-form" id="loginForm">
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Login Page -->
+        <div class="login-container" id="loginPage">
+            <div class="login-box">
+                <div class="login-header">
+                    <h2>🔐 ĐĂNG NHẬP HỆ THỐNG</h2>
+                    <p>GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</p>
+                </div>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="userId">ID Người dùng</label>
+                        <input type="text" id="userId" required placeholder="Nhập ID của bạn">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input type="password" id="password" required 
+                               placeholder="Ít nhất 8 ký tự: Hoa, thường, số, đặc biệt">
+                        <div class="password-hint">
+                            * Yêu cầu: 8+ ký tự, chữ hoa, chữ thường, số và ký tự đặc biệt
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">ĐĂNG NHẬP</button>
+                    <div class="error-msg" id="loginError"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div class="dashboard" id="adminDashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-title">👤 QUẢN LÝ NGƯỜI DÙNG</div>
+                <button class="btn btn-small" onclick="openAddUserModal()" style="width: auto;">
+                    + Thêm người dùng mới
+                </button>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('admin', 'users')">Danh sách Users</button>
+                <button class="tab" onclick="switchTab('admin', 'changePassword')">Đổi mật khẩu</button>
+            </div>
+
+            <div id="admin-users" class="tab-content active">
+                <div class="admin-grid" id="userList"></div>
+            </div>
+
+            <div id="admin-changePassword" class="tab-content">
+                <div class="card" style="max-width: 500px;">
+                    <div class="card-title">Đổi mật khẩu của bạn</div>
+                    <form onsubmit="handleChangePassword(event)">
+                        <div class="form-group">
+                            <label>Mật khẩu hiện tại</label>
+                            <input type="password" id="adminCurrentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu mới</label>
+                            <input type="password" id="adminNewPassword" required 
+                                   placeholder="Ít nhất 8 ký tự: Hoa, thường, số, đặc biệt">
+                        </div>
+                        <div class="form-group">
+                            <label>Xác nhận mật khẩu mới</label>
+                            <input type="password" id="adminConfirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn">Cập nhật mật khẩu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- PNV Dashboard -->
+        <div class="dashboard" id="pnvDashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-title">📊 DASHBOARD PHÒNG NGHIỆP VỤ</div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('pnv', 'askPrice')">Hỏi tỷ giá</button>
+                <button class="tab" onclick="switchTab('pnv', 'blotter')">Blotter PNV</button>
+                <button class="tab" onclick="switchTab('pnv', 'chat')">Chat</button>
+                <button class="tab" onclick="switchTab('pnv', 'changePassword')">Đổi mật khẩu</button>
+            </div>
+
+            <!-- Tab Hỏi tỷ giá -->
+            <div id="pnv-askPrice" class="tab-content active">
+                <div class="card">
+                    <div class="card-title">Thông tin giao dịch</div>
+                    <form id="askPriceForm" onsubmit="submitAskPrice(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>CIF (10 ký tự)</label>
+                                <input type="text" id="cif" maxlength="10" required 
+                                       onblur="lookupCustomerName()">
+                            </div>
+                            <div class="form-group">
+                                <label>Tên khách hàng</label>
+                                <input type="text" id="customerName" readonly 
+                                       placeholder="Tự động hiển thị từ CIF">
+                            </div>
+                            <div class="form-group">
+                                <label>Chiều giao dịch</label>
+                                <select id="transactionType" required onchange="updatePurposeLabel()">
+                                    <option value="">Chọn...</option>
+                                    <option value="buy">VCB MUA</option>
+                                    <option value="sell">VCB BÁN</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ngày giao dịch</label>
+                                <input type="text" id="transactionDate" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Ngày hiệu lực (ddmmyyyy)</label>
+                                <input type="text" id="effectiveDate" maxlength="8" required 
+                                       placeholder="Ví dụ: 15032026">
+                            </div>
+                            <div class="form-group">
+                                <label>Mã tiền tệ giao dịch</label>
+                                <select id="currencyCode" required>
+                                    <option value="">Chọn...</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="JPY">JPY</option>
+                                    <option value="AUD">AUD</option>
+                                    <option value="SGD">SGD</option>
+                                    <option value="THB">THB</option>
+                                    <option value="CAD">CAD</option>
+                                    <option value="CHF">CHF</option>
+                                    <option value="HKD">HKD</option>
+                                    <option value="DKK">DKK</option>
+                                    <option value="KRW">KRW</option>
+                                    <option value="NOK">NOK</option>
+                                    <option value="SEK">SEK</option>
+                                    <option value="VND">VND</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Đồng tiền mua</label>
+                                <select id="buyCurrency" required>
+                                    <option value="">Chọn...</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="JPY">JPY</option>
+                                    <option value="AUD">AUD</option>
+                                    <option value="SGD">SGD</option>
+                                    <option value="THB">THB</option>
+                                    <option value="CAD">CAD</option>
+                                    <option value="CHF">CHF</option>
+                                    <option value="HKD">HKD</option>
+                                    <option value="DKK">DKK</option>
+                                    <option value="KRW">KRW</option>
+                                    <option value="NOK">NOK</option>
+                                    <option value="SEK">SEK</option>
+                                    <option value="VND">VND</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Đồng tiền bán</label>
+                                <select id="sellCurrency" required>
+                                    <option value="">Chọn...</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="JPY">JPY</option>
+                                    <option value="AUD">AUD</option>
+                                    <option value="SGD">SGD</option>
+                                    <option value="THB">THB</option>
+                                    <option value="CAD">CAD</option>
+                                    <option value="CHF">CHF</option>
+                                    <option value="HKD">HKD</option>
+                                    <option value="DKK">DKK</option>
+                                    <option value="KRW">KRW</option>
+                                    <option value="NOK">NOK</option>
+                                    <option value="SEK">SEK</option>
+                                    <option value="VND">VND</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Số lượng ngoại tệ giao dịch</label>
+                                <input type="number" id="amount" required step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label id="purposeLabel">Mục đích/Nguồn (1-12)</label>
+                                <input type="number" id="purpose" min="1" max="12" required>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn">Gửi hỏi giá</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Quote Response Area -->
+                <div id="quoteResponse" class="hidden">
+                    <div class="quote-box">
+                        <div class="quote-header">
+                            <span style="font-weight: 600;">Tỷ giá từ PQL</span>
+                            <span class="quote-timer" id="quoteTimer">02:00</span>
+                        </div>
+                        <div class="quote-price" id="quotePrice">23,450.00</div>
+                        <div style="text-align: center; color: #666; margin-bottom: 15px;">
+                            <span id="quotePair">VND/USD</span> | Thời gian còn lại để chấp nhận
+                        </div>
+                        <div class="quote-actions">
+                            <button class="btn btn-small" onclick="acceptPrice()" style="background: var(--success);">
+                                ✓ Chấp nhận giá
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="rejectPrice()">
+                                ✗ Từ chối giá
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Blotter -->
+            <div id="pnv-blotter" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Lịch sử giao dịch thành công</div>
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label>Từ ngày</label>
+                                <input type="date" id="pnvFilterFromDate">
+                            </div>
+                            <div class="filter-group">
+                                <label>Đến ngày</label>
+                                <input type="date" id="pnvFilterToDate">
+                            </div>
+                            <div class="filter-group">
+                                <label>Mã tiền tệ</label>
+                                <select id="pnvFilterCurrency">
+                                    <option value="">Tất cả</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="JPY">JPY</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-small" onclick="filterPnvBlotter()" style="width: auto;">
+                                Lọc
+                            </button>
+                            <button class="btn btn-small btn-secondary" onclick="exportPnvBlotter('excel')" style="width: auto;">
+                                📊 Excel
+                            </button>
+                            <button class="btn btn-small btn-secondary" onclick="exportPnvBlotter('pdf')" style="width: auto;">
+                                📄 PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="pnvBlotterTable">
+                            <thead>
+                                <tr>
+                                    <th>Ngày GD</th>
+                                    <th>Ngày hiệu lực</th>
+                                    <th>CIF</th>
+                                    <th>Tên KH</th>
+                                    <th>Chiều GD</th>
+                                    <th>Mua</th>
+                                    <th>Bán</th>
+                                    <th>Số lượng</th>
+                                    <th>Tỷ giá</th>
+                                    <th>Thành tiền</th>
+                                    <th>Loại</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pnvBlotterBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Chat -->
+            <div id="pnv-chat" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Chat với Phòng Quản lý</div>
+                    <div class="chat-container">
+                        <div class="chat-messages" id="pnvChatMessages">
+                            <div class="chat-message received">
+                                <strong>Hệ thống:</strong><br>
+                                Chào mừng! Bạn có thể chat trực tiếp với PQL tại đây.
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" class="chat-input" id="pnvChatInput" 
+                                   placeholder="Nhập tin nhắn..." onkeypress="handleChatKeyPress(event)">
+                            <button class="btn chat-send" onclick="sendChatMessage()">Gửi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Đổi mật khẩu -->
+            <div id="pnv-changePassword" class="tab-content">
+                <div class="card" style="max-width: 500px;">
+                    <div class="card-title">Đổi mật khẩu</div>
+                    <form onsubmit="handleChangePassword(event)">
+                        <div class="form-group">
+                            <label>Mật khẩu hiện tại</label>
+                            <input type="password" id="pnvCurrentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu mới</label>
+                            <input type="password" id="pnvNewPassword" required 
+                                   placeholder="Ít nhất 8 ký tự: Hoa, thường, số, đặc biệt">
+                        </div>
+                        <div class="form-group">
+                            <label>Xác nhận mật khẩu mới</label>
+                            <input type="password" id="pnvConfirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn">Cập nhật mật khẩu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- PQL Dashboard -->
+        <div class="dashboard" id="pqlDashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-title">📊 DASHBOARD PHÒNG QUẢN LÝ</div>
+            </div>
+
+            <div class="interrupt-bar">
+                <div class="interrupt-title">⚠️ QUYỀN KHẨN CẤP</div>
+                <div class="btn-group" style="margin: 0;">
+                    <button class="btn btn-small btn-danger" onclick="interruptCurrent()">Interrupt</button>
+                    <button class="btn btn-small btn-danger" onclick="interruptAll()">Interrupt All</button>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('pql', 'dataEntry')">Nhập dữ liệu</button>
+                <button class="tab" onclick="switchTab('pql', 'quotes')">Chào giá</button>
+                <button class="tab" onclick="switchTab('pql', 'blotter')">Blotter PQL</button>
+                <button class="tab" onclick="switchTab('pql', 'reports')">Báo cáo</button>
+                <button class="tab" onclick="switchTab('pql', 'chat')">Chat</button>
+                <button class="tab" onclick="switchTab('pql', 'changePassword')">Đổi mật khẩu</button>
+            </div>
+
+            <!-- Tab Nhập dữ liệu -->
+            <div id="pql-dataEntry" class="tab-content active">
+                <div class="card">
+                    <div class="card-title">Upload dữ liệu CIF - Tên KH</div>
+                    <form onsubmit="uploadCIFData(event)">
+                        <div class="form-group">
+                            <label>Chọn file Excel/CSV</label>
+                            <input type="file" id="cifFile" accept=".xlsx,.csv,.xls">
+                        </div>
+                        <div class="form-group">
+                            <label>Hoặc nhập thủ công (CIF,Tên KH mỗi dòng)</label>
+                            <textarea id="cifManualData" rows="10" style="width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-family: monospace;" 
+                                      placeholder="1234567890,CÔNG TY TNHH ABC&#10;0987654321,TẬP ĐOÀN XYZ&#10;1122334455,NGÂN HÀNG DEF"></textarea>
+                        </div>
+                        <button type="submit" class="btn">Lưu dữ liệu CIF</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Danh sách CIF hiện tại</div>
+                    <div class="table-container">
+                        <table id="cifTable">
+                            <thead>
+                                <tr>
+                                    <th>CIF</th>
+                                    <th>Tên khách hàng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cifTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Chào giá -->
+            <div id="pql-quotes" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Yêu cầu hỏi giá đang chờ</div>
+                    <div id="pendingQuotes">
+                        <div style="padding: 20px; text-align: center; color: var(--gray);">
+                            Không có yêu cầu nào đang chờ
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card hidden" id="quoteFormCard">
+                    <div class="card-title">Chào giá chi tiết</div>
+                    <form id="quoteForm" onsubmit="submitQuote(event)">
+                        <input type="hidden" id="quoteRequestId">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>PNV yêu cầu</label>
+                                    <input type="text" id="quotePnv" readonly>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>CIF</label>
+                                    <input type="text" id="quoteCif" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Tên khách hàng</label>
+                                    <input type="text" id="quoteCifName" readonly>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Chiều giao dịch</label>
+                                    <input type="text" id="quoteDirection" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Đồng tiền mua</label>
+                                    <input type="text" id="quoteBuyCurr" readonly>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Đồng tiền bán</label>
+                                    <input type="text" id="quoteSellCurr" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Số lượng giao dịch</label>
+                                    <input type="text" id="quoteAmount" readonly>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Ngày hiệu lực</label>
+                                    <input type="text" id="quoteEffDate" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Tỷ giá chào</label>
+                                    <input type="number" id="quoteRate" step="0.0001" required 
+                                           placeholder="Nhập tỷ giá (VD: 25350.50)">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Thời gian hiệu lực (phút)</label>
+                                    <input type="number" id="quoteDuration" min="1" max="10" value="2" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn">Gửi chào giá</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelQuote()">Hủy</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab Blotter PQL -->
+            <div id="pql-blotter" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Tất cả giao dịch thành công</div>
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label>PNV</label>
+                                <select id="pqlFilterPnv">
+                                    <option value="">Tất cả PNV</option>
+                                    <option value="K1">KHDN1 (K1)</option>
+                                    <option value="L1">KHBL1 (L1)</option>
+                                    <option value="TN">DV KHTN (TN)</option>
+                                    <option value="T1">DVKHTC1 (T1)</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Từ ngày</label>
+                                <input type="date" id="pqlFilterFrom">
+                            </div>
+                            <div class="filter-group">
+                                <label>Đến ngày</label>
+                                <input type="date" id="pqlFilterTo">
+                            </div>
+                            <div class="filter-group">
+                                <label>Trạng thái</label>
+                                <select id="pqlFilterStatus">
+                                    <option value="">Tất cả</option>
+                                    <option value="Thành công">Thành công</option>
+                                    <option value="Đã sửa">Đã sửa</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-small" onclick="filterPqlBlotter()" style="width: auto;">Lọc</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportPqlBlotter('excel')" style="width: auto;">Excel</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportPqlBlotter('pdf')" style="width: auto;">PDF</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="pqlBlotterTable">
+                            <thead>
+                                <tr>
+                                    <th>PNV</th>
+                                    <th>Ngày GD</th>
+                                    <th>Ngày hiệu lực</th>
+                                    <th>CIF</th>
+                                    <th>Tên KH</th>
+                                    <th>Chiều</th>
+                                    <th>Mua</th>
+                                    <th>Bán</th>
+                                    <th>Số lượng</th>
+                                    <th>Tỷ giá</th>
+                                    <th>Tương đương</th>
+                                    <th>Loại</th>
+                                    <th>Người sửa</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pqlBlotterBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Báo cáo -->
+            <div id="pql-reports" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Báo cáo giao dịch</div>
+                    <div class="filter-section">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Ngày giao dịch từ</label>
+                                    <input type="date" id="reportTransFrom">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Ngày giao dịch đến</label>
+                                    <input type="date" id="reportTransTo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Ngày hiệu lực từ</label>
+                                    <input type="date" id="reportEffFrom">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Ngày hiệu lực đến</label>
+                                    <input type="date" id="reportEffTo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Mã đồng tiền bán</label>
+                                    <select id="reportSellCurr">
+                                        <option value="">Tất cả</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="JPY">JPY</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Mã đồng tiền mua</label>
+                                    <select id="reportBuyCurr">
+                                        <option value="">Tất cả</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="VND">VND</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Mã PNV</label>
+                                    <select id="reportPnv">
+                                        <option value="">Tất cả</option>
+                                        <option value="K1">K1</option>
+                                        <option value="L1">L1</option>
+                                        <option value="TN">TN</option>
+                                        <option value="T1">T1</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Loại giao dịch</label>
+                                    <select id="reportType">
+                                        <option value="">Tất cả</option>
+                                        <option value="GN">GN (Giao ngay)</option>
+                                        <option value="KH">KH (Kỳ hạn)</option>
+                                        <option value="HĐ">HĐ (Hợp đồng)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-small" onclick="generateReport()" style="width: auto;">Xem báo cáo</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportReport('excel')" style="width: auto;">Xuất Excel</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportReport('pdf')" style="width: auto;">Xuất PDF</button>
+                        </div>
+                    </div>
+                    <div id="reportResult" class="table-container" style="margin-top: 20px;">
+                        <div style="padding: 40px; text-align: center; color: var(--gray);">
+                            Vui lòng chọn điều kiện lọc và nhấn "Xem báo cáo"
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Chat -->
+            <div id="pql-chat" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Chat với Phòng Nghiệp vụ</div>
+                    <div class="chat-container">
+                        <div class="chat-messages" id="pqlChatMessages">
+                            <div class="chat-message received">
+                                <strong>Hệ thống:</strong><br>
+                                Sẵn sàng nhận tin nhắn từ PNV.
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" class="chat-input" id="pqlChatInput" 
+                                   placeholder="Nhập tin nhắn..." onkeypress="handlePqlChatKeyPress(event)">
+                            <button class="btn chat-send" onclick="sendPqlChatMessage()">Gửi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Đổi mật khẩu -->
+            <div id="pql-changePassword" class="tab-content">
+                <div class="card" style="max-width: 500px;">
+                    <div class="card-title">Đổi mật khẩu</div>
+                    <form onsubmit="handleChangePassword(event)">
+                        <div class="form-group">
+                            <label>Mật khẩu hiện tại</label>
+                            <input type="password" id="pqlCurrentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu mới</label>
+                            <input type="password" id="pqlNewPassword" required 
+                                   placeholder="Ít nhất 8 ký tự: Hoa, thường, số, đặc biệt">
+                        </div>
+                        <div class="form-group">
+                            <label>Xác nhận mật khẩu mới</label>
+                            <input type="password" id="pqlConfirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn">Cập nhật mật khẩu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- BGĐ Dashboard -->
+        <div class="dashboard" id="bgdDashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-title">📊 DASHBOARD BAN GIÁM ĐỐC</div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('bgd', 'viewOnly')">Xem giao dịch</button>
+                <button class="tab" onclick="switchTab('bgd', 'changePassword')">Đổi mật khẩu</button>
+            </div>
+
+            <div id="bgd-viewOnly" class="tab-content active">
+                <div class="card">
+                    <div class="card-title">Giao dịch của PNV thuộc quản lý</div>
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label>Chọn PNV</label>
+                                <select id="bgdFilterPnv">
+                                    <option value="">Tất cả PNV</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Từ ngày</label>
+                                <input type="date" id="bgdFromDate">
+                            </div>
+                            <div class="filter-group">
+                                <label>Đến ngày</label>
+                                <input type="date" id="bgdToDate">
+                            </div>
+                            <button class="btn btn-small" onclick="filterBgdView()" style="width: auto;">Xem</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportBgdView('excel')" style="width: auto;">Excel</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="bgdTable">
+                            <thead>
+                                <tr>
+                                    <th>PNV</th>
+                                    <th>Ngày GD</th>
+                                    <th>Ngày hiệu lực</th>
+                                    <th>CIF</th>
+                                    <th>KH</th>
+                                    <th>Chiều</th>
+                                    <th>Mua</th>
+                                    <th>Bán</th>
+                                    <th>Số tiền</th>
+                                    <th>Tỷ giá</th>
+                                    <th>Loại</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bgdViewBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bgd-changePassword" class="tab-content">
+                <div class="card" style="max-width: 500px;">
+                    <div class="card-title">Đổi mật khẩu</div>
+                    <form onsubmit="handleChangePassword(event)">
+                        <div class="form-group">
+                            <label>Mật khẩu hiện tại</label>
+                            <input type="password" id="bgdCurrentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu mới</label>
+                            <input type="password" id="bgdNewPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Xác nhận mật khẩu mới</label>
+                            <input type="password" id="bgdConfirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn">Cập nhật mật khẩu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="footer" style="display: none;">
+        <span>Developed by MBNT Development Team | © 2026 Vietcombank</span>
+    </footer>
+
+    <!-- Modal Thêm User -->
+    <div class="modal" id="addUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Thêm người dùng mới</h3>
+                <button class="close-btn" onclick="closeAddUserModal()">&times;</button>
+            </div>
+            <form onsubmit="handleAddUser(event)">
                 <div class="form-group">
                     <label>ID Người dùng</label>
-                    <input type="text" class="form-control" id="loginId" placeholder="Nhập ID của bạn" required autocomplete="username">
+                    <input type="text" id="newUserId" required>
                 </div>
                 <div class="form-group">
-                    <label>Mật khẩu</label>
-                    <input type="password" class="form-control" id="loginPassword" placeholder="Ít nhất 8 ký tự: Hoa, thường, số, đặc biệt" required autocomplete="current-password">
-                    <div class="password-hint">Ví dụ hợp lệ: Vcb@1234, MyPass#2024</div>
-                    <div class="error-message" id="loginError"></div>
+                    <label>Họ tên</label>
+                    <input type="text" id="newUserName" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
-                    <span id="loginBtnText">ĐĂNG NHẬP</span>
-                </button>
+                <div class="form-group">
+                    <label>Phòng ban</label>
+                    <select id="newUserDept" required onchange="updateUserRole()">
+                        <option value="">Chọn phòng ban...</option>
+                        <option value="PNV-K1">KHDN1 (K1)</option>
+                        <option value="PNV-L1">KHBL1 (L1)</option>
+                        <option value="PNV-TN">DV KHTN (TN)</option>
+                        <option value="PNV-T1">DVKHTC1 (T1)</option>
+                        <option value="PNV-TĐT">PGD TĐT</option>
+                        <option value="PQL-KT">PQL - Kế toán</option>
+                        <option value="BGD">Ban Giám đốc</option>
+                    </select>
+                </div>
+                <div class="form-group" id="managerSelect" style="display: none;">
+                    <label>Quản lý bởi (BGĐ)</label>
+                    <select id="newUserManager">
+                        <option value="">Chọn BGĐ quản lý...</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn">Thêm user</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddUserModal()">Hủy</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- Main Application -->
-    <div id="mainApp" class="hidden">
-        <!-- Rate Ticker -->
-        <div id="rateTicker" class="rate-ticker hidden">
-            <div class="rate-item">
-                <span>USD/VND:</span>
-                <span class="rate-value" id="rateUSD">24,850</span>
-                <span class="rate-change rate-up" id="changeUSD">+0.15%</span>
+    <!-- Modal Edit Transaction -->
+    <div class="modal" id="editTransactionModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Chỉnh sửa giao dịch</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
             </div>
-            <div class="rate-item">
-                <span>EUR/VND:</span>
-                <span class="rate-value" id="rateEUR">27,120</span>
-                <span class="rate-change rate-down" id="changeEUR">-0.08%</span>
-            </div>
-            <div class="rate-item">
-                <span>GBP/VND:</span>
-                <span class="rate-value" id="rateGBP">31,450</span>
-                <span class="rate-change rate-up" id="changeGBP">+0.22%</span>
-            </div>
-            <div class="rate-item">
-                <span>JPY/VND:</span>
-                <span class="rate-value" id="rateJPY">165.20</span>
-                <span class="rate-change rate-down" id="changeJPY">-0.05%</span>
-            </div>
-            <div class="rate-item">
-                <span>Cập nhật:</span>
-                <span id="lastUpdate">10:45:22</span>
-            </div>
-        </div>
-
-        <header class="header">
-            <div class="header-left">
-                <div class="logo">VCB<br>MBNT</div>
-                <div class="header-title" id="pageTitle">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</div>
-            </div>
-            <div class="header-right">
-                <div class="user-info">
-                    <div class="user-name" id="displayUserName">User Name</div>
-                    <div class="user-dept" id="displayUserDept">Phòng ban</div>
+            <form id="editTransactionForm" onsubmit="saveEditTransaction(event)">
+                <input type="hidden" id="editTransId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>CIF</label>
+                        <input type="text" id="editCif" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên KH</label>
+                        <input type="text" id="editCifName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày hiệu lực</label>
+                        <input type="text" id="editEffDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Đồng tiền mua</label>
+                        <select id="editBuyCurr" required>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                            <option value="JPY">JPY</option>
+                            <option value="VND">VND</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Đồng tiền bán</label>
+                        <select id="editSellCurr" required>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                            <option value="JPY">JPY</option>
+                            <option value="VND">VND</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Số lượng</label>
+                        <input type="number" id="editAmount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tỷ giá</label>
+                        <input type="number" id="editRate" step="0.0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Loại giao dịch</label>
+                        <select id="editType" required>
+                            <option value="GN">GN - Giao ngay</option>
+                            <option value="KH">KH - Kỳ hạn</option>
+                            <option value="HĐ">HĐ - Hợp đồng</option>
+                        </select>
+                    </div>
                 </div>
-                <button class="logout-btn" onclick="logout()">Đăng xuất</button>
-            </div>
-        </header>
-
-        <div class="main-container" id="mainContainer">
-            <nav class="sidebar" id="sidebar"></nav>
-            <main class="content" id="contentArea"></main>
-        </div>
-
-        <footer class="footer">
-            <div>Developer: MBNT System Team | © 2026 Vietcombank. All rights reserved.</div>
-        </footer>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal" id="modal">
-            <div class="modal-header" id="modalHeader">
-                <h3 id="modalTitle">Title</h3>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-            <div class="modal-footer" id="modalFooter">
-                <button class="btn btn-secondary" onclick="closeModal()">Đóng</button>
-            </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn">Lưu thay đổi</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Hủy</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" onclick="toggleTheme()" title="Chuyển đổi giao diện">🌓</button>
-
-    <!-- Help Panel -->
-    <div class="help-panel" id="helpPanel">
-        <div class="help-header">
-            <h3>📚 Hướng dẫn sử dụng</h3>
-            <span class="help-close" onclick="toggleHelp()">×</span>
-        </div>
-        <div class="help-content">
-            <div class="help-section">
-                <div class="help-title">🚀 Phím tắt nhanh</div>
-                <div class="shortcut-row"><span>Ctrl + N</span><span class="keyboard-shortcut">Tạo giao dịch mới</span></div>
-                <div class="shortcut-row"><span>Ctrl + F</span><span class="keyboard-shortcut">Tìm kiếm</span></div>
-                <div class="shortcut-row"><span>Ctrl + Enter</span><span class="keyboard-shortcut">Gửi tin nhắn</span></div>
-                <div class="shortcut-row"><span>Esc</span><span class="keyboard-shortcut">Đóng modal</span></div>
-            </div>
-            <div class="help-section">
-                <div class="help-title">💡 Mẹo sử dụng</div>
-                <p class="help-text">• Hỏi tỷ giá realtime trong 30 giây<br>• Chat trực tiếp Phòng Quản lý<br>• Xem lịch sử trong Blotter<br>• Bật dark mode ban đêm</p>
-            </div>
-            <div class="help-section">
-                <div class="help-title">⚠️ Lưu ý bảo mật</div>
-                <p class="help-text">• Không chia sẻ mật khẩu<br>• Đăng xuất khi rời máy<br>• Báo cáo giao dịch bất thường</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Help Toggle Button -->
-    <button class="help-toggle" onclick="toggleHelp()" title="Trợ giúp">❓</button>
-
-    <!-- Floating Action Button -->
-    <button class="floating-action-btn" id="fab" onclick="toggleFabMenu()">+</button>
-    <div class="fab-menu" id="fabMenu">
-        <div class="fab-item" onclick="quickAction('new')"><div class="fab-item-btn">📝</div><span class="fab-item-label">Tạo mới</span></div>
-        <div class="fab-item" onclick="quickAction('chat')"><div class="fab-item-btn">💬</div><span class="fab-item-label">Chat nhanh</span></div>
-        <div class="fab-item" onclick="quickAction('refresh')"><div class="fab-item-btn">🔄</div><span class="fab-item-label">Làm mới</span></div>
-    </div>
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
 
     <script>
-        // ==================== CẤU HÌNH & DỮ LIỆU ====================
-        const API_URL = window.location.origin.includes('localhost') ? 'http://localhost:3000/api' : '/api';
-        let isOnline = false;
+        // ==========================================
+        // GLOBAL STATE & CONFIGURATION
+        // ==========================================
+        let currentUser = null;
+        let quoteTimer = null;
+        let quoteExpiryTime = null;
+        let currentQuoteId = null;
+        let editingTransactionId = null;
 
-        async function testAPI() {
-            try {
-                await fetch(`${API_URL}/health`, {method:'GET', mode:'no-cors'});
-                isOnline = true;
-            } catch {
-                isOnline = false;
-            }
-        }
+        // ==========================================
+        // MOCK DATA INITIALIZATION
+        // ==========================================
+        let mockUsers = [
+            { id: 'admin', name: 'Administrator', dept: 'IT', role: 'admin', password: 'Vcb@1234', manager: null },
+            { id: 'K001', name: 'Nguyễn Văn A', dept: 'KHDN1 (K1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
+            { id: 'L001', name: 'Trần Thị B', dept: 'KHBL1 (L1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
+            { id: 'TN001', name: 'Lê Văn C', dept: 'DV KHTN (TN)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
+            { id: 'KT001', name: 'Phạm Văn C', dept: 'PQL - Kế toán', role: 'PQL', password: 'Vcb@1234', manager: null },
+            { id: 'BGD001', name: 'Lê Văn D', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null },
+            { id: 'BGD002', name: 'Nguyễn Thị E', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null }
+        ];
 
-        async function apiSave(type, data) {
-            if (!isOnline) {
-                localStorage.setItem(`mbnt_${type}`, JSON.stringify(data));
-                return {success:true, offline:true};
-            }
-            try {
-                const res = await fetch(`${API_URL}/data/${type}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({data})
-                });
-                return await res.json();
-            } catch {
-                localStorage.setItem(`mbnt_${type}`, JSON.stringify(data));
-                return {success:false};
-            }
-        }
-
-        async function apiLoad(type) {
-            const local = localStorage.getItem(`mbnt_${type}`);
-            let localData = local ? JSON.parse(local) : null;
-            if (!isOnline) return localData;
-            try {
-                const res = await fetch(`${API_URL}/data/${type}`);
-                const server = await res.json();
-                return server && Object.keys(server).length ? server : localData;
-            } catch {
-                return localData;
-            }
-        }
-
-        const DB = {
-            users: [
-                {id:'admin', password:'Vcb@1234', name:'Administrator', role:'admin', dept:'IT Admin'},
-                {id:'K1_001', password:'Vcb@1234', name:'Nguyễn Văn A', role:'pnv', dept:'KHDN1'},
-                {id:'L1_001', password:'Vcb@1234', name:'Trần Thị B', role:'pnv', dept:'KHBL1'},
-                {id:'T1_001', password:'Vcb@1234', name:'Lê Văn C', role:'pnv', dept:'DVKHTC1'},
-                {id:'KT_001', password:'Vcb@1234', name:'Phạm Thị D', role:'pql', dept:'Phòng Quản lý'},
-                {id:'BGD_001', password:'Vcb@1234', name:'Giám đốc E', role:'bgd', dept:'Ban Giám đốc'}
-            ],
-            cifData: [
-                {cif:'0000095531', name:'CT TNHH DV DL HOAN MY'},
-                {cif:'0000096478', name:'CT TNHH TM SON DAU MOTO KIEU'},
-                {cif:'0000096544', name:'CT TNHH TM TIC TAC'},
-                {cif:'0000097231', name:'CT TNHH A.D.V'},
-                {cif:'0000098065', name:'TCT DL SAI GON-TNHH MTV'},
-                {cif:'0013664616', name:'CNCT TNHH THE ONLY GROUP'},
-                {cif:'0025016417', name:'CT TNHH SEALINK INTERNATIONAL'},
-                {cif:'0029543111', name:'CT TNHH CA PHE BAU CAN'}
-            ],
-            purposes: [
-                {code:'1', name:'Thanh toán nhập khẩu hàng hóa'},
-                {code:'2', name:'Thanh toán nhập khẩu dịch vụ'},
-                {code:'3', name:'Chuyển tiền một chiều'},
-                {code:'4', name:'Chuyển thu nhập từ hoạt động đầu tư'},
-                {code:'8', name:'Giải ngân vốn vay trong nước'},
-                {code:'11', name:'Nguồn khác'},
-                {code:'12', name:'Mục đích khác'}
-            ],
-            currencies: ['USD','EUR','GBP','JPY','AUD','SGD','THB','CAD','CHF','HKD','DKK','KRW','NOK','SEK','VND'],
-            transactions: [],
-            chatMessages: [],
-            pendingQuotes: [],
-            rates: {
-                USD: {buy:24850, sell:24950, change:0.15},
-                EUR: {buy:27120, sell:27250, change:-0.08},
-                GBP: {buy:31450, sell:31600, change:0.22},
-                JPY: {buy:165.2, sell:166.5, change:-0.05}
-            }
+        let mockCIF = {
+            '1234567890': 'CÔNG TY TNHH ABC',
+            '0987654321': 'TẬP ĐOÀN XYZ',
+            '1122334455': 'NGÂN HÀNG DEF',
+            '2233445566': 'CÔNG TY CP GHI',
+            '3344556677': 'TẬP ĐOÀN JKL'
         };
 
-        let currentUser = null;
-        let currentPage = '';
-        let quoteTimers = {};
-        let autoSaveInterval;
-        let isDarkMode = false;
-        let currentQuote = null;
-
-        // ==================== UTILITY ====================
-        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2,9); }
-        function formatDate(d = new Date()) { return d.toLocaleDateString('vi-VN'); }
-        function formatDateTime(d) { return d ? new Date(d).toLocaleString('vi-VN') : '-'; }
-        function formatNumber(n) { return new Intl.NumberFormat('vi-VN').format(n); }
-        function formatCurrency(n, c = '') { return formatNumber(n) + ' ' + c; }
-
-        function showLoading(show) {
-            document.getElementById('loadingOverlay').classList.toggle('hidden', !show);
-        }
-
-        function showModal() { document.getElementById('modalOverlay').classList.add('active'); }
-        function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
-
-        function showNotification(msg, type='success', dur=3000) {
-            const t = document.createElement('div');
-            t.className = `notification-toast ${type}`;
-            t.innerHTML = `
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <span style="font-size:24px;">${type==='success'?'✅':type==='error'?'❌':'⚠️'}</span>
-                    <div><div style="font-weight:600">${type==='success'?'Thành công':type==='error'?'Lỗi':'Cảnh báo'}</div><div style="font-size:13px">${msg}</div></div>
-                </div>
-                <span class="toast-close" onclick="this.parentElement.remove()">×</span>
-            `;
-            document.body.appendChild(t);
-            setTimeout(()=>t.remove(), dur);
-        }
-
-        function showConfetti() {
-            for(let i=0; i<100; i++){
-                setTimeout(()=>{
-                    const c = document.createElement('div');
-                    c.className = 'confetti-piece';
-                    c.style.left = Math.random()*100 + 'vw';
-                    c.style.background = ['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff'][Math.floor(Math.random()*6)];
-                    document.body.appendChild(c);
-                    c.animate([
-                        {transform:'translateY(-100vh) rotate(0deg)', opacity:1},
-                        {transform:`translateY(${window.innerHeight}px) rotate(${Math.random()*720}deg)`, opacity:0}
-                    ], {duration: Math.random()*3000+2000, easing:'ease-out'}).onfinish = ()=>c.remove();
-                }, i*30);
+        let mockTransactions = [
+            {
+                id: 1,
+                pnv: 'K001',
+                pnvName: 'Nguyễn Văn A',
+                date: '15/03/2026',
+                effectiveDate: '17/03/2026',
+                cif: '1234567890',
+                customerName: 'CÔNG TY TNHH ABC',
+                direction: 'MUA',
+                buyCurr: 'USD',
+                sellCurr: 'VND',
+                amount: 100000,
+                rate: 25350.00,
+                equivalent: 2535000000,
+                type: 'GN',
+                status: 'Thành công',
+                purpose: '1',
+                editedBy: null,
+                editTime: null
+            },
+            {
+                id: 2,
+                pnv: 'L001',
+                pnvName: 'Trần Thị B',
+                date: '14/03/2026',
+                effectiveDate: '16/03/2026',
+                cif: '0987654321',
+                customerName: 'TẬP ĐOÀN XYZ',
+                direction: 'BÁN',
+                buyCurr: 'VND',
+                sellCurr: 'EUR',
+                amount: 50000,
+                rate: 27500.00,
+                equivalent: 1375000000,
+                type: 'GN',
+                status: 'Thành công',
+                purpose: '2',
+                editedBy: null,
+                editTime: null
             }
+        ];
+
+        let pendingQuotes = [];
+        let chatMessages = [];
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        function formatDate(date) {
+            return date.toLocaleDateString('vi-VN');
         }
 
-        // ==================== THEME ====================
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            localStorage.setItem('mbnt_dark_mode', isDarkMode);
-            showNotification(isDarkMode ? 'Dark Mode bật' : 'Dark Mode tắt', 'success');
+        function formatDateYYYYMMDD(date) {
+            const d = new Date(date);
+            return d.toISOString().split('T')[0];
         }
 
-        function toggleHelp() {
-            document.getElementById('helpPanel').classList.toggle('active');
-        }
-
-        function toggleFabMenu() {
-            document.getElementById('fabMenu').classList.toggle('active');
-        }
-
-        function quickAction(action) {
-            document.getElementById('fabMenu').classList.remove('active');
-            switch(action) {
-                case 'new':
-                    if (currentUser?.role === 'pnv') showPage('askRate');
-                    else if (currentUser?.role === 'admin') showPage('adminUsers');
-                    break;
-                case 'chat':
-                    showPage('chat');
-                    break;
-                case 'refresh':
-                    if (currentPage) showPage(currentPage);
-                    showNotification('Đã làm mới dữ liệu', 'success');
-                    break;
+        function parseDate(dateStr) {
+            // Parse dd/mm/yyyy or ddmmyyyy
+            if (dateStr.length === 8 && !dateStr.includes('/')) {
+                const day = dateStr.substring(0, 2);
+                const month = dateStr.substring(2, 4);
+                const year = dateStr.substring(4, 8);
+                return new Date(year, month - 1, day);
             }
+            const parts = dateStr.split('/');
+            return new Date(parts[2], parts[1] - 1, parts[0]);
         }
 
-        // ==================== AUTH & INIT ====================
-        document.getElementById('loginForm').addEventListener('submit', async e => {
+        function validatePassword(password) {
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#^])[A-Za-z\d@$!%*?&_#^]{8,}$/;
+            return regex.test(password);
+        }
+
+        function showNotification(message, type = 'success') {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = `notification ${type}`;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function calculateTransactionType(effDateStr, transDateStr) {
+            const eff = parseDate(effDateStr);
+            const trans = parseDate(transDateStr);
+            const diffTime = Math.abs(eff - trans);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Simple calculation: <= 2 working days = GN, > 2 = KH
+            // In real app, need to exclude weekends and holidays
+            return diffDays <= 2 ? 'GN' : 'KH';
+        }
+
+        // ==========================================
+        // LOCAL STORAGE MANAGEMENT
+        // ==========================================
+        function saveToLocalStorage() {
+            localStorage.setItem('mbnt_users', JSON.stringify(mockUsers));
+            localStorage.setItem('mbnt_cif', JSON.stringify(mockCIF));
+            localStorage.setItem('mbnt_transactions', JSON.stringify(mockTransactions));
+            localStorage.setItem('mbnt_pendingQuotes', JSON.stringify(pendingQuotes));
+        }
+
+        function loadFromLocalStorage() {
+            const users = localStorage.getItem('mbnt_users');
+            const cif = localStorage.getItem('mbnt_cif');
+            const trans = localStorage.getItem('mbnt_transactions');
+            const quotes = localStorage.getItem('mbnt_pendingQuotes');
+
+            if (users) mockUsers = JSON.parse(users);
+            if (cif) mockCIF = JSON.parse(cif);
+            if (trans) mockTransactions = JSON.parse(trans);
+            if (quotes) pendingQuotes = JSON.parse(quotes);
+        }
+
+                // ==========================================
+        // AUTHENTICATION
+        // ==========================================
+        function handleLogin(e) {
             e.preventDefault();
-            const id = document.getElementById('loginId').value.trim();
-            const pw = document.getElementById('loginPassword').value;
+            const userId = document.getElementById('userId').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
 
-            showLoading(true);
-            await testAPI();
-            await initData();
-
-            const user = DB.users.find(u => u.id === id && u.password === pw);
-            if (user) {
-                currentUser = user;
-                document.getElementById('loginPage').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-
-                if (user.role !== 'admin') {
-                    document.getElementById('rateTicker').classList.remove('hidden');
-                    document.getElementById('mainContainer').classList.add('main-container-with-ticker');
-                    document.getElementById('sidebar').classList.add('sidebar-with-ticker');
-                    document.getElementById('contentArea').classList.add('content-with-ticker');
-                    setInterval(updateRateTicker, 5000);
-                }
-
-                autoSaveInterval = setInterval(() => apiSave('main', DB), 30000);
-                initApp();
-                showNotification(`Chào ${user.name}!`, 'success');
-            } else {
-                showNotification('Sai ID hoặc mật khẩu', 'error');
+            const user = mockUsers.find(u => u.id === userId && u.password === password);
+            
+            if (!user) {
+                errorDiv.textContent = 'ID hoặc mật khẩu không đúng!';
+                errorDiv.style.display = 'block';
+                return;
             }
-            showLoading(false);
-        });
+
+            if (!validatePassword(password) && password !== 'Vcb@1234') {
+                errorDiv.textContent = 'Mật khẩu không đúng định dạng yêu cầu! (8+ ký tự, Hoa, thường, số, đặc biệt)';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            currentUser = user;
+            errorDiv.style.display = 'none';
+            
+            // Show header and footer
+            document.getElementById('header').style.display = 'flex';
+            document.getElementById('footer').style.display = 'flex';
+            
+            // Update user info
+            document.getElementById('displayUserName').textContent = user.name;
+            document.getElementById('displayUserDept').textContent = user.dept;
+
+            // Hide login, show appropriate dashboard
+            document.getElementById('loginPage').style.display = 'none';
+            
+            if (user.role === 'admin') {
+                document.getElementById('adminDashboard').style.display = 'block';
+                loadUserList();
+            } else if (user.role === 'PNV') {
+                document.getElementById('pnvDashboard').style.display = 'block';
+                document.getElementById('transactionDate').value = formatDate(new Date());
+                loadPnvBlotter();
+            } else if (user.role === 'PQL') {
+                document.getElementById('pqlDashboard').style.display = 'block';
+                loadCifTable();
+                loadPendingQuotes();
+                loadPqlBlotter();
+            } else if (user.role === 'BGD') {
+                document.getElementById('bgdDashboard').style.display = 'block';
+                loadBgdPnvList();
+                loadBgdView();
+            }
+
+            showNotification(`Chào mừng ${user.name}!`);
+            
+            // Start polling for updates
+            startPolling();
+        }
 
         function logout() {
             currentUser = null;
-            clearInterval(autoSaveInterval);
-            apiSave('main', DB);
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('loginPage').classList.remove('hidden');
-            document.getElementById('rateTicker').classList.add('hidden');
-            document.getElementById('mainContainer').classList.remove('main-container-with-ticker');
-            document.getElementById('sidebar').classList.remove('sidebar-with-ticker');
-            document.getElementById('contentArea').classList.remove('content-with-ticker');
-            showNotification('Đã đăng xuất', 'success');
+            stopPolling();
+            location.reload();
         }
 
-        async function initData() {
-            isDarkMode = localStorage.getItem('mbnt_dark_mode') === 'true';
-            document.body.classList.toggle('dark-mode', isDarkMode);
+        function handleChangePassword(e) {
+            e.preventDefault();
+            const prefix = currentUser.role.toLowerCase();
+            const currentPwd = document.getElementById(`${prefix}CurrentPassword`).value;
+            const newPwd = document.getElementById(`${prefix}NewPassword`).value;
+            const confirmPwd = document.getElementById(`${prefix}ConfirmPassword`).value;
 
-            const saved = await apiLoad('main');
-            if (saved) Object.assign(DB, saved);
-            else await apiSave('main', DB);
+            if (currentPwd !== currentUser.password) {
+                showNotification('Mật khẩu hiện tại không đúng!', 'error');
+                return;
+            }
+
+            if (!validatePassword(newPwd)) {
+                showNotification('Mật khẩu mới không đủ mạnh! (8+ ký tự, Hoa, thường, số, đặc biệt)', 'error');
+                return;
+            }
+
+            if (newPwd !== confirmPwd) {
+                showNotification('Mật khẩu xác nhận không khớp!', 'error');
+                return;
+            }
+
+            currentUser.password = newPwd;
+            const userIndex = mockUsers.findIndex(u => u.id === currentUser.id);
+            if (userIndex > -1) {
+                mockUsers[userIndex].password = newPwd;
+            }
+            saveToLocalStorage();
+            
+            // Reset form
+            e.target.reset();
+            showNotification('Đổi mật khẩu thành công!');
         }
 
-        function initApp() {
-            document.getElementById('displayUserName').textContent = currentUser.name;
-            document.getElementById('displayUserDept').textContent = currentUser.dept;
-            renderSidebar();
-            const pages = {admin:'adminUsers', pnv:'askRate', pql:'inputData', bgd:'reportBGD'};
-            showPage(pages[currentUser.role] || 'askRate');
+        // ==========================================
+        // TAB SWITCHING
+        // ==========================================
+        function switchTab(dashboard, tabName) {
+            // Update tab buttons
+            const tabs = document.querySelectorAll(`#${dashboard}Dashboard .tab`);
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            const contents = document.querySelectorAll(`#${dashboard}Dashboard .tab-content`);
+            contents.forEach(content => content.classList.remove('active'));
+            document.getElementById(`${dashboard}-${tabName}`).classList.add('active');
+
+            // Load data if needed
+            if (dashboard === 'pql' && tabName === 'quotes') {
+                loadPendingQuotes();
+            } else if (dashboard === 'pql' && tabName === 'blotter') {
+                loadPqlBlotter();
+            } else if (dashboard === 'pnv' && tabName === 'blotter') {
+                loadPnvBlotter();
+            }
         }
 
-        // ==================== SIDEBAR & PAGE SWITCH ====================
-        function renderSidebar() {
-            const menus = {
-                admin: [{id:'adminUsers',icon:'👥',label:'Quản lý Users'},{id:'adminData',icon:'📊',label:'Nhập dữ liệu'},{id:'adminSettings',icon:'⚙️',label:'Cài đặt'}],
-                pnv: [{id:'askRate',icon:'💱',label:'Hỏi tỷ giá'},{id:'blotterPNV',icon:'📋',label:'Blotter PNV'},{id:'chat',icon:'💬',label:'Chat'},{id:'calendar',icon:'📅',label:'Lịch'}],
-                pql: [{id:'inputData',icon:'📥',label:'Nhập dữ liệu'},{id:'blotterPQL',icon:'📋',label:'Blotter PQL'},{id:'report',icon:'📊',label:'Báo cáo'},{id:'chat',icon:'💬',label:'Chat'},{id:'approval',icon:'✅',label:'Phê duyệt'}],
-                bgd: [{id:'reportBGD',icon:'📊',label:'Báo cáo BGĐ'},{id:'dashboard',icon:'🎯',label:'Dashboard'},{id:'settings',icon:'⚙️',label:'Cài đặt'}]
-            };
-            const items = menus[currentUser.role] || [];
-            items.push({id:'changePass',icon:'🔐',label:'Đổi mật khẩu'});
-
-            const sidebar = document.getElementById('sidebar');
-            sidebar.innerHTML = items.map(i => `
-                <div class="nav-item" data-page="${i.id}" onclick="${i.id==='changePass'?'changePassword()':'showPage(\''+i.id+'\')'}">
-                    <span class="nav-icon">${i.icon}</span><span>${i.label}</span>
-                </div>
-            `).join('');
-        }
-
-        function showPage(id) {
-            currentPage = id;
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === id));
-
-            const area = document.getElementById('contentArea');
-            area.innerHTML = '<div class="spinner"></div>';
-
-            setTimeout(() => {
-                const renders = {
-                    adminUsers: renderAdminUsers,
-                    adminData: renderAdminData,
-                    adminSettings: renderAdminSettings,
-                    askRate: renderAskRate,
-                    blotterPNV: renderBlotterPNV,
-                    blotterPQL: renderBlotterPQL,
-                    inputData: renderInputData,
-                    report: renderReport,
-                    reportBGD: renderReportBGD,
-                    chat: renderChat,
-                    calendar: renderCalendar,
-                    approval: renderApproval,
-                    dashboard: renderDashboard,
-                    settings: renderSettings
-                };
-                (renders[id] || (c => c.innerHTML = '<div class="alert alert-warning">Chức năng đang phát triển</div>'))(area);
-            }, 150);
-        }
-
-        function updateRateTicker() {
-            ['USD','EUR','GBP','JPY'].forEach(c => {
-                const r = DB.rates[c];
-                if (r) {
-                    document.getElementById(`rate${c}`).textContent = formatNumber(r.sell);
-                    const ch = document.getElementById(`change${c}`);
-                    ch.textContent = (r.change > 0 ? '+' : '') + r.change + '%';
-                    ch.className = 'rate-change ' + (r.change >= 0 ? 'rate-up' : 'rate-down');
-                }
+        // ==========================================
+        // ADMIN FUNCTIONS
+        // ==========================================
+        function loadUserList() {
+            const container = document.getElementById('userList');
+            container.innerHTML = '';
+            
+            mockUsers.forEach(user => {
+                if (user.id === 'admin') return;
+                
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `
+                    <h4>${user.name}</h4>
+                    <div class="user-info-text">ID: ${user.id}</div>
+                    <div class="user-info-text">Phòng: ${user.dept}</div>
+                    <div class="user-info-text">Vai trò: ${user.role}</div>
+                    ${user.manager ? `<div class="user-info-text">Quản lý bởi: ${user.manager}</div>` : ''}
+                    <div class="user-actions">
+                        <button class="btn btn-small btn-warning" onclick="resetPassword('${user.id}')">Reset MK</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteUser('${user.id}')">Xóa</button>
+                    </div>
+                `;
+                container.appendChild(card);
             });
-            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
         }
 
-        // ==================== ADMIN USERS ====================
-        function renderAdminUsers(c) {
-            c.innerHTML = `
-                <h2 class="page-title">👥 Quản lý Người dùng</h2>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value">${DB.users.length}</div><div class="stat-label">Tổng Users</div></div>
-                    <div class="stat-card warning"><div class="stat-value">${DB.users.filter(u=>u.role==='pnv').length}</div><div class="stat-label">PNV</div></div>
-                    <div class="stat-card"><div class="stat-value">${DB.users.filter(u=>u.role==='pql').length}</div><div class="stat-label">PQL</div></div>
-                    <div class="stat-card danger"><div class="stat-value">${DB.users.filter(u=>u.role==='bgd').length}</div><div class="stat-label">BGĐ</div></div>
-                </div>
-                <div class="card">
-                    <div class="card-header flex-between">
-                        <span>Danh sách Users</span>
-                        <button class="btn btn-primary" onclick="showAddUserModal()">+ Thêm User</button>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>ID</th><th>Họ tên</th><th>Vai trò</th><th>Phòng ban</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
-                            <tbody>
-                                ${DB.users.map(u => `
-                                    <tr>
-                                        <td><strong>${u.id}</strong></td>
-                                        <td>${u.name}</td>
-                                        <td><span class="user-role role-${u.role}">${u.role.toUpperCase()}</span></td>
-                                        <td>${u.dept}</td>
-                                        <td><span class="status-badge status-success">Hoạt động</span></td>
-                                        <td>
-                                            <button class="btn btn-warning btn-sm" onclick="resetPassword('${u.id}')">Reset MK</button>
-                                            <button class="btn btn-secondary btn-sm" onclick="editUser('${u.id}')">Sửa</button>
-                                            ${u.id !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Xóa</button>` : ''}
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
+        function openAddUserModal() {
+            document.getElementById('addUserModal').classList.add('active');
+            // Load BGD list for manager select
+            const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
+            const select = document.getElementById('newUserManager');
+            select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
+            bgdUsers.forEach(u => {
+                select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+            });
         }
 
-        // ==================== HỎI TỶ GIÁ (PNV) ====================
-        function renderAskRate(c) {
-            const t = new Date();
-            const po = DB.purposes.map(p=>`<option value="${p.code}">${p.code} - ${p.name}</option>`).join('');
-            const co = DB.currencies.map(c=>`<option value="${c}" ${c==='USD'?'selected':''}>${c}</option>`).join('');
-
-            c.innerHTML = `
-                <h2 class="page-title">💱 Hỏi tỷ giá</h2>
-                <div class="card">
-                    <form id="quoteForm" onsubmit="submitQuoteRequest(event)">
-                        <div class="form-grid">
-                            <div class="form-group"><label>CIF *</label><input type="text" id="quoteCif" maxlength="10" required onblur="lookupCustomerName()" placeholder="10 số CIF"></div>
-                            <div class="form-group"><label>Tên KH</label><input type="text" id="quoteCifName" readonly></div>
-                            <div class="form-group"><label>Chiều GD *</label><select id="quoteDirection" onchange="updatePurposeLabel();updateEstimatedValue()">
-                                <option value="buy">🟢 VCB MUA</option>
-                                <option value="sell">🔴 VCB BÁN</option>
-                            </select></div>
-                            <div class="form-group"><label>Ngày hiệu lực *</label><input type="text" id="quoteEffectiveDate" value="${t.getDate().toString().padStart(2,'0')}${(t.getMonth()+1).toString().padStart(2,'0')}${t.getFullYear()}" maxlength="8" required></div>
-                            <div class="form-group"><label>Loại tiền *</label><select id="quoteCurrency" required onchange="updateEstimatedValue()">${co}</select></div>
-                            <div class="form-group"><label>Số lượng *</label><input type="number" id="quoteAmount" min="1" required oninput="updateEstimatedValue()"></div>
-                            <div class="form-group"><label id="purposeLabel">Mục đích *</label><select id="quotePurpose" required>${po}</select></div>
-                        </div>
-                        <div id="estimateBox" class="summary-box" style="display:none">
-                            <div class="summary-title">Ước tính</div>
-                            <div class="summary-grid">
-                                <div class="summary-item"><div class="summary-value" id="estimateRate">-</div><div class="summary-label">Tỷ giá</div></div>
-                                <div class="summary-item"><div class="summary-value" id="estimateValue">-</div><div class="summary-label">Giá trị VND</div></div>
-                            </div>
-                        </div>
-                        <div id="quoteResultPanel" class="quote-panel mt-20" style="display:none">
-                            <div class="quote-header"><span>⚡ BÁO GIÁ</span><span class="countdown" id="quoteCountdown">60s</span></div>
-                            <div class="price-display" id="quotePrice">-</div>
-                            <div style="text-align:center;margin:15px 0">Tổng: <strong id="quoteTotalValue">-</strong></div>
-                            <div style="display:flex;gap:15px;justify-content:center">
-                                <button type="button" class="btn btn-success" onclick="acceptQuote()">✓ Chấp nhận</button>
-                                <button type="button" class="btn btn-danger" onclick="rejectQuote()">✕ Từ chối</button>
-                            </div>
-                        </div>
-                        <div class="btn-group">
-                            <button type="submit" class="btn btn-primary" id="btnAskQuote">📞 HỎI TỶ GIÁ</button>
-                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('quoteForm').reset()">Làm mới</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="card"><div id="pendingQuotesList"></div></div>
-            `;
-            renderPendingQuotes();
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').classList.remove('active');
         }
 
-        function lookupCustomerName() {
-            const cif = document.getElementById('quoteCif').value.trim();
-            const nameEl = document.getElementById('quoteCifName');
-            if (cif.length === 10) {
-                const customer = DB.cifData.find(c => c.cif === cif);
-                nameEl.value = customer ? customer.name : '⚠️ Không tìm thấy KH';
-                nameEl.style.color = customer ? 'var(--primary-green)' : 'var(--error)';
+        function updateUserRole() {
+            const dept = document.getElementById('newUserDept').value;
+            const managerDiv = document.getElementById('managerSelect');
+            
+            if (dept.startsWith('PNV')) {
+                managerDiv.style.display = 'block';
             } else {
-                nameEl.value = '';
+                managerDiv.style.display = 'none';
+                document.getElementById('newUserManager').value = '';
+            }
+        }
+
+        function handleAddUser(e) {
+            e.preventDefault();
+            const id = document.getElementById('newUserId').value.trim();
+            const name = document.getElementById('newUserName').value.trim();
+            const deptValue = document.getElementById('newUserDept').value;
+            const deptText = document.getElementById('newUserDept').options[document.getElementById('newUserDept').selectedIndex].text;
+            const manager = document.getElementById('newUserManager').value;
+
+            if (mockUsers.find(u => u.id === id)) {
+                showNotification('ID đã tồn tại!', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: id,
+                name: name,
+                dept: deptText,
+                role: deptValue.split('-')[0],
+                password: 'Vcb@1234',
+                manager: manager || null
+            };
+            
+            mockUsers.push(newUser);
+            saveToLocalStorage();
+            closeAddUserModal();
+            e.target.reset();
+            loadUserList();
+            showNotification('Thêm user thành công!');
+        }
+
+        function resetPassword(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (user) {
+                user.password = 'Vcb@1234';
+                saveToLocalStorage();
+                showNotification(`Đã reset mật khẩu cho ${user.name} về mặc định (Vcb@1234)`);
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Bạn có chắc muốn xóa user này?')) {
+                const index = mockUsers.findIndex(u => u.id === userId);
+                if (index > -1) {
+                    mockUsers.splice(index, 1);
+                    saveToLocalStorage();
+                    loadUserList();
+                    showNotification('Đã xóa user');
+                }
+            }
+        }
+
+        // ==========================================
+        // PNV FUNCTIONS
+        // ==========================================
+        function lookupCustomerName() {
+            const cif = document.getElementById('cif').value.trim();
+            const nameInput = document.getElementById('customerName');
+            
+            if (mockCIF[cif]) {
+                nameInput.value = mockCIF[cif];
+                nameInput.style.color = 'green';
+            } else {
+                nameInput.value = 'Không tìm thấy KH - Vui lòng kiểm tra lại CIF';
+                nameInput.style.color = 'red';
             }
         }
 
         function updatePurposeLabel() {
-            const dir = document.getElementById('quoteDirection').value;
-            document.getElementById('purposeLabel').innerHTML = dir === 'buy' ? '🎯 Mục đích mua *' : '💰 Nguồn bán *';
+            const type = document.getElementById('transactionType').value;
+            const label = document.getElementById('purposeLabel');
+            label.textContent = type === 'buy' ? 'Nguồn (1-12)' : 'Mục đích (1-12)';
         }
 
-        function updateEstimatedValue() {
-            const ccy = document.getElementById('quoteCurrency').value;
-            const amt = parseFloat(document.getElementById('quoteAmount').value) || 0;
-            const dir = document.getElementById('quoteDirection').value;
-            const rate = DB.rates[ccy];
-            if (rate && amt > 0) {
-                const ref = dir === 'buy' ? rate.buy : rate.sell;
-                document.getElementById('estimateBox').style.display = 'block';
-                document.getElementById('estimateRate').textContent = formatNumber(ref) + ' VND';
-                document.getElementById('estimateValue').textContent = formatNumber(amt * ref) + ' VND';
-            } else {
-                document.getElementById('estimateBox').style.display = 'none';
-            }
-        }
-
-        function submitQuoteRequest(e) {
+        function submitAskPrice(e) {
             e.preventDefault();
-            const cif = document.getElementById('quoteCif').value.trim();
-            if (!DB.cifData.find(c => c.cif === cif)) {
-                showNotification('CIF không tồn tại!', 'error');
+            
+            // Validate currencies
+            const buyCurr = document.getElementById('buyCurrency').value;
+            const sellCurr = document.getElementById('sellCurrency').value;
+            
+            if (buyCurr === sellCurr) {
+                showNotification('Đồng tiền mua và bán không được giống nhau!', 'error');
                 return;
             }
 
-            const quote = {
+            const cif = document.getElementById('cif').value.trim();
+            if (!mockCIF[cif]) {
+                showNotification('CIF không tồn tại trong hệ thống!', 'error');
+                return;
+            }
+
+            // Create quote request
+            const quoteRequest = {
                 id: generateId(),
-                cif,
-                cifName: document.getElementById('quoteCifName').value,
-                direction: document.getElementById('quoteDirection').value,
-                effectiveDate: document.getElementById('quoteEffectiveDate').value,
-                currency: document.getElementById('quoteCurrency').value,
-                amount: parseFloat(document.getElementById('quoteAmount').value),
-                purpose: document.getElementById('quotePurpose').value,
-                purposeName: DB.purposes.find(p => p.code === document.getElementById('quotePurpose').value)?.name || '',
-                requester: currentUser.id,
-                requesterName: currentUser.name,
-                requesterDept: currentUser.dept,
-                requestTime: new Date().toISOString(),
-                status: 'pending'
+                pnv: currentUser.id,
+                pnvName: currentUser.name,
+                cif: cif,
+                customerName: document.getElementById('customerName').value,
+                direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
+                date: formatDate(new Date()),
+                effectiveDate: document.getElementById('effectiveDate').value,
+                currency: document.getElementById('currencyCode').value,
+                buyCurr: buyCurr,
+                sellCurr: sellCurr,
+                amount: parseFloat(document.getElementById('amount').value),
+                purpose: document.getElementById('purpose').value,
+                status: 'pending',
+                timestamp: new Date().toISOString()
             };
 
-            DB.pendingQuotes.push(quote);
-            apiSave('main', DB);
+            pendingQuotes.push(quoteRequest);
+            saveToLocalStorage();
 
-            const btn = document.getElementById('btnAskQuote');
-            btn.disabled = true;
-            btn.innerHTML = '⏳ Đang chờ...';
-
-            setTimeout(() => simulateQuoteResponse(quote.id), Math.random()*3000 + 2000);
-
-            renderPendingQuotes();
-            showNotification('Đã gửi yêu cầu!', 'success');
+            showNotification('Đã gửi yêu cầu hỏi giá đến PQL!');
+            
+            // Reset form except date fields
+            const effDate = document.getElementById('effectiveDate').value;
+            document.getElementById('askPriceForm').reset();
+            document.getElementById('transactionDate').value = formatDate(new Date());
+            document.getElementById('effectiveDate').value = effDate;
         }
 
-        function simulateQuoteResponse(id) {
-            const q = DB.pendingQuotes.find(q => q.id === id);
-            if (!q || q.status !== 'pending') return;
-
-            const base = {USD:24850,EUR:27120,GBP:31450,JPY:165.2}[q.currency] || 25000;
-            const spread = (Math.random()-0.5)*0.01*base;
-            q.price = Math.round(base + spread);
-            q.expiryTime = Date.now() + 60000;
-            q.status = 'quoted';
-            q.quotedBy = 'KT_001';
-            q.quotedAt = new Date().toISOString();
-
-            apiSave('main', DB);
-
-            if (currentPage === 'askRate') showQuoteResult(q);
-            renderPendingQuotes();
-            showNotification('Đã nhận báo giá!', 'success');
-        }
-
-        function showQuoteResult(q) {
-            const panel = document.getElementById('quoteResultPanel');
-            panel.style.display = 'block';
-
-            const price = q.currency === 'JPY' ? q.price.toFixed(2) : formatNumber(q.price);
-            document.getElementById('quotePrice').innerHTML = `${price} <span style="font-size:18px">VND/${q.currency}</span>`;
-            document.getElementById('quoteTotalValue').textContent = formatNumber(q.amount * q.price) + ' VND';
-
-            panel.scrollIntoView({behavior:'smooth', block:'center'});
-
-            let sec = 60;
-            const cd = document.getElementById('quoteCountdown');
-            const txt = document.getElementById('countdownText');
-
-            if (quoteTimers[q.id]) clearInterval(quoteTimers[q.id]);
-
-            quoteTimers[q.id] = setInterval(() => {
-                sec--;
-                cd.textContent = sec + 's';
-                txt.textContent = sec;
-                if (sec <= 10) {
-                    cd.style.color = '#e74c3c';
-                    panel.style.borderColor = '#e74c3c';
+        function startQuoteTimer(seconds, quoteId) {
+            quoteExpiryTime = Date.now() + (seconds * 1000);
+            currentQuoteId = quoteId;
+            const timerDisplay = document.getElementById('quoteTimer');
+            
+            if (quoteTimer) clearInterval(quoteTimer);
+            
+            quoteTimer = setInterval(() => {
+                const remaining = Math.ceil((quoteExpiryTime - Date.now()) / 1000);
+                
+                if (remaining <= 0) {
+                    clearInterval(quoteTimer);
+                    timerDisplay.textContent = '00:00';
+                    document.getElementById('quoteResponse').classList.add('hidden');
+                    showNotification('Tỷ giá đã hết hiệu lực!', 'error');
+                    currentQuoteId = null;
+                    return;
                 }
-                if (sec <= 0) {
-                    clearInterval(quoteTimers[q.id]);
-                    q.status = 'expired';
-                    apiSave('main', DB);
-                    panel.style.display = 'none';
-                    document.getElementById('btnAskQuote').disabled = false;
-                    document.getElementById('btnAskQuote').innerHTML = '📞 HỎI TỶ GIÁ';
-                    showNotification('Báo giá hết hạn!', 'warning');
-                    renderPendingQuotes();
-                }
+                
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }, 1000);
-
-            window.currentQuote = q;
         }
 
-        function acceptQuote() {
-            if (!window.currentQuote) return;
-            const q = window.currentQuote;
-            q.status = 'accepted';
-            q.acceptTime = new Date().toISOString();
-            q.acceptedBy = currentUser.id;
-
-            const tx = {
-                id: 'GD' + generateId().substr(-8).toUpperCase(),
-                quoteId: q.id,
-                cif: q.cif,
-                cifName: q.cifName,
-                direction: q.direction,
-                currency: q.currency,
-                amount: q.amount,
-                price: q.price,
-                totalValue: Math.round(q.amount * q.price),
-                purpose: q.purpose,
-                purposeName: q.purposeName,
-                effectiveDate: q.effectiveDate,
-                requester: q.requester,
-                requesterName: q.requesterName,
-                requesterDept: q.requesterDept,
-                requestTime: q.requestTime,
-                status: 'completed',
-                createdAt: new Date().toISOString(),
-                completedAt: new Date().toISOString()
+        function acceptPrice() {
+            if (!currentQuoteId) return;
+            
+            clearInterval(quoteTimer);
+            
+            // Get quote data from localStorage or memory
+            const quoteData = JSON.parse(localStorage.getItem('currentQuoteData') || '{}');
+            
+            // Create transaction
+            const transaction = {
+                id: generateId(),
+                pnv: currentUser.id,
+                pnvName: currentUser.name,
+                date: formatDate(new Date()),
+                effectiveDate: document.getElementById('effectiveDate').value,
+                cif: document.getElementById('cif').value,
+                customerName: document.getElementById('customerName').value,
+                direction: document.getElementById('transactionType').value === 'buy' ? 'MUA' : 'BÁN',
+                buyCurr: document.getElementById('buyCurrency').value,
+                sellCurr: document.getElementById('sellCurrency').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                rate: quoteData.rate || 0,
+                equivalent: 0,
+                type: calculateTransactionType(document.getElementById('effectiveDate').value, formatDate(new Date())),
+                status: 'Thành công',
+                purpose: document.getElementById('purpose').value,
+                editedBy: null,
+                editTime: null
             };
+            
+            // Calculate equivalent amount
+            if (transaction.direction === 'MUA') {
+                transaction.equivalent = transaction.amount * transaction.rate;
+            } else {
+                transaction.equivalent = transaction.amount * transaction.rate;
+            }
+            
+            mockTransactions.push(transaction);
+            saveToLocalStorage();
+            
+            // Hide quote and reset
+            document.getElementById('quoteResponse').classList.add('hidden');
+            document.getElementById('askPriceForm').reset();
+            document.getElementById('transactionDate').value = formatDate(new Date());
+            currentQuoteId = null;
+            
+            showNotification('Giao dịch thành công!');
+            loadPnvBlotter();
+        }
 
-            DB.transactions.unshift(tx);
-            DB.pendingQuotes = DB.pendingQuotes.filter(x => x.id !== q.id);
-            apiSave('main', DB);
+        function rejectPrice() {
+            clearInterval(quoteTimer);
+            document.getElementById('quoteResponse').classList.add('hidden');
+            currentQuoteId = null;
+            showNotification('Đã từ chối tỷ giá', 'warning');
+        }
 
-            clearInterval(quoteTimers[q.id]);
-            showConfetti();
-            showNotification('Giao dịch xác nhận thành công!', 'success', 5000);
+        function loadPnvBlotter() {
+            const tbody = document.getElementById('pnvBlotterBody');
+            tbody.innerHTML = '';
+            
+            const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
+            
+            userTrans.forEach(t => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${t.date}</td>
+                    <td>${t.effectiveDate}</td>
+                    <td>${t.cif}</td>
+                    <td>${t.customerName}</td>
+                    <td>${t.direction}</td>
+                    <td>${t.buyCurr}</td>
+                    <td>${t.sellCurr}</td>
+                    <td>${t.amount.toLocaleString('vi-VN')}</td>
+                    <td>${t.rate.toLocaleString('vi-VN')}</td>
+                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
+                    <td><span class="badge badge-success">${t.type}</span></td>
+                    <td class="status-success">${t.status}</td>
+                `;
+            });
+        }
 
+        function filterPnvBlotter() {
+            loadPnvBlotter();
+            // Apply filters
+            const fromDate = document.getElementById('pnvFilterFromDate').value;
+            const toDate = document.getElementById('pnvFilterToDate').value;
+            const currency = document.getElementById('pnvFilterCurrency').value;
+            
+            // Implementation would filter the displayed data
+            showNotification('Đã áp dụng bộ lọc');
+        }
+
+        function exportPnvBlotter(format) {
+            showNotification(`Đang xuất file ${format.toUpperCase()}...`);
+            // Implementation would generate and download file
             setTimeout(() => {
-                document.getElementById('quoteResultPanel').style.display = 'none';
-                document.getElementById('btnAskQuote').disabled = false;
-                document.getElementById('btnAskQuote').innerHTML = '📞 HỎI TỶ GIÁ';
-                renderPendingQuotes();
-            }, 2000);
+                showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
+            }, 1000);
         }
 
-        function rejectQuote() {
-            if (!window.currentQuote) return;
-            const q = window.currentQuote;
-            const reason = prompt('Lý do từ chối (không bắt buộc):') || 'Từ chối bởi PNV';
-            q.status = 'rejected';
-            q.rejectTime = new Date().toISOString();
-            q.rejectReason = reason;
-            q.rejectedBy = currentUser.id;
+        // ==========================================
+        // PQL FUNCTIONS
+        // ==========================================
+        function loadCifTable() {
+            const tbody = document.getElementById('cifTableBody');
+            tbody.innerHTML = '';
+            
+            Object.entries(mockCIF).forEach(([cif, name]) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${cif}</td>
+                    <td>${name}</td>
+                    <td>
+                        <button class="btn btn-small btn-danger" onclick="deleteCif('${cif}')">Xóa</button>
+                    </td>
+                `;
+            });
+        }
 
+        function deleteCif(cif) {
+            if (confirm('Xóa CIF này?')) {
+                delete mockCIF[cif];
+                saveToLocalStorage();
+                loadCifTable();
+                showNotification('Đã xóa CIF');
+            }
+        }
+
+        function uploadCIFData(e) {
+            e.preventDefault();
+            const manualData = document.getElementById('cifManualData').value.trim();
+            
+            if (manualData) {
+                const lines = manualData.split('\n');
+                lines.forEach(line => {
+                    const parts = line.split(',');
+                    if (parts.length >= 2) {
+                        const cif = parts[0].trim();
+                        const name = parts[1].trim();
+                        if (cif && name) {
+                            mockCIF[cif] = name;
+                        }
+                    }
+                });
+                saveToLocalStorage();
+                loadCifTable();
+                document.getElementById('cifManualData').value = '';
+                showNotification('Đã lưu dữ liệu CIF!');
+            }
+        }
+
+        function loadPendingQuotes() {
+            const container = document.getElementById('pendingQuotes');
+            const pending = pendingQuotes.filter(q => q.status === 'pending');
+            
+            if (pending.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            pending.forEach(quote => {
+                const div = document.createElement('div');
+                div.className = 'pending-quote';
+                div.onclick = () => selectQuote(quote.id);
+                div.innerHTML = `
+                    <div class="pending-quote-header">
+                        <span class="pending-quote-title">${quote.pnvName} (${quote.pnv})</span>
+                        <span class="pending-quote-time">${new Date(quote.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                    <div class="pending-quote-details">
+                        CIF: ${quote.cif} | ${quote.customerName}<br>
+                        Chiều: ${quote.direction} | ${quote.buyCurr} → ${quote.sellCurr}<br>
+                        Số lượng: ${quote.amount.toLocaleString()} | Ngày hiệu lực: ${quote.effectiveDate}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function selectQuote(quoteId) {
+            const quote = pendingQuotes.find(q => q.id === quoteId);
+            if (!quote) return;
+            
+            document.getElementById('quoteFormCard').classList.remove('hidden');
+            document.getElementById('quoteRequestId').value = quoteId;
+            document.getElementById('quotePnv').value = `${quote.pnvName} (${quote.pnv})`;
+            document.getElementById('quoteCif').value = quote.cif;
+            document.getElementById('quoteCifName').value = quote.customerName;
+            document.getElementById('quoteDirection').value = quote.direction;
+            document.getElementById('quoteBuyCurr').value = quote.buyCurr;
+            document.getElementById('quoteSellCurr').value = quote.sellCurr;
+            document.getElementById('quoteAmount').value = quote.amount.toLocaleString();
+            document.getElementById('quoteEffDate').value = quote.effectiveDate;
+            
+            // Reset quote inputs
+            document.getElementById('quoteRate').value = '';
+            document.getElementById('quoteDuration').value = '2';
+        }
+
+        function cancelQuote() {
+            document.getElementById('quoteFormCard').classList.add('hidden');
+        }
+
+        function submitQuote(e) {
+            e.preventDefault();
+            const quoteId = document.getElementById('quoteRequestId').value;
+            const rate = parseFloat(document.getElementById('quoteRate').value);
+            const duration = parseInt(document.getElementById('quoteDuration').value);
+            
+            if (!rate || rate <= 0) {
+                showNotification('Vui lòng nhập tỷ giá hợp lệ!', 'error');
+                return;
+            }
+            
+            // Update quote status
+            const quoteIndex = pendingQuotes.findIndex(q => q.id === quoteId);
+            if (quoteIndex > -1) {
+                pendingQuotes[quoteIndex].status = 'quoted';
+                pendingQuotes[quoteIndex].rate = rate;
+                pendingQuotes[quoteIndex].duration = duration;
+                pendingQuotes[quoteIndex].quoteTime = new Date().toISOString();
+                saveToLocalStorage();
+            }
+            
+            // Store current quote data for PNV to retrieve
+            localStorage.setItem('currentQuoteData', JSON.stringify({
+                quoteId: quoteId,
+                rate: rate,
+                duration: duration,
+                timestamp: new Date().toISOString()
+            }));
+            
+            // Simulate sending to PNV (in real app, this would be a push notification)
+            showNotification(`Đã chào giá ${rate} cho ${duration} phút!`);
+            
+            document.getElementById('quoteFormCard').classList.add('hidden');
+            loadPendingQuotes();
+        }
+
+        function interruptCurrent() {
+            if (currentQuoteId) {
+                clearInterval(quoteTimer);
+                document.getElementById('quoteResponse')?.classList.add('hidden');
+                currentQuoteId = null;
+                showNotification('Đã Interrupt giao dịch hiện tại', 'warning');
+            }
+        }
+
+        function interruptAll() {
+            // Clear all active quotes
+            pendingQuotes.forEach(q => {
+                if (q.status === 'quoted') {
+                    q.status = 'interrupted';
+                }
+            });
+            saveToLocalStorage();
+            
+            clearInterval(quoteTimer);
+            document.getElementById('quoteResponse')?.classList.add('hidden');
+            currentQuoteId = null;
+            
+            showNotification('Đã Interrupt ALL tất cả giao dịch đang chào giá!', 'error');
+        }
+
+        function loadPqlBlotter() {
+            const tbody = document.getElementById('pqlBlotterBody');
+            tbody.innerHTML = '';
+            
+            mockTransactions.forEach(t => {
+                const row = tbody.insertRow();
+                const editInfo = t.editedBy ? `<br><small style="color: orange;">Sửa bởi: ${t.editedBy}</small>` : '';
+                
+                row.innerHTML = `
+                    <td>${t.pnv}<br><small>${t.pnvName}</small></td>
+                    <td>${t.date}</td>
+                    <td>${t.effectiveDate}</td>
+                    <td>${t.cif}</td>
+                    <td>${t.customerName}</td>
+                    <td>${t.direction}</td>
+                    <td>${t.buyCurr}</td>
+                    <td>${t.sellCurr}</td>
+                    <td>${t.amount.toLocaleString('vi-VN')}</td>
+                    <td>${t.rate.toLocaleString('vi-VN')}</td>
+                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
+                    <td><span class="badge ${t.type === 'GN' ? 'badge-success' : 'badge-warning'}">${t.type}</span></td>
+                    <td>${t.editedBy || '-'}</td>
+                    <td>
+                        <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
+                    </td>
+                `;
+            });
+        }
+
+        function filterPqlBlotter() {
+            loadPqlBlotter();
+            showNotification('Đã áp dụng bộ lọc');
+        }
+
+        function exportPqlBlotter(format) {
+            showNotification(`Đang xuất file ${format.toUpperCase()}...`);
             setTimeout(() => {
-                DB.pendingQuotes = DB.pendingQuotes.filter(x => x.id !== q.id);
-                apiSave('main', DB);
-            }, 5000);
-
-            clearInterval(quoteTimers[q.id]);
-            document.getElementById('quoteResultPanel').style.display = 'none';
-            document.getElementById('btnAskQuote').disabled = false;
-            document.getElementById('btnAskQuote').innerHTML = '📞 HỎI TỶ GIÁ';
-            renderPendingQuotes();
-            showNotification('Đã từ chối báo giá', 'warning');
+                showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
+            }, 1000);
         }
 
-        function renderPendingQuotes() {
-            const list = document.getElementById('pendingQuotesList');
-            if (list) list.innerHTML = renderPendingQuotesList();
+        function openEditTransaction(transId) {
+            const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
+            if (!t) {
+                showNotification('Không tìm thấy giao dịch!', 'error');
+                return;
+            }
+            
+            editingTransactionId = t.id;
+            document.getElementById('editTransId').value = t.id;
+            document.getElementById('editCif').value = t.cif;
+            document.getElementById('editCifName').value = t.customerName;
+            document.getElementById('editEffDate').value = t.effectiveDate;
+            document.getElementById('editBuyCurr').value = t.buyCurr;
+            document.getElementById('editSellCurr').value = t.sellCurr;
+            document.getElementById('editAmount').value = t.amount;
+            document.getElementById('editRate').value = t.rate;
+            document.getElementById('editType').value = t.type;
+            
+            document.getElementById('editTransactionModal').classList.add('active');
         }
 
-        function renderPendingQuotesList() {
-            const quotes = DB.pendingQuotes
-                .filter(q => q.requester === currentUser.id)
-                .sort((a,b) => new Date(b.requestTime) - new Date(a.requestTime))
-                .slice(0,10);
-
-            if (!quotes.length) return `
-                <div class="empty-state">
-                    <div class="empty-state-icon">📭</div>
-                    <p>Chưa có báo giá nào</p>
-                </div>
-            `;
-
-            return `
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr><th>Thời gian</th><th>CIF / Tên</th><th>Chiều</th><th>CCY</th><th>Số lượng</th><th>Tỷ giá</th><th>Trạng thái</th></tr>
-                        </thead>
-                        <tbody>
-                            ${quotes.map(q => {
-                                let cls = '', txt = '', icon = '';
-                                switch(q.status){
-                                    case 'pending': cls='status-pending'; txt='Chờ'; icon='⏳'; break;
-                                    case 'quoted': cls='status-success'; txt='Đã báo'; icon='💰'; break;
-                                    case 'expired': cls='status-expired'; txt='Hết hạn'; icon='⏰'; break;
-                                    case 'rejected': cls='status-interrupted'; txt='Từ chối'; icon='❌'; break;
-                                    default: cls='status-pending'; txt=q.status; icon='❓';
-                                }
-                                return `
-                                    <tr>
-                                        <td>${formatDateTime(q.requestTime)}</td>
-                                        <td><strong>${q.cif}</strong><br><small>${q.cifName}</small></td>
-                                        <td><span style="color:${q.direction==='buy'?'#27ae60':'#e74c3c'};">${q.direction==='buy'?'🟢 MUA':'🔴 BÁN'}</span></td>
-                                        <td><strong>${q.currency}</strong></td>
-                                        <td>${formatNumber(q.amount)}</td>
-                                        <td>${q.price ? formatNumber(q.price) : '-'}</td>
-                                        <td><span class="status-badge ${cls}">${icon} ${txt}</span></td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
+        function closeEditModal() {
+            document.getElementById('editTransactionModal').classList.remove('active');
+            editingTransactionId = null;
         }
 
-        // ==================== BLOTTER PNV ====================
-        function renderBlotterPNV(c) {
-            const myTx = DB.transactions.filter(t => t.requester === currentUser.id);
-            c.innerHTML = `
-                <h2 class="page-title">📋 Blotter PNV</h2>
-                <div class="card">
-                    <div class="card-header">Lịch sử giao dịch của bạn (${myTx.length})</div>
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>Mã GD</th><th>Ngày</th><th>CCY</th><th>Số lượng</th><th>Giá</th><th>Tổng</th><th>Trạng thái</th></tr></thead>
-                            <tbody>
-                                ${myTx.map(t => `
-                                    <tr>
-                                        <td><strong>${t.id}</strong></td>
-                                        <td>${formatDate(t.createdAt)}</td>
-                                        <td>${t.currency}</td>
-                                        <td>${formatNumber(t.amount)}</td>
-                                        <td>${formatNumber(t.price)}</td>
-                                        <td>${formatCurrency(t.totalValue, 'VND')}</td>
-                                        <td><span class="status-badge status-success">Hoàn thành</span></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
+        function saveEditTransaction(e) {
+            e.preventDefault();
+            const t = mockTransactions.find(tr => tr.id === editingTransactionId);
+            if (!t) return;
+            
+            t.cif = document.getElementById('editCif').value;
+            t.customerName = document.getElementById('editCifName').value;
+            t.effectiveDate = document.getElementById('editEffDate').value;
+            t.buyCurr = document.getElementById('editBuyCurr').value;
+            t.sellCurr = document.getElementById('editSellCurr').value;
+            t.amount = parseFloat(document.getElementById('editAmount').value);
+            t.rate = parseFloat(document.getElementById('editRate').value);
+            t.type = document.getElementById('editType').value;
+            t.editedBy = currentUser.id;
+            t.editTime = new Date().toISOString();
+            
+            // Recalculate equivalent
+            t.equivalent = t.amount * t.rate;
+            
+            saveToLocalStorage();
+            closeEditModal();
+            loadPqlBlotter();
+            showNotification('Đã cập nhật giao dịch!');
         }
 
-        // ==================== BLOTTER PQL ====================
-        function renderBlotterPQL(c) {
-            const allTx = DB.transactions;
-            c.innerHTML = `
-                <h2 class="page-title">📋 Blotter PQL</h2>
-                <div class="card">
-                    <div class="card-header">Tất cả giao dịch (${allTx.length})</div>
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>Mã GD</th><th>PNV</th><th>CCY</th><th>Số lượng</th><th>Giá</th><th>Tổng</th><th>Trạng thái</th></tr></thead>
-                            <tbody>
-                                ${allTx.map(t => `
-                                    <tr>
-                                        <td><strong>${t.id}</strong></td>
-                                        <td>${t.requesterName}</td>
-                                        <td>${t.currency}</td>
-                                        <td>${formatNumber(t.amount)}</td>
-                                        <td>${formatNumber(t.price)}</td>
-                                        <td>${formatCurrency(t.totalValue, 'VND')}</td>
-                                        <td><span class="status-badge status-success">Hoàn thành</span></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        function generateReport() {
+            const fromDate = document.getElementById('reportTransFrom').value;
+            const toDate = document.getElementById('reportTransTo').value;
+            const pnv = document.getElementById('reportPnv').value;
+            
+            // Filter transactions
+            let filtered = mockTransactions;
+            if (pnv) {
+                filtered = filtered.filter(t => t.pnv.includes(pnv));
+            }
+            
+            const container = document.getElementById('reportResult');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PNV</th>
+                            <th>Ngày GD</th>
+                            <th>CIF</th>
+                            <th>Chiều</th>
+                            <th>Số tiền</th>
+                            <th>Tỷ giá</th>
+                            <th>Loại</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
+            
+            filtered.forEach(t => {
+                html += `
+                    <tr>
+                        <td>${t.pnv}</td>
+                        <td>${t.date}</td>
+                        <td>${t.cif}</td>
+                        <td>${t.direction}</td>
+                        <td>${t.amount.toLocaleString()}</td>
+                        <td>${t.rate.toLocaleString()}</td>
+                        <td>${t.type}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            showNotification(`Báo cáo có ${filtered.length} giao dịch`);
         }
 
-        // ==================== CHAT (giả lập) ====================
-        function renderChat(c) {
-            c.innerHTML = `
-                <h2 class="page-title">💬 Chat nội bộ</h2>
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <span>Phòng chat chung</span>
-                    </div>
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message message-received">
-                            <div>Xin chào! Chào mừng đến phòng chat nội bộ.</div>
-                            <div class="message-time">09:40</div>
-                        </div>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" class="chat-input" id="chatInput" placeholder="Nhập tin nhắn...">
-                        <button class="btn btn-primary" onclick="sendMessage()">Gửi</button>
-                    </div>
-                </div>
-            `;
+        function exportReport(format) {
+            showNotification(`Xuất báo cáo dạng ${format.toUpperCase()}...`);
         }
 
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            if (!input.value.trim()) return;
+        // ==========================================
+        // BGĐ FUNCTIONS
+        // ==========================================
+        function loadBgdPnvList() {
+            const select = document.getElementById('bgdFilterPnv');
+            // Get PNVs managed by this BGD
+            const managedPnvs = mockUsers.filter(u => u.role === 'PNV' && u.manager === currentUser.id);
+            
+            select.innerHTML = '<option value="">Tất cả PNV</option>';
+            managedPnvs.forEach(u => {
+                select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+            });
+        }
 
-            const msgArea = document.getElementById('chatMessages');
-            const msg = document.createElement('div');
-            msg.className = 'message message-sent';
-            msg.innerHTML = `
-                <div>${escapeHtml(input.value)}</div>
-                <div class="message-time">${new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</div>
-            `;
-            msgArea.appendChild(msg);
-            msgArea.scrollTop = msgArea.scrollHeight;
+        function loadBgdView() {
+            const tbody = document.getElementById('bgdViewBody');
+            tbody.innerHTML = '';
+            
+            // Get transactions of managed PNVs
+            const managedPnvIds = mockUsers
+                .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
+                .map(u => u.id);
+            
+            const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
+            
+            visibleTrans.forEach(t => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${t.pnv}</td>
+                    <td>${t.date}</td>
+                    <td>${t.effectiveDate}</td>
+                    <td>${t.cif}</td>
+                    <td>${t.customerName}</td>
+                    <td>${t.direction}</td>
+                    <td>${t.buyCurr}</td>
+                    <td>${t.sellCurr}</td>
+                    <td>${t.amount.toLocaleString()}</td>
+                    <td>${t.rate.toLocaleString()}</td>
+                    <td><span class="badge badge-success">${t.type}</span></td>
+                `;
+            });
+        }
+
+        function filterBgdView() {
+            loadBgdView();
+            showNotification('Đã cập nhật dữ liệu');
+        }
+
+        function exportBgdView(format) {
+            showNotification(`Xuất file ${format.toUpperCase()}...`);
+        }
+
+        // ==========================================
+        // CHAT FUNCTIONS
+        // ==========================================
+        function handleChatKeyPress(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        function handlePqlChatKeyPress(e) {
+            if (e.key === 'Enter') sendPqlChatMessage();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('pnvChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const container = document.getElementById('pnvChatMessages');
+            const div = document.createElement('div');
+            div.className = 'chat-message sent';
+            div.innerHTML = `<strong>${currentUser.name}:</strong><br>${message}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
             input.value = '';
+            
+            // Store message
+            chatMessages.push({
+                from: currentUser.id,
+                to: 'PQL',
+                message: message,
+                time: new Date().toISOString()
+            });
         }
 
-        function escapeHtml(text) {
-            const map = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#039;'};
-            return text.replace(/[&<>"']/g, m => map[m]);
+        function sendPqlChatMessage() {
+            const input = document.getElementById('pqlChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const container = document.getElementById('pqlChatMessages');
+            const div = document.createElement('div');
+            div.className = 'chat-message sent';
+            div.innerHTML = `<strong>${currentUser.name} (PQL):</strong><br>${message}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            input.value = '';
+            
+            chatMessages.push({
+                from: currentUser.id,
+                to: 'PNV',
+                message: message,
+                time: new Date().toISOString()
+            });
         }
 
-        // ==================== CÁC TRANG KHÁC (placeholder) ====================
-        function renderReport(c) { c.innerHTML = '<h2 class="page-title">📊 Báo cáo</h2><div class="card"><p>Báo cáo đang phát triển...</p></div>'; }
-        function renderCalendar(c) { c.innerHTML = '<h2 class="page-title">📅 Lịch</h2><div class="card"><p>Lịch đang phát triển...</p></div>'; }
-        function renderApproval(c) { c.innerHTML = '<h2 class="page-title">✅ Phê duyệt</h2><div class="card"><p>Phê duyệt đang phát triển...</p></div>'; }
-        function renderDashboard(c) { c.innerHTML = '<h2 class="page-title">🎯 Dashboard</h2><div class="card"><p>Dashboard đang phát triển...</p></div>'; }
-        function renderSettings(c) { c.innerHTML = '<h2 class="page-title">⚙️ Cài đặt</h2><div class="card"><p>Cài đặt đang phát triển...</p></div>'; }
+        // ==========================================
+        // POLLING & REALTIME UPDATES
+        // ==========================================
+        let pollInterval = null;
 
-        // ==================== KHỞI ĐỘNG ====================
-        window.addEventListener('load', async () => {
-            await testAPI();
-            await initData();
+        function startPolling() {
+            // Poll every 3 seconds for updates
+            pollInterval = setInterval(() => {
+                checkForUpdates();
+            }, 3000);
+        }
+
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+
+        function checkForUpdates() {
+            // Check for new quotes for PNV
+            if (currentUser?.role === 'PNV') {
+                const quoteData = localStorage.getItem('currentQuoteData');
+                if (quoteData) {
+                    const data = JSON.parse(quoteData);
+                    const quoteTime = new Date(data.timestamp);
+                    const now = new Date();
+                    const age = (now - quoteTime) / 1000; // seconds
+                    
+                    // If quote is recent (within last 5 minutes) and not yet shown
+                    if (age < 300 && data.quoteId && !document.getElementById('quoteResponse').classList.contains('hidden') === false) {
+                        // Show quote to PNV
+                        document.getElementById('quoteResponse').classList.remove('hidden');
+                        document.getElementById('quotePrice').textContent = data.rate.toLocaleString('vi-VN');
+                        
+                        // Determine currency pair
+                        const buyCurr = document.getElementById('buyCurrency').value;
+                        const sellCurr = document.getElementById('sellCurrency').value;
+                        document.getElementById('quotePair').textContent = `${buyCurr}/${sellCurr}`;
+                        
+                        startQuoteTimer(data.duration * 60, data.quoteId);
+                        showNotification('PQL đã chào giá! Vui lòng chấp nhận trong thời gian quy định.', 'warning');
+                    }
+                }
+            }
+            
+            // Check for new quote requests for PQL
+            if (currentUser?.role === 'PQL') {
+                const currentTab = document.querySelector('#pql-quotes.tab-content');
+                if (currentTab && currentTab.classList.contains('active')) {
+                    loadPendingQuotes();
+                }
+            }
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            
+            // Set default dates
+            const today = new Date();
+            document.getElementById('pnvFilterFromDate').value = formatDateYYYYMMDD(today);
+            document.getElementById('pnvFilterToDate').value = formatDateYYYYMMDD(today);
+            document.getElementById('pqlFilterFrom').value = formatDateYYYYMMDD(today);
+            document.getElementById('pqlFilterTo').value = formatDateYYYYMMDD(today);
+            document.getElementById('reportTransFrom').value = formatDateYYYYMMDD(today);
+            document.getElementById('reportTransTo').value = formatDateYYYYMMDD(today);
+            document.getElementById('bgdFromDate').value = formatDateYYYYMMDD(today);
+            document.getElementById('bgdToDate').value = formatDateYYYYMMDD(today);
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', function() {
+            stopPolling();
         });
     </script>
 </body>
