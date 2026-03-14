@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ - MBNT</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}:root{--primary-green:#1a5f3f;--secondary-green:#2ecc71;--light-green:#d5f5e3;--dark-green:#0e3d28;--accent-green:#27ae60;--white:#ffffff;--gray:#f5f5f5;--dark-gray:#333;--border:#ddd;--error:#e74c3c;--warning:#f39c12;--success:#27ae60}body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#f0f9f4 0%,#e8f5e9 100%);min-height:100vh;display:flex;flex-direction:column}.header{background:linear-gradient(135deg,var(--primary-green) 0%,var(--dark-green) 100%);color:white;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,0.15);position:fixed;top:0;left:0;right:0;z-index:1000;height:70px}.header-left{display:flex;align-items:center;gap:15px}.logo{width:50px;height:50px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;color:var(--primary-green);font-size:12px;text-align:center;line-height:1.2;box-shadow:0 2px 10px rgba(0,0,0,0.2)}.header-title{font-size:18px;font-weight:600;letter-spacing:0.5px}.header-right{display:flex;align-items:center;gap:20px}.user-info{text-align:right;font-size:14px}.user-name{font-weight:600}.user-dept{font-size:12px;opacity:0.9}.logout-btn{background:rgba(255,255,255,0.2);border:1px solid white;color:white;padding:8px 16px;border-radius:20px;cursor:pointer;transition:all 0.3s;font-size:13px}.logout-btn:hover{background:white;color:var(--primary-green)}.main-container{margin-top:70px;flex:1;display:flex;min-height:calc(100vh - 110px)}.sidebar{width:250px;background:white;border-right:1px solid var(--border);padding:20px 0;box-shadow:2px 0 10px rgba(0,0,0,0.05)}.nav-item{padding:15px 25px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent;display:flex;align-items:center;gap:12px;color:var(--dark-gray)}.nav-item:hover{background:var(--light-green);border-left-color:var(--secondary-green);color:var(--primary-green)}.nav-item.active{background:var(--light-green);border-left-color:var(--primary-green);color:var(--primary-green);font-weight:600}.nav-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center}.content{flex:1;padding:30px;overflow-y:auto}.page-title{font-size:24px;color:var(--primary-green);margin-bottom:25px;padding-bottom:10px;border-bottom:3px solid var(--secondary-green);display:flex;align-items:center;gap:10px}.card{background:white;border-radius:12px;padding:25px;margin-bottom:25px;box-shadow:0 4px 15px rgba(0,0,0,0.08);border:1px solid #e0e0e0}.card-header{font-size:18px;font-weight:600;color:var(--primary-green);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}.form-group{display:flex;flex-direction:column;gap:8px}.form-group label{font-weight:600;color:var(--dark-gray);font-size:14px}.form-control{padding:12px 15px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;transition:all 0.3s;background:white}.form-control:focus{outline:none;border-color:var(--secondary-green);box-shadow:0 0 0 3px rgba(46,204,113,0.1)}select.form-control{cursor:pointer}.btn{padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;font-size:14px;display:inline-flex;align-items:center;gap:8px}.btn-primary{background:linear-gradient(135deg,var(--secondary-green) 0%,var(--accent-green) 100%);color:white;box-shadow:0 4px 15px rgba(39,174,96,0.3)}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(39,174,96,0.4)}.btn-danger{background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:white}.btn-warning{background:linear-gradient(135deg,#f39c12 0%,#e67e22 100%);color:white}.btn-success{background:linear-gradient(135deg,#27ae60 0%,#229954 100%);color:white}.btn-secondary{background:#95a5a6;color:white}.btn-group{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}.table-container{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}table{width:100%;border-collapse:collapse;font-size:13px}th{background:linear-gradient(135deg,var(--primary-green) 0%,var(--dark-green) 100%);color:white;padding:14px;text-align:left;font-weight:600;white-space:nowrap}td{padding:12px 14px;border-bottom:1px solid #eee;color:var(--dark-gray)}tr:hover{background:#f8f9fa}.status-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;display:inline-block}.status-pending{background:#fff3cd;color:#856404}.status-success{background:#d4edda;color:#155724}.status-expired{background:#f8d7da;color:#721c24}.status-interrupted{background:#e2e3e5;color:#383d41}.login-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary-green) 0%,var(--dark-green) 100%);position:relative;overflow:hidden}.login-container::before{content:'';position:absolute;width:200%;height:200%;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,0.03) 10px,rgba(255,255,255,0.03) 20px);animation:slide 20s linear infinite}@keyframes slide{0%{transform:translate(-50%,-50%)}100%{transform:translate(0,0)}}.login-box{background:white;padding:40px;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);width:100%;max-width:450px;position:relative;z-index:1}.login-header{text-align:center;margin-bottom:30px}.login-logo{width:80px;height:80px;background:linear-gradient(135deg,var(--primary-green) 0%,var(--secondary-green) 100%);border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:24px;box-shadow:0 10px 30px rgba(26,95,63,0.3)}.login-title{font-size:24px;color:var(--primary-green);margin-bottom:10px}.login-subtitle{color:#666;font-size:14px}.login-form .form-group{margin-bottom:20px}.login-form input{width:100%}.password-hint{font-size:12px;color:#666;margin-top:5px;font-style:italic}.error-message{color:var(--error);font-size:13px;margin-top:5px;display:none}.chat-container{height:500px;display:flex;flex-direction:column;background:white;border-radius:12px;overflow:hidden;border:1px solid var(--border)}.chat-header{background:var(--primary-green);color:white;padding:15px;display:flex;justify-content:space-between;align-items:center}.chat-messages{flex:1;overflow-y:auto;padding:20px;background:#f8f9fa;display:flex;flex-direction:column}.message{margin-bottom:15px;max-width:70%;padding:12px 16px;border-radius:15px;position:relative;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.message-received{background:white;border:1px solid #e0e0e0;align-self:flex-start;border-bottom-left-radius:5px}.message-sent{background:linear-gradient(135deg,var(--secondary-green) 0%,var(--accent-green) 100%);color:white;align-self:flex-end;margin-left:auto;border-bottom-right-radius:5px}.message-time{font-size:11px;opacity:0.7;margin-top:5px}.chat-input-area{padding:15px;background:white;border-top:1px solid #eee;display:flex;gap:10px}.chat-input{flex:1;padding:12px;border:2px solid #e0e0e0;border-radius:25px;outline:none}.chat-input:focus{border-color:var(--secondary-green)}.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:20px}.user-card{background:white;border-radius:12px;padding:20px;border:1px solid var(--border);transition:all 0.3s}.user-card:hover{box-shadow:0 5px 20px rgba(0,0,0,0.1);transform:translateY(-2px)}.user-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.user-role{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}.role-admin{background:#e74c3c;color:white}.role-pnv{background:#3498db;color:white}.role-pql{background:#9b59b6;color:white}.role-bgd{background:#f39c12;color:white}.quote-panel{background:linear-gradient(135deg,#fff9e6 0%,#fff3cd 100%);border:2px solid #ffc107;border-radius:12px;padding:20px;margin-bottom:20px;position:relative;overflow:hidden}.quote-panel::before{content:'⚡';position:absolute;top:-10px;right:-10px;font-size:60px;opacity:0.1}.quote-header{font-size:16px;font-weight:600;color:#856404;margin-bottom:15px;display:flex;align-items:center;gap:10px}.countdown{font-size:24px;font-weight:bold;color:var(--error);font-family:monospace}.price-display{font-size:32px;font-weight:bold;color:var(--primary-green);text-align:center;margin:20px 0;font-family:'Courier New',monospace;text-shadow:2px 2px 4px rgba(0,0,0,0.1)}.footer{background:var(--dark-green);color:white;text-align:center;padding:15px;font-size:13px}.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center}.modal-overlay.active{display:flex}.modal{background:white;border-radius:16px;width:90%;max-width:800px;max-height:90vh;overflow-y:auto;animation:modalSlide 0.3s ease}@keyframes modalSlide{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}.modal-header{background:linear-gradient(135deg,var(--primary-green) 0%,var(--dark-green) 100%);color:white;padding:20px;border-radius:16px 16px 0 0}.modal-body{padding:25px}.modal-footer{padding:20px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:10px}.hidden{display:none !important}.text-center{text-align:center}.mt-20{margin-top:20px}.mb-20{margin-bottom:20px}.flex{display:flex}.flex-between{justify-content:space-between}.gap-10{gap:10px}.alert{padding:15px;border-radius:8px;margin-bottom:20px}.alert-info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}.alert-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}.alert-warning{background:#fff3cd;color:#856404;border:1px solid #ffeeba}.alert-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}.filter-section{background:#f8f9fa;padding:20px;border-radius:8px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:15px;align-items:end}.filter-group{display:flex;flex-direction:column;gap:5px}.filter-group label{font-size:13px;font-weight:600;color:#666}.filter-input{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px}@media(max-width:768px){.sidebar{width:100%;position:fixed;bottom:0;left:0;right:0;z-index:999;display:flex;overflow-x:auto;padding:0}.nav-item{flex-direction:column;padding:10px;min-width:80px;text-align:center;border-left:none;border-top:3px solid transparent}.nav-item.active{border-left:none;border-top-color:var(--primary-green)}.content{margin-bottom:80px;padding:15px}.header-title{font-size:14px}.form-grid{grid-template-columns:1fr}}@keyframes highlight{0%{background:var(--light-green)}100%{background:transparent}}.new-item{animation:highlight 2s ease}.spinner{border:3px solid #f3f3f3;border-top:3px solid var(--primary-green);border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin:20px auto}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;z-index:3000}.badge{position:absolute;top:-5px;right:-5px;background:var(--error);color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold}.nav-item{position:relative}.empty-state{text-align:center;padding:40px;color:#666}.empty-state-icon{font-size:48px;margin-bottom:15px}
+    </style>
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="login-logo">VCB</div>
+                <h2 class="login-title">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</h2>
+                <p class="login-subtitle">Hệ thống quản lý giao dịch ngoại tệ</p>
+            </div>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label>ID Người dùng</label>
+                    <input type="text" class="form-control" id="loginId" placeholder="Nhập ID của bạn" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Ít nhất 8 ký tự: Hoa, thường, số, đặc biệt" required autocomplete="current-password">
+                    <div class="password-hint">Ví dụ hợp lệ: Vcb@1234, MyPass#2024</div>
+                    <div class="error-message" id="loginError"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+                    <span id="loginBtnText">ĐĂNG NHẬP</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <!-- Rate Ticker -->
+        <div id="rateTicker" class="rate-ticker hidden">
+            <div class="rate-item">
+                <span>USD/VND:</span>
+                <span class="rate-value" id="rateUSD">24,850</span>
+                <span class="rate-change rate-up" id="changeUSD">+0.15%</span>
+            </div>
+            <div class="rate-item">
+                <span>EUR/VND:</span>
+                <span class="rate-value" id="rateEUR">27,120</span>
+                <span class="rate-change rate-down" id="changeEUR">-0.08%</span>
+            </div>
+            <div class="rate-item">
+                <span>GBP/VND:</span>
+                <span class="rate-value" id="rateGBP">31,450</span>
+                <span class="rate-change rate-up" id="changeGBP">+0.22%</span>
+            </div>
+            <div class="rate-item">
+                <span>JPY/VND:</span>
+                <span class="rate-value" id="rateJPY">165.20</span>
+                <span class="rate-change rate-down" id="changeJPY">-0.05%</span>
+            </div>
+            <div class="rate-item">
+                <span>Cập nhật:</span>
+                <span id="lastUpdate">10:45:22</span>
+            </div>
+        </div>
+
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">VCB<br>MBNT</div>
+                <div class="header-title" id="pageTitle">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-name" id="displayUserName">User Name</div>
+                    <div class="user-dept" id="displayUserDept">Phòng ban</div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+            </div>
+        </header>
+
+        <div class="main-container" id="mainContainer">
+            <nav class="sidebar" id="sidebar"></nav>
+            <main class="content" id="contentArea"></main>
+        </div>
+
+        <footer class="footer">
+            <div>Developer: MBNT System Team | © 2026 Vietcombank. All rights reserved.</div>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header" id="modalHeader">
+                <h3 id="modalTitle">Title</h3>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn btn-secondary" onclick="closeModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Chuyển đổi giao diện">🌓</button>
+
+    <!-- Help Panel -->
+    <div class="help-panel" id="helpPanel">
+        <div class="help-header">
+            <h3>📚 Hướng dẫn sử dụng</h3>
+            <span class="help-close" onclick="toggleHelp()">×</span>
+        </div>
+        <div class="help-content">
+            <div class="help-section">
+                <div class="help-title">🚀 Phím tắt nhanh</div>
+                <div class="shortcut-row"><span>Ctrl + N</span><span class="keyboard-shortcut">Tạo giao dịch mới</span></div>
+                <div class="shortcut-row"><span>Ctrl + F</span><span class="keyboard-shortcut">Tìm kiếm</span></div>
+                <div class="shortcut-row"><span>Ctrl + Enter</span><span class="keyboard-shortcut">Gửi tin nhắn</span></div>
+                <div class="shortcut-row"><span>Esc</span><span class="keyboard-shortcut">Đóng modal</span></div>
+            </div>
+            <div class="help-section">
+                <div class="help-title">💡 Mẹo sử dụng</div>
+                <p class="help-text">• Hỏi tỷ giá realtime trong 30 giây<br>• Chat trực tiếp Phòng Quản lý<br>• Xem lịch sử trong Blotter<br>• Bật dark mode ban đêm</p>
+            </div>
+            <div class="help-section">
+                <div class="help-title">⚠️ Lưu ý bảo mật</div>
+                <p class="help-text">• Không chia sẻ mật khẩu<br>• Đăng xuất khi rời máy<br>• Báo cáo giao dịch bất thường</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Toggle Button -->
+    <button class="help-toggle" onclick="toggleHelp()" title="Trợ giúp">❓</button>
+
+    <!-- Floating Action Button -->
+    <button class="floating-action-btn" id="fab" onclick="toggleFabMenu()">+</button>
+    <div class="fab-menu" id="fabMenu">
+        <div class="fab-item" onclick="quickAction('new')"><div class="fab-item-btn">📝</div><span class="fab-item-label">Tạo mới</span></div>
+        <div class="fab-item" onclick="quickAction('chat')"><div class="fab-item-btn">💬</div><span class="fab-item-label">Chat nhanh</span></div>
+        <div class="fab-item" onclick="quickAction('refresh')"><div class="fab-item-btn">🔄</div><span class="fab-item-label">Làm mới</span></div>
+    </div>
+
+    <script>
+        // ==================== CẤU HÌNH & DỮ LIỆU ====================
+        const API_URL = window.location.origin.includes('localhost') ? 'http://localhost:3000/api' : '/api';
+        let isOnline = false;
+
+        async function testAPI() {
+            try {
+                await fetch(`${API_URL}/health`, {method:'GET', mode:'no-cors'});
+                isOnline = true;
+            } catch {
+                isOnline = false;
+            }
+        }
+
+        async function apiSave(type, data) {
+            if (!isOnline) {
+                localStorage.setItem(`mbnt_${type}`, JSON.stringify(data));
+                return {success:true, offline:true};
+            }
+            try {
+                const res = await fetch(`${API_URL}/data/${type}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({data})
+                });
+                return await res.json();
+            } catch {
+                localStorage.setItem(`mbnt_${type}`, JSON.stringify(data));
+                return {success:false};
+            }
+        }
+
+        async function apiLoad(type) {
+            const local = localStorage.getItem(`mbnt_${type}`);
+            let localData = local ? JSON.parse(local) : null;
+            if (!isOnline) return localData;
+            try {
+                const res = await fetch(`${API_URL}/data/${type}`);
+                const server = await res.json();
+                return server && Object.keys(server).length ? server : localData;
+            } catch {
+                return localData;
+            }
+        }
+
+        const DB = {
+            users: [
+                {id:'admin', password:'Vcb@1234', name:'Administrator', role:'admin', dept:'IT Admin'},
+                {id:'K1_001', password:'Vcb@1234', name:'Nguyễn Văn A', role:'pnv', dept:'KHDN1'},
+                {id:'L1_001', password:'Vcb@1234', name:'Trần Thị B', role:'pnv', dept:'KHBL1'},
+                {id:'T1_001', password:'Vcb@1234', name:'Lê Văn C', role:'pnv', dept:'DVKHTC1'},
+                {id:'KT_001', password:'Vcb@1234', name:'Phạm Thị D', role:'pql', dept:'Phòng Quản lý'},
+                {id:'BGD_001', password:'Vcb@1234', name:'Giám đốc E', role:'bgd', dept:'Ban Giám đốc'}
+            ],
+            cifData: [
+                {cif:'0000095531', name:'CT TNHH DV DL HOAN MY'},
+                {cif:'0000096478', name:'CT TNHH TM SON DAU MOTO KIEU'},
+                {cif:'0000096544', name:'CT TNHH TM TIC TAC'},
+                {cif:'0000097231', name:'CT TNHH A.D.V'},
+                {cif:'0000098065', name:'TCT DL SAI GON-TNHH MTV'},
+                {cif:'0013664616', name:'CNCT TNHH THE ONLY GROUP'},
+                {cif:'0025016417', name:'CT TNHH SEALINK INTERNATIONAL'},
+                {cif:'0029543111', name:'CT TNHH CA PHE BAU CAN'}
+            ],
+            purposes: [
+                {code:'1', name:'Thanh toán nhập khẩu hàng hóa'},
+                {code:'2', name:'Thanh toán nhập khẩu dịch vụ'},
+                {code:'3', name:'Chuyển tiền một chiều'},
+                {code:'4', name:'Chuyển thu nhập từ hoạt động đầu tư'},
+                {code:'8', name:'Giải ngân vốn vay trong nước'},
+                {code:'11', name:'Nguồn khác'},
+                {code:'12', name:'Mục đích khác'}
+            ],
+            currencies: ['USD','EUR','GBP','JPY','AUD','SGD','THB','CAD','CHF','HKD','DKK','KRW','NOK','SEK','VND'],
+            transactions: [],
+            chatMessages: [],
+            pendingQuotes: [],
+            rates: {
+                USD: {buy:24850, sell:24950, change:0.15},
+                EUR: {buy:27120, sell:27250, change:-0.08},
+                GBP: {buy:31450, sell:31600, change:0.22},
+                JPY: {buy:165.2, sell:166.5, change:-0.05}
+            }
+        };
+
+        let currentUser = null;
+        let currentPage = '';
+        let quoteTimers = {};
+        let autoSaveInterval;
+        let isDarkMode = false;
+        let currentQuote = null;
+
+        // ==================== UTILITY ====================
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2,9); }
+        function formatDate(d = new Date()) { return d.toLocaleDateString('vi-VN'); }
+        function formatDateTime(d) { return d ? new Date(d).toLocaleString('vi-VN') : '-'; }
+        function formatNumber(n) { return new Intl.NumberFormat('vi-VN').format(n); }
+        function formatCurrency(n, c = '') { return formatNumber(n) + ' ' + c; }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('hidden', !show);
+        }
+
+        function showModal() { document.getElementById('modalOverlay').classList.add('active'); }
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+
+        function showNotification(msg, type='success', dur=3000) {
+            const t = document.createElement('div');
+            t.className = `notification-toast ${type}`;
+            t.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:24px;">${type==='success'?'✅':type==='error'?'❌':'⚠️'}</span>
+                    <div><div style="font-weight:600">${type==='success'?'Thành công':type==='error'?'Lỗi':'Cảnh báo'}</div><div style="font-size:13px">${msg}</div></div>
+                </div>
+                <span class="toast-close" onclick="this.parentElement.remove()">×</span>
+            `;
+            document.body.appendChild(t);
+            setTimeout(()=>t.remove(), dur);
+        }
+
+        function showConfetti() {
+            for(let i=0; i<100; i++){
+                setTimeout(()=>{
+                    const c = document.createElement('div');
+                    c.className = 'confetti-piece';
+                    c.style.left = Math.random()*100 + 'vw';
+                    c.style.background = ['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff'][Math.floor(Math.random()*6)];
+                    document.body.appendChild(c);
+                    c.animate([
+                        {transform:'translateY(-100vh) rotate(0deg)', opacity:1},
+                        {transform:`translateY(${window.innerHeight}px) rotate(${Math.random()*720}deg)`, opacity:0}
+                    ], {duration: Math.random()*3000+2000, easing:'ease-out'}).onfinish = ()=>c.remove();
+                }, i*30);
+            }
+        }
+
+        // ==================== THEME ====================
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            localStorage.setItem('mbnt_dark_mode', isDarkMode);
+            showNotification(isDarkMode ? 'Dark Mode bật' : 'Dark Mode tắt', 'success');
+        }
+
+        function toggleHelp() {
+            document.getElementById('helpPanel').classList.toggle('active');
+        }
+
+        function toggleFabMenu() {
+            document.getElementById('fabMenu').classList.toggle('active');
+        }
+
+        function quickAction(action) {
+            document.getElementById('fabMenu').classList.remove('active');
+            switch(action) {
+                case 'new':
+                    if (currentUser?.role === 'pnv') showPage('askRate');
+                    else if (currentUser?.role === 'admin') showPage('adminUsers');
+                    break;
+                case 'chat':
+                    showPage('chat');
+                    break;
+                case 'refresh':
+                    if (currentPage) showPage(currentPage);
+                    showNotification('Đã làm mới dữ liệu', 'success');
+                    break;
+            }
+        }
+
+        // ==================== AUTH & INIT ====================
+        document.getElementById('loginForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const id = document.getElementById('loginId').value.trim();
+            const pw = document.getElementById('loginPassword').value;
+
+            showLoading(true);
+            await testAPI();
+            await initData();
+
+            const user = DB.users.find(u => u.id === id && u.password === pw);
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+
+                if (user.role !== 'admin') {
+                    document.getElementById('rateTicker').classList.remove('hidden');
+                    document.getElementById('mainContainer').classList.add('main-container-with-ticker');
+                    document.getElementById('sidebar').classList.add('sidebar-with-ticker');
+                    document.getElementById('contentArea').classList.add('content-with-ticker');
+                    setInterval(updateRateTicker, 5000);
+                }
+
+                autoSaveInterval = setInterval(() => apiSave('main', DB), 30000);
+                initApp();
+                showNotification(`Chào ${user.name}!`, 'success');
+            } else {
+                showNotification('Sai ID hoặc mật khẩu', 'error');
+            }
+            showLoading(false);
+        });
+
+        function logout() {
+            currentUser = null;
+            clearInterval(autoSaveInterval);
+            apiSave('main', DB);
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('rateTicker').classList.add('hidden');
+            document.getElementById('mainContainer').classList.remove('main-container-with-ticker');
+            document.getElementById('sidebar').classList.remove('sidebar-with-ticker');
+            document.getElementById('contentArea').classList.remove('content-with-ticker');
+            showNotification('Đã đăng xuất', 'success');
+        }
+
+        async function initData() {
+            isDarkMode = localStorage.getItem('mbnt_dark_mode') === 'true';
+            document.body.classList.toggle('dark-mode', isDarkMode);
+
+            const saved = await apiLoad('main');
+            if (saved) Object.assign(DB, saved);
+            else await apiSave('main', DB);
+        }
+
+        function initApp() {
+            document.getElementById('displayUserName').textContent = currentUser.name;
+            document.getElementById('displayUserDept').textContent = currentUser.dept;
+            renderSidebar();
+            const pages = {admin:'adminUsers', pnv:'askRate', pql:'inputData', bgd:'reportBGD'};
+            showPage(pages[currentUser.role] || 'askRate');
+        }
+
+        // ==================== SIDEBAR & PAGE SWITCH ====================
+        function renderSidebar() {
+            const menus = {
+                admin: [{id:'adminUsers',icon:'👥',label:'Quản lý Users'},{id:'adminData',icon:'📊',label:'Nhập dữ liệu'},{id:'adminSettings',icon:'⚙️',label:'Cài đặt'}],
+                pnv: [{id:'askRate',icon:'💱',label:'Hỏi tỷ giá'},{id:'blotterPNV',icon:'📋',label:'Blotter PNV'},{id:'chat',icon:'💬',label:'Chat'},{id:'calendar',icon:'📅',label:'Lịch'}],
+                pql: [{id:'inputData',icon:'📥',label:'Nhập dữ liệu'},{id:'blotterPQL',icon:'📋',label:'Blotter PQL'},{id:'report',icon:'📊',label:'Báo cáo'},{id:'chat',icon:'💬',label:'Chat'},{id:'approval',icon:'✅',label:'Phê duyệt'}],
+                bgd: [{id:'reportBGD',icon:'📊',label:'Báo cáo BGĐ'},{id:'dashboard',icon:'🎯',label:'Dashboard'},{id:'settings',icon:'⚙️',label:'Cài đặt'}]
+            };
+            const items = menus[currentUser.role] || [];
+            items.push({id:'changePass',icon:'🔐',label:'Đổi mật khẩu'});
+
+            const sidebar = document.getElementById('sidebar');
+            sidebar.innerHTML = items.map(i => `
+                <div class="nav-item" data-page="${i.id}" onclick="${i.id==='changePass'?'changePassword()':'showPage(\''+i.id+'\')'}">
+                    <span class="nav-icon">${i.icon}</span><span>${i.label}</span>
+                </div>
+            `).join('');
+        }
+
+        function showPage(id) {
+            currentPage = id;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === id));
+
+            const area = document.getElementById('contentArea');
+            area.innerHTML = '<div class="spinner"></div>';
+
+            setTimeout(() => {
+                const renders = {
+                    adminUsers: renderAdminUsers,
+                    adminData: renderAdminData,
+                    adminSettings: renderAdminSettings,
+                    askRate: renderAskRate,
+                    blotterPNV: renderBlotterPNV,
+                    blotterPQL: renderBlotterPQL,
+                    inputData: renderInputData,
+                    report: renderReport,
+                    reportBGD: renderReportBGD,
+                    chat: renderChat,
+                    calendar: renderCalendar,
+                    approval: renderApproval,
+                    dashboard: renderDashboard,
+                    settings: renderSettings
+                };
+                (renders[id] || (c => c.innerHTML = '<div class="alert alert-warning">Chức năng đang phát triển</div>'))(area);
+            }, 150);
+        }
+
+        function updateRateTicker() {
+            ['USD','EUR','GBP','JPY'].forEach(c => {
+                const r = DB.rates[c];
+                if (r) {
+                    document.getElementById(`rate${c}`).textContent = formatNumber(r.sell);
+                    const ch = document.getElementById(`change${c}`);
+                    ch.textContent = (r.change > 0 ? '+' : '') + r.change + '%';
+                    ch.className = 'rate-change ' + (r.change >= 0 ? 'rate-up' : 'rate-down');
+                }
+            });
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        }
+
+        // ==================== ADMIN USERS ====================
+        function renderAdminUsers(c) {
+            c.innerHTML = `
+                <h2 class="page-title">👥 Quản lý Người dùng</h2>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value">${DB.users.length}</div><div class="stat-label">Tổng Users</div></div>
+                    <div class="stat-card warning"><div class="stat-value">${DB.users.filter(u=>u.role==='pnv').length}</div><div class="stat-label">PNV</div></div>
+                    <div class="stat-card"><div class="stat-value">${DB.users.filter(u=>u.role==='pql').length}</div><div class="stat-label">PQL</div></div>
+                    <div class="stat-card danger"><div class="stat-value">${DB.users.filter(u=>u.role==='bgd').length}</div><div class="stat-label">BGĐ</div></div>
+                </div>
+                <div class="card">
+                    <div class="card-header flex-between">
+                        <span>Danh sách Users</span>
+                        <button class="btn btn-primary" onclick="showAddUserModal()">+ Thêm User</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>ID</th><th>Họ tên</th><th>Vai trò</th><th>Phòng ban</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                            <tbody>
+                                ${DB.users.map(u => `
+                                    <tr>
+                                        <td><strong>${u.id}</strong></td>
+                                        <td>${u.name}</td>
+                                        <td><span class="user-role role-${u.role}">${u.role.toUpperCase()}</span></td>
+                                        <td>${u.dept}</td>
+                                        <td><span class="status-badge status-success">Hoạt động</span></td>
+                                        <td>
+                                            <button class="btn btn-warning btn-sm" onclick="resetPassword('${u.id}')">Reset MK</button>
+                                            <button class="btn btn-secondary btn-sm" onclick="editUser('${u.id}')">Sửa</button>
+                                            ${u.id !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Xóa</button>` : ''}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== HỎI TỶ GIÁ (PNV) ====================
+        function renderAskRate(c) {
+            const t = new Date();
+            const po = DB.purposes.map(p=>`<option value="${p.code}">${p.code} - ${p.name}</option>`).join('');
+            const co = DB.currencies.map(c=>`<option value="${c}" ${c==='USD'?'selected':''}>${c}</option>`).join('');
+
+            c.innerHTML = `
+                <h2 class="page-title">💱 Hỏi tỷ giá</h2>
+                <div class="card">
+                    <form id="quoteForm" onsubmit="submitQuoteRequest(event)">
+                        <div class="form-grid">
+                            <div class="form-group"><label>CIF *</label><input type="text" id="quoteCif" maxlength="10" required onblur="lookupCustomerName()" placeholder="10 số CIF"></div>
+                            <div class="form-group"><label>Tên KH</label><input type="text" id="quoteCifName" readonly></div>
+                            <div class="form-group"><label>Chiều GD *</label><select id="quoteDirection" onchange="updatePurposeLabel();updateEstimatedValue()">
+                                <option value="buy">🟢 VCB MUA</option>
+                                <option value="sell">🔴 VCB BÁN</option>
+                            </select></div>
+                            <div class="form-group"><label>Ngày hiệu lực *</label><input type="text" id="quoteEffectiveDate" value="${t.getDate().toString().padStart(2,'0')}${(t.getMonth()+1).toString().padStart(2,'0')}${t.getFullYear()}" maxlength="8" required></div>
+                            <div class="form-group"><label>Loại tiền *</label><select id="quoteCurrency" required onchange="updateEstimatedValue()">${co}</select></div>
+                            <div class="form-group"><label>Số lượng *</label><input type="number" id="quoteAmount" min="1" required oninput="updateEstimatedValue()"></div>
+                            <div class="form-group"><label id="purposeLabel">Mục đích *</label><select id="quotePurpose" required>${po}</select></div>
+                        </div>
+                        <div id="estimateBox" class="summary-box" style="display:none">
+                            <div class="summary-title">Ước tính</div>
+                            <div class="summary-grid">
+                                <div class="summary-item"><div class="summary-value" id="estimateRate">-</div><div class="summary-label">Tỷ giá</div></div>
+                                <div class="summary-item"><div class="summary-value" id="estimateValue">-</div><div class="summary-label">Giá trị VND</div></div>
+                            </div>
+                        </div>
+                        <div id="quoteResultPanel" class="quote-panel mt-20" style="display:none">
+                            <div class="quote-header"><span>⚡ BÁO GIÁ</span><span class="countdown" id="quoteCountdown">60s</span></div>
+                            <div class="price-display" id="quotePrice">-</div>
+                            <div style="text-align:center;margin:15px 0">Tổng: <strong id="quoteTotalValue">-</strong></div>
+                            <div style="display:flex;gap:15px;justify-content:center">
+                                <button type="button" class="btn btn-success" onclick="acceptQuote()">✓ Chấp nhận</button>
+                                <button type="button" class="btn btn-danger" onclick="rejectQuote()">✕ Từ chối</button>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary" id="btnAskQuote">📞 HỎI TỶ GIÁ</button>
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('quoteForm').reset()">Làm mới</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card"><div id="pendingQuotesList"></div></div>
+            `;
+            renderPendingQuotes();
+        }
+
+        function lookupCustomerName() {
+            const cif = document.getElementById('quoteCif').value.trim();
+            const nameEl = document.getElementById('quoteCifName');
+            if (cif.length === 10) {
+                const customer = DB.cifData.find(c => c.cif === cif);
+                nameEl.value = customer ? customer.name : '⚠️ Không tìm thấy KH';
+                nameEl.style.color = customer ? 'var(--primary-green)' : 'var(--error)';
+            } else {
+                nameEl.value = '';
+            }
+        }
+
+        function updatePurposeLabel() {
+            const dir = document.getElementById('quoteDirection').value;
+            document.getElementById('purposeLabel').innerHTML = dir === 'buy' ? '🎯 Mục đích mua *' : '💰 Nguồn bán *';
+        }
+
+        function updateEstimatedValue() {
+            const ccy = document.getElementById('quoteCurrency').value;
+            const amt = parseFloat(document.getElementById('quoteAmount').value) || 0;
+            const dir = document.getElementById('quoteDirection').value;
+            const rate = DB.rates[ccy];
+            if (rate && amt > 0) {
+                const ref = dir === 'buy' ? rate.buy : rate.sell;
+                document.getElementById('estimateBox').style.display = 'block';
+                document.getElementById('estimateRate').textContent = formatNumber(ref) + ' VND';
+                document.getElementById('estimateValue').textContent = formatNumber(amt * ref) + ' VND';
+            } else {
+                document.getElementById('estimateBox').style.display = 'none';
+            }
+        }
+
+        function submitQuoteRequest(e) {
+            e.preventDefault();
+            const cif = document.getElementById('quoteCif').value.trim();
+            if (!DB.cifData.find(c => c.cif === cif)) {
+                showNotification('CIF không tồn tại!', 'error');
+                return;
+            }
+
+            const quote = {
+                id: generateId(),
+                cif,
+                cifName: document.getElementById('quoteCifName').value,
+                direction: document.getElementById('quoteDirection').value,
+                effectiveDate: document.getElementById('quoteEffectiveDate').value,
+                currency: document.getElementById('quoteCurrency').value,
+                amount: parseFloat(document.getElementById('quoteAmount').value),
+                purpose: document.getElementById('quotePurpose').value,
+                purposeName: DB.purposes.find(p => p.code === document.getElementById('quotePurpose').value)?.name || '',
+                requester: currentUser.id,
+                requesterName: currentUser.name,
+                requesterDept: currentUser.dept,
+                requestTime: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            DB.pendingQuotes.push(quote);
+            apiSave('main', DB);
+
+            const btn = document.getElementById('btnAskQuote');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Đang chờ...';
+
+            setTimeout(() => simulateQuoteResponse(quote.id), Math.random()*3000 + 2000);
+
+            renderPendingQuotes();
+            showNotification('Đã gửi yêu cầu!', 'success');
+        }
+
+        function simulateQuoteResponse(id) {
+            const q = DB.pendingQuotes.find(q => q.id === id);
+            if (!q || q.status !== 'pending') return;
+
+            const base = {USD:24850,EUR:27120,GBP:31450,JPY:165.2}[q.currency] || 25000;
+            const spread = (Math.random()-0.5)*0.01*base;
+            q.price = Math.round(base + spread);
+            q.expiryTime = Date.now() + 60000;
+            q.status = 'quoted';
+            q.quotedBy = 'KT_001';
+            q.quotedAt = new Date().toISOString();
+
+            apiSave('main', DB);
+
+            if (currentPage === 'askRate') showQuoteResult(q);
+            renderPendingQuotes();
+            showNotification('Đã nhận báo giá!', 'success');
+        }
+
+        function showQuoteResult(q) {
+            const panel = document.getElementById('quoteResultPanel');
+            panel.style.display = 'block';
+
+            const price = q.currency === 'JPY' ? q.price.toFixed(2) : formatNumber(q.price);
+            document.getElementById('quotePrice').innerHTML = `${price} <span style="font-size:18px">VND/${q.currency}</span>`;
+            document.getElementById('quoteTotalValue').textContent = formatNumber(q.amount * q.price) + ' VND';
+
+            panel.scrollIntoView({behavior:'smooth', block:'center'});
+
+            let sec = 60;
+            const cd = document.getElementById('quoteCountdown');
+            const txt = document.getElementById('countdownText');
+
+            if (quoteTimers[q.id]) clearInterval(quoteTimers[q.id]);
+
+            quoteTimers[q.id] = setInterval(() => {
+                sec--;
+                cd.textContent = sec + 's';
+                txt.textContent = sec;
+                if (sec <= 10) {
+                    cd.style.color = '#e74c3c';
+                    panel.style.borderColor = '#e74c3c';
+                }
+                if (sec <= 0) {
+                    clearInterval(quoteTimers[q.id]);
+                    q.status = 'expired';
+                    apiSave('main', DB);
+                    panel.style.display = 'none';
+                    document.getElementById('btnAskQuote').disabled = false;
+                    document.getElementById('btnAskQuote').innerHTML = '📞 HỎI TỶ GIÁ';
+                    showNotification('Báo giá hết hạn!', 'warning');
+                    renderPendingQuotes();
+                }
+            }, 1000);
+
+            window.currentQuote = q;
+        }
+
+        function acceptQuote() {
+            if (!window.currentQuote) return;
+            const q = window.currentQuote;
+            q.status = 'accepted';
+            q.acceptTime = new Date().toISOString();
+            q.acceptedBy = currentUser.id;
+
+            const tx = {
+                id: 'GD' + generateId().substr(-8).toUpperCase(),
+                quoteId: q.id,
+                cif: q.cif,
+                cifName: q.cifName,
+                direction: q.direction,
+                currency: q.currency,
+                amount: q.amount,
+                price: q.price,
+                totalValue: Math.round(q.amount * q.price),
+                purpose: q.purpose,
+                purposeName: q.purposeName,
+                effectiveDate: q.effectiveDate,
+                requester: q.requester,
+                requesterName: q.requesterName,
+                requesterDept: q.requesterDept,
+                requestTime: q.requestTime,
+                status: 'completed',
+                createdAt: new Date().toISOString(),
+                completedAt: new Date().toISOString()
+            };
+
+            DB.transactions.unshift(tx);
+            DB.pendingQuotes = DB.pendingQuotes.filter(x => x.id !== q.id);
+            apiSave('main', DB);
+
+            clearInterval(quoteTimers[q.id]);
+            showConfetti();
+            showNotification('Giao dịch xác nhận thành công!', 'success', 5000);
+
+            setTimeout(() => {
+                document.getElementById('quoteResultPanel').style.display = 'none';
+                document.getElementById('btnAskQuote').disabled = false;
+                document.getElementById('btnAskQuote').innerHTML = '📞 HỎI TỶ GIÁ';
+                renderPendingQuotes();
+            }, 2000);
+        }
+
+        function rejectQuote() {
+            if (!window.currentQuote) return;
+            const q = window.currentQuote;
+            const reason = prompt('Lý do từ chối (không bắt buộc):') || 'Từ chối bởi PNV';
+            q.status = 'rejected';
+            q.rejectTime = new Date().toISOString();
+            q.rejectReason = reason;
+            q.rejectedBy = currentUser.id;
+
+            setTimeout(() => {
+                DB.pendingQuotes = DB.pendingQuotes.filter(x => x.id !== q.id);
+                apiSave('main', DB);
+            }, 5000);
+
+            clearInterval(quoteTimers[q.id]);
+            document.getElementById('quoteResultPanel').style.display = 'none';
+            document.getElementById('btnAskQuote').disabled = false;
+            document.getElementById('btnAskQuote').innerHTML = '📞 HỎI TỶ GIÁ';
+            renderPendingQuotes();
+            showNotification('Đã từ chối báo giá', 'warning');
+        }
+
+        function renderPendingQuotes() {
+            const list = document.getElementById('pendingQuotesList');
+            if (list) list.innerHTML = renderPendingQuotesList();
+        }
+
+        function renderPendingQuotesList() {
+            const quotes = DB.pendingQuotes
+                .filter(q => q.requester === currentUser.id)
+                .sort((a,b) => new Date(b.requestTime) - new Date(a.requestTime))
+                .slice(0,10);
+
+            if (!quotes.length) return `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <p>Chưa có báo giá nào</p>
+                </div>
+            `;
+
+            return `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Thời gian</th><th>CIF / Tên</th><th>Chiều</th><th>CCY</th><th>Số lượng</th><th>Tỷ giá</th><th>Trạng thái</th></tr>
+                        </thead>
+                        <tbody>
+                            ${quotes.map(q => {
+                                let cls = '', txt = '', icon = '';
+                                switch(q.status){
+                                    case 'pending': cls='status-pending'; txt='Chờ'; icon='⏳'; break;
+                                    case 'quoted': cls='status-success'; txt='Đã báo'; icon='💰'; break;
+                                    case 'expired': cls='status-expired'; txt='Hết hạn'; icon='⏰'; break;
+                                    case 'rejected': cls='status-interrupted'; txt='Từ chối'; icon='❌'; break;
+                                    default: cls='status-pending'; txt=q.status; icon='❓';
+                                }
+                                return `
+                                    <tr>
+                                        <td>${formatDateTime(q.requestTime)}</td>
+                                        <td><strong>${q.cif}</strong><br><small>${q.cifName}</small></td>
+                                        <td><span style="color:${q.direction==='buy'?'#27ae60':'#e74c3c'};">${q.direction==='buy'?'🟢 MUA':'🔴 BÁN'}</span></td>
+                                        <td><strong>${q.currency}</strong></td>
+                                        <td>${formatNumber(q.amount)}</td>
+                                        <td>${q.price ? formatNumber(q.price) : '-'}</td>
+                                        <td><span class="status-badge ${cls}">${icon} ${txt}</span></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // ==================== BLOTTER PNV ====================
+        function renderBlotterPNV(c) {
+            const myTx = DB.transactions.filter(t => t.requester === currentUser.id);
+            c.innerHTML = `
+                <h2 class="page-title">📋 Blotter PNV</h2>
+                <div class="card">
+                    <div class="card-header">Lịch sử giao dịch của bạn (${myTx.length})</div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Mã GD</th><th>Ngày</th><th>CCY</th><th>Số lượng</th><th>Giá</th><th>Tổng</th><th>Trạng thái</th></tr></thead>
+                            <tbody>
+                                ${myTx.map(t => `
+                                    <tr>
+                                        <td><strong>${t.id}</strong></td>
+                                        <td>${formatDate(t.createdAt)}</td>
+                                        <td>${t.currency}</td>
+                                        <td>${formatNumber(t.amount)}</td>
+                                        <td>${formatNumber(t.price)}</td>
+                                        <td>${formatCurrency(t.totalValue, 'VND')}</td>
+                                        <td><span class="status-badge status-success">Hoàn thành</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== BLOTTER PQL ====================
+        function renderBlotterPQL(c) {
+            const allTx = DB.transactions;
+            c.innerHTML = `
+                <h2 class="page-title">📋 Blotter PQL</h2>
+                <div class="card">
+                    <div class="card-header">Tất cả giao dịch (${allTx.length})</div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Mã GD</th><th>PNV</th><th>CCY</th><th>Số lượng</th><th>Giá</th><th>Tổng</th><th>Trạng thái</th></tr></thead>
+                            <tbody>
+                                ${allTx.map(t => `
+                                    <tr>
+                                        <td><strong>${t.id}</strong></td>
+                                        <td>${t.requesterName}</td>
+                                        <td>${t.currency}</td>
+                                        <td>${formatNumber(t.amount)}</td>
+                                        <td>${formatNumber(t.price)}</td>
+                                        <td>${formatCurrency(t.totalValue, 'VND')}</td>
+                                        <td><span class="status-badge status-success">Hoàn thành</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== CHAT (giả lập) ====================
+        function renderChat(c) {
+            c.innerHTML = `
+                <h2 class="page-title">💬 Chat nội bộ</h2>
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <span>Phòng chat chung</span>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message message-received">
+                            <div>Xin chào! Chào mừng đến phòng chat nội bộ.</div>
+                            <div class="message-time">09:40</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Nhập tin nhắn...">
+                        <button class="btn btn-primary" onclick="sendMessage()">Gửi</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            if (!input.value.trim()) return;
+
+            const msgArea = document.getElementById('chatMessages');
+            const msg = document.createElement('div');
+            msg.className = 'message message-sent';
+            msg.innerHTML = `
+                <div>${escapeHtml(input.value)}</div>
+                <div class="message-time">${new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</div>
+            `;
+            msgArea.appendChild(msg);
+            msgArea.scrollTop = msgArea.scrollHeight;
+            input.value = '';
+        }
+
+        function escapeHtml(text) {
+            const map = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#039;'};
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // ==================== CÁC TRANG KHÁC (placeholder) ====================
+        function renderReport(c) { c.innerHTML = '<h2 class="page-title">📊 Báo cáo</h2><div class="card"><p>Báo cáo đang phát triển...</p></div>'; }
+        function renderCalendar(c) { c.innerHTML = '<h2 class="page-title">📅 Lịch</h2><div class="card"><p>Lịch đang phát triển...</p></div>'; }
+        function renderApproval(c) { c.innerHTML = '<h2 class="page-title">✅ Phê duyệt</h2><div class="card"><p>Phê duyệt đang phát triển...</p></div>'; }
+        function renderDashboard(c) { c.innerHTML = '<h2 class="page-title">🎯 Dashboard</h2><div class="card"><p>Dashboard đang phát triển...</p></div>'; }
+        function renderSettings(c) { c.innerHTML = '<h2 class="page-title">⚙️ Cài đặt</h2><div class="card"><p>Cài đặt đang phát triển...</p></div>'; }
+
+        // ==================== KHỞI ĐỘNG ====================
+        window.addEventListener('load', async () => {
+            await testAPI();
+            await initData();
+        });
+    </script>
+</body>
+</html>
