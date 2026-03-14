@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: mbnt-system
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mbnt-db
+          property: connectionString
+
+databases:
+  - name: mbnt-db
+    plan: free
+    postgresMajorVersion: 15
