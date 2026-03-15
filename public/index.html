@@ -845,7 +845,13 @@
     <!-- Header -->
     <header class="header" id="header">
         <div class="logo-section">
-            <img src="./static/Logo.png" alt="Vietcombank Logo" id="brand-logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect width=%2250%22 height=%2250%22 fill=%22%23ffffff%22/%3E%3Ctext x=%2225%22 y=%2230%22 font-size=%2212%22 text-anchor=%22middle%22 fill=%22%231a5f1a%22%3EVCB%3C/text%3E%3C/svg%3E'; this.onerror=null;">
+            <!-- SỬA LOGO: Thay thế SVG placeholder bằng logo Vietcombank chuẩn -->
+            <svg id="brand-logo" width="50" height="50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Logo Vietcombank chuẩn -->
+                <rect width="100" height="100" fill="#006633" rx="10"/>
+                <text x="50" y="65" font-family="Arial, sans-serif" font-size="45" font-weight="bold" text-anchor="middle" fill="white">VCB</text>
+                <path d="M20 75 Q50 85 80 75" stroke="white" stroke-width="3" fill="none"/>
+            </svg>
             
             <div class="logo-text">
                 <span class="bank-name">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
@@ -942,7 +948,7 @@
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('pnv', 'askPrice')">Hỏi tỷ giá</button>
                 <button class="tab" onclick="switchTab('pnv', 'blotter')">Blotter PNV</button>
-                <button class="tab" onclick="switchTab('pnv', 'chat')">Chat</button>
+                <button class="tab" onclick="switchTab('pnv', 'chat')">Chat với PQL</button>
                 <button class="tab" onclick="switchTab('pnv', 'changePassword')">Đổi mật khẩu</button>
             </div>
 
@@ -1056,28 +1062,6 @@
                         </div>
                     </form>
                 </div>
-
-                <!-- Quote Response Area - CHỈ HIỂN THỊ KHI PQL CHÀO GIÁ -->
-                <div id="quoteResponse" class="hidden">
-                    <div class="quote-box">
-                        <div class="quote-header">
-                            <span style="font-weight: 600;">Tỷ giá từ PQL</span>
-                            <span class="quote-timer" id="quoteTimer">02:00</span>
-                        </div>
-                        <div class="quote-price" id="quotePrice">0.00</div>
-                        <div style="text-align: center; color: #666; margin-bottom: 15px;">
-                            <span id="quotePair">VND/USD</span> | Thời gian còn lại để chấp nhận
-                        </div>
-                        <div class="quote-actions">
-                            <button class="btn btn-small" onclick="acceptPrice()" style="background: var(--success);">
-                                ✓ Chấp nhận giá
-                            </button>
-                            <button class="btn btn-small btn-danger" onclick="rejectPrice()">
-                                ✗ Từ chối giá
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Tab Blotter -->
@@ -1139,10 +1123,13 @@
                 </div>
             </div>
 
-            <!-- Tab Chat -->
+            <!-- Tab Chat PNV -->
             <div id="pnv-chat" class="tab-content">
                 <div class="card">
-                    <div class="card-title">Chat với Phòng Quản lý</div>
+                    <div class="card-title">Chat với Phòng Quản lý (PQL)</div>
+                    <div class="chat-info" style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 13px;">
+                        💬 Tin nhắn của bạn sẽ được gửi đến tất cả PQL. PQL sẽ chọn phản hồi riêng với bạn.
+                    </div>
                     <div class="chat-container">
                         <div class="chat-messages" id="pnvChatMessages">
                             <div class="chat-message received">
@@ -1152,7 +1139,7 @@
                         </div>
                         <div class="chat-input-area">
                             <input type="text" class="chat-input" id="pnvChatInput" 
-                                   placeholder="Nhập tin nhắn..." onkeypress="handleChatKeyPress(event)">
+                                   placeholder="Nhập tin nhắn gửi đến PQL..." onkeypress="handleChatKeyPress(event)">
                             <button class="btn chat-send" onclick="sendChatMessage()">Gửi</button>
                         </div>
                     </div>
@@ -1189,7 +1176,7 @@
                 <div class="dashboard-title">📊 DASHBOARD PHÒNG QUẢN LÝ</div>
             </div>
 
-            <!-- INTERRUPT BAR - LUÔN HIỂN THỊ -->
+            <!-- INTERRUPT BAR -->
             <div class="interrupt-bar">
                 <div class="interrupt-title">⚠️ QUYỀN KHẨN CẤP</div>
                 <div class="btn-group" style="margin: 0;">
@@ -1203,16 +1190,15 @@
                 <button class="tab" onclick="switchTab('pql', 'quotes')">Chào giá</button>
                 <button class="tab" onclick="switchTab('pql', 'blotter')">Blotter PQL</button>
                 <button class="tab" onclick="switchTab('pql', 'reports')">Báo cáo</button>
-                <button class="tab" onclick="switchTab('pql', 'chat')">Chat</button>
+                <button class="tab" onclick="switchTab('pql', 'chat')">Chat PNV</button>
                 <button class="tab" onclick="switchTab('pql', 'changePassword')">Đổi mật khẩu</button>
             </div>
 
-            <!-- Tab Nhập dữ liệu - ĐÃ SỬA ĐỂ UPLOAD FILE -->
+            <!-- Tab Nhập dữ liệu -->
             <div id="pql-dataEntry" class="tab-content active">
                 <div class="card">
                     <div class="card-title">Upload dữ liệu CIF - Tên KH</div>
                     
-                    <!-- FILE UPLOAD AREA -->
                     <div class="file-upload-area" id="cifUploadArea">
                         <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
                         <div style="font-weight: 600; margin-bottom: 5px;">Kéo thả file hoặc click để chọn file</div>
@@ -1370,22 +1356,6 @@
                                 <label>PNV</label>
                                 <select id="pqlFilterPnv">
                                     <option value="">Tất cả PNV</option>
-                                    <option value="K1">KHDN1 (K1)</option>
-                                    <option value="K2">KHDN2 (K2)</option>
-                                    <option value="K3">KHDN3 (K3)</option>
-                                    <option value="FDI">FDI (FDI)</option>                                    
-                                    <option value="L1">KHBL1 (L1)</option>
-                                    <option value="L2">KHBL2 (L2)</option>
-                                    <option value="L3">KHBL3 (L3)</option>
-                                    <option value="PGD TĐT">PGD TĐT (TĐT)</option>
-                                    <option value="PGD ML">PGD ML (ML)</option>
-                                    <option value="PGD ĐK">PGD ĐK (ĐK)</option>
-                                    <option value="PGD CH">PGD CH (CH)</option>
-                                    <option value="PGD VVK">PGD VVK (VVK)</option>
-                                    <option value="PGD LTT">PGD LTT (LTT)</option>                                    
-                                    <option value="TN">DV KHTN (TN)</option>
-                                    <option value="T1">DVKHTC1 (T1)</option>
-                                    <option value="T2">DVKHTC2 (T2)</option>
                                 </select>
                             </div>
                             <div class="filter-group">
@@ -1435,10 +1405,10 @@
                 </div>
             </div>
 
-            <!-- Tab Báo cáo -->
+            <!-- Tab Báo cáo MỚI -->
             <div id="pql-reports" class="tab-content">
                 <div class="card">
-                    <div class="card-title">Báo cáo giao dịch</div>
+                    <div class="card-title">Báo cáo Lợi nhuận Giao dịch</div>
                     <div class="filter-section">
                         <div class="form-row">
                             <div class="form-col">
@@ -1457,22 +1427,16 @@
                         <div class="form-row">
                             <div class="form-col">
                                 <div class="form-group">
-                                    <label>Ngày hiệu lực từ</label>
-                                    <input type="date" id="reportEffFrom">
+                                    <label>Phòng QL (PNV)</label>
+                                    <select id="reportPnv">
+                                        <option value="">Tất cả</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-col">
                                 <div class="form-group">
-                                    <label>Ngày hiệu lực đến</label>
-                                    <input type="date" id="reportEffTo">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Mã đồng tiền bán</label>
-                                    <select id="reportSellCurr">
+                                    <label>Loại tiền</label>
+                                    <select id="reportCurrency">
                                         <option value="">Tất cả</option>
                                         <option value="USD">USD</option>
                                         <option value="EUR">EUR</option>
@@ -1481,50 +1445,16 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Mã đồng tiền mua</label>
-                                    <select id="reportBuyCurr">
-                                        <option value="">Tất cả</option>
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                        <option value="VND">VND</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Mã PNV</label>
-                                    <select id="reportPnv">
-                                        <option value="">Tất cả</option>
-                                        <option value="K1">K1</option>
-                                        <option value="L1">L1</option>
-                                        <option value="TN">TN</option>
-                                        <option value="T1">T1</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Loại giao dịch</label>
-                                    <select id="reportType">
-                                        <option value="">Tất cả</option>
-                                        <option value="GN">GN (Giao ngay)</option>
-                                        <option value="KH">KH (Kỳ hạn)</option>
-                                        <option value="HĐ">HĐ (Hợp đồng)</option>
-                                    </select>
-                                </div>
-                            </div>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-small" onclick="generateReport()" style="width: auto;">Xem báo cáo</button>
-                            <button class="btn btn-small btn-secondary" onclick="exportReport('excel')" style="width: auto;">Xuất Excel</button>
-                            <button class="btn btn-small btn-secondary" onclick="exportReport('pdf')" style="width: auto;">Xuất PDF</button>
+                            <button class="btn btn-small" onclick="generateProfitReport()" style="width: auto;">Xem báo cáo</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportProfitReport('excel')" style="width: auto;">Xuất Excel</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportProfitReport('pdf')" style="width: auto;">Xuất PDF</button>
                         </div>
                     </div>
-                    <div id="reportResult" class="table-container" style="margin-top: 20px;">
+                    
+                    <!-- Kết quả báo cáo -->
+                    <div id="reportResult" style="margin-top: 20px;">
                         <div style="padding: 40px; text-align: center; color: var(--gray);">
                             Vui lòng chọn điều kiện lọc và nhấn "Xem báo cáo"
                         </div>
@@ -1532,21 +1462,35 @@
                 </div>
             </div>
 
-            <!-- Tab Chat -->
+            <!-- Tab Chat PQL -->
             <div id="pql-chat" class="tab-content">
                 <div class="card">
                     <div class="card-title">Chat với Phòng Nghiệp vụ</div>
+                    
+                    <!-- Chọn PNV để chat -->
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Chọn PNV để chat riêng (bắt buộc):</label>
+                        <select id="pqlChatPnvSelect" onchange="loadPqlChatForPnv()">
+                            <option value="">-- Chọn PNV --</option>
+                        </select>
+                    </div>
+
+                    <div class="chat-info" style="background: #fff3e0; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 13px;">
+                        📢 Tin nhắn từ các PNV sẽ hiển thị ở đây. Bạn phải chọn PNV để trả lời riêng.
+                    </div>
+                    
                     <div class="chat-container">
                         <div class="chat-messages" id="pqlChatMessages">
                             <div class="chat-message received">
                                 <strong>Hệ thống:</strong><br>
-                                Sẵn sàng nhận tin nhắn từ PNV.
+                                Chọn PNV từ dropdown trên để xem và trả lời tin nhắn.
                             </div>
                         </div>
                         <div class="chat-input-area">
                             <input type="text" class="chat-input" id="pqlChatInput" 
-                                   placeholder="Nhập tin nhắn..." onkeypress="handlePqlChatKeyPress(event)">
-                            <button class="btn chat-send" onclick="sendPqlChatMessage()">Gửi</button>
+                                   placeholder="Chọn PNV trước khi gửi tin nhắn..." 
+                                   onkeypress="handlePqlChatKeyPress(event)" disabled>
+                            <button class="btn chat-send" onclick="sendPqlChatMessage()" id="pqlChatSendBtn" disabled>Gửi</button>
                         </div>
                     </div>
                 </div>
@@ -1661,6 +1605,8 @@
         <span>Developed by Forex Development Team - Developer: Lại Thế Trọng | © 2026 Vietcombank</span>
     </footer>
 
+    <!-- MODALS -->
+
     <!-- Modal Thêm User -->
     <div class="modal" id="addUserModal">
         <div class="modal-content">
@@ -1683,7 +1629,7 @@
                         <option value="">Chọn phòng ban...</option>
                         <option value="PNV-K1">KHDN1 (K1)</option>
                         <option value="PNV-K2">KHDN2 (K2)</option>
-                        <option value="PNV-K3">KHDN3 (K3)</option>                        
+                        <option value="PNV-K3">KHDN3 (K3)</option>
                         <option value="PNV-L1">KHBL1 (L1)</option>
                         <option value="PNV-L2">KHBL2 (L2)</option>
                         <option value="PNV-L3">KHBL3 (L3)</option>
@@ -1692,10 +1638,10 @@
                         <option value="PNV-ĐK">PGD ĐK (ĐK)</option>
                         <option value="PNV-CH">PGD CH (CH)</option>
                         <option value="PNV-VVK">PGD VVK (VVK)</option>
-                        <option value="PNV-LTT">PGD LTT (LTT)</option>                        
+                        <option value="PNV-LTT">PGD LTT (LTT)</option>
                         <option value="PNV-TN">DV KHTN (TN)</option>
                         <option value="PNV-T1">DVKHTC1 (T1)</option>
-                        <option value="PNV-T2">DVKHTC2 (T2)</option>                        
+                        <option value="PNV-T2">DVKHTC2 (T2)</option>
                         <option value="PQL-KT">PQL - Kế toán (KT)</option>
                         <option value="BGD">Ban Giám đốc (BGĐ)</option>
                     </select>
@@ -1736,7 +1682,7 @@
                         <option value="">Chọn phòng ban...</option>
                         <option value="PNV-K1">KHDN1 (K1)</option>
                         <option value="PNV-K2">KHDN2 (K2)</option>
-                        <option value="PNV-K3">KHDN3 (K3)</option>                        
+                        <option value="PNV-K3">KHDN3 (K3)</option>
                         <option value="PNV-L1">KHBL1 (L1)</option>
                         <option value="PNV-L2">KHBL2 (L2)</option>
                         <option value="PNV-L3">KHBL3 (L3)</option>
@@ -1745,10 +1691,10 @@
                         <option value="PNV-ĐK">PGD ĐK (ĐK)</option>
                         <option value="PNV-CH">PGD CH (CH)</option>
                         <option value="PNV-VVK">PGD VVK (VVK)</option>
-                        <option value="PNV-LTT">PGD LTT (LTT)</option>                        
+                        <option value="PNV-LTT">PGD LTT (LTT)</option>
                         <option value="PNV-TN">DV KHTN (TN)</option>
                         <option value="PNV-T1">DVKHTC1 (T1)</option>
-                        <option value="PNV-T2">DVKHTC2 (T2)</option>                        
+                        <option value="PNV-T2">DVKHTC2 (T2)</option>
                         <option value="PQL-KT">PQL - Kế toán (KT)</option>
                         <option value="BGD">Ban Giám đốc (BGĐ)</option>
                     </select>
@@ -1767,7 +1713,7 @@
         </div>
     </div>
 
-       <!-- Modal Edit Transaction -->
+    <!-- Modal Edit Transaction -->
     <div class="modal" id="editTransactionModal">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
@@ -1834,12 +1780,58 @@
         </div>
     </div>
 
+    <!-- QUOTE ACCEPTANCE MODAL - Popup cho PNV khi có giá chào -->
+    <div class="modal" id="quoteAcceptanceModal" style="z-index: 4000;">
+        <div class="modal-content" style="max-width: 500px; border: 3px solid var(--primary-green);">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%); color: white; margin: -30px -30px 20px -30px; padding: 20px 30px; border-radius: 12px 12px 0 0;">
+                <h3 class="modal-title" style="color: white; font-size: 20px;">🎯 TỶ GIÁ TỪ PQL</h3>
+                <button class="close-btn" onclick="rejectPrice()" style="color: white; font-size: 28px;">&times;</button>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 14px; color: var(--gray); margin-bottom: 10px;">Tỷ giá chào cho giao dịch</div>
+                <div id="modalQuotePair" style="font-size: 16px; font-weight: 600; color: var(--dark-green); margin-bottom: 15px;">USD/VND</div>
+                
+                <div id="modalQuotePrice" style="font-size: 42px; font-weight: bold; color: var(--primary-green); margin: 20px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
+                    25,350.00
+                </div>
+                
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <span style="font-size: 14px; color: var(--gray);">Thời gian còn lại:</span>
+                    <span id="modalQuoteTimer" style="font-size: 24px; font-weight: bold; color: var(--danger); font-family: monospace;">02:00</span>
+                </div>
+            </div>
+
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div><strong>PNV:</strong> <span id="modalQuotePnv">-</span></div>
+                    <div><strong>CIF:</strong> <span id="modalQuoteCif">-</span></div>
+                    <div><strong>KH:</strong> <span id="modalQuoteCifName">-</span></div>
+                    <div><strong>Chiều:</strong> <span id="modalQuoteDirection">-</span></div>
+                    <div><strong>Mua:</strong> <span id="modalQuoteBuy">-</span></div>
+                    <div><strong>Bán:</strong> <span id="modalQuoteSell">-</span></div>
+                    <div><strong>Số lượng:</strong> <span id="modalQuoteAmount">-</span></div>
+                    <div><strong>Ngày HL:</strong> <span id="modalQuoteEffDate">-</span></div>
+                </div>
+            </div>
+
+            <div class="quote-actions" style="display: flex; gap: 15px; justify-content: center;">
+                <button class="btn" onclick="acceptPrice()" style="background: var(--success); flex: 1; padding: 15px; font-size: 16px;">
+                    ✓ CHẤP NHẬN GIÁ
+                </button>
+                <button class="btn btn-danger" onclick="rejectPrice()" style="flex: 1; padding: 15px; font-size: 16px;">
+                    ✗ TỪ CHỐI
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification -->
     <div class="notification" id="notification"></div>
 
     <script>
         // ==========================================
-        // GLOBAL STATE & CONFIGURATION
+        // PHẦN 2: GLOBAL STATE & CONFIGURATION
         // ==========================================
         let currentUser = null;
         let quoteTimer = null;
@@ -1848,6 +1840,7 @@
         let editingTransactionId = null;
         let currentEditingUserId = null;
         let selectedCifFile = null;
+        let currentChatPnv = null; // PNV đang chat với PQL
 
         // ==========================================
         // MOCK DATA INITIALIZATION
@@ -1855,11 +1848,13 @@
         let mockUsers = [
             { id: 'admin', name: 'Administrator', dept: 'IT', role: 'admin', password: 'Vcb@1234', manager: null },
             { id: 'K001', name: 'Nguyễn Văn A', dept: 'KHDN1 (K1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
-            { id: 'L001', name: 'Trần Thị B', dept: 'KHBL1 (L1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
-            { id: 'TN001', name: 'Lê Văn C', dept: 'DV KHTN (TN)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
-            { id: 'KT001', name: 'Phạm Văn C', dept: 'PQL - Kế toán', role: 'PQL', password: 'Vcb@1234', manager: null },
-            { id: 'BGD001', name: 'Lê Văn D', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null },
-            { id: 'BGD002', name: 'Nguyễn Thị E', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null }
+            { id: 'K002', name: 'Trần Thị B', dept: 'KHDN2 (K2)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
+            { id: 'L001', name: 'Lê Văn C', dept: 'KHBL1 (L1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
+            { id: 'TN001', name: 'Phạm Thị D', dept: 'DV KHTN (TN)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
+            { id: 'KT001', name: 'Hoàng Văn E', dept: 'PQL - Kế toán', role: 'PQL', password: 'Vcb@1234', manager: null },
+            { id: 'KT002', name: 'Ngô Thị F', dept: 'PQL - Kế toán', role: 'PQL', password: 'Vcb@1234', manager: null },
+            { id: 'BGD001', name: 'Lê Văn G', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null },
+            { id: 'BGD002', name: 'Nguyễn Thị H', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null }
         ];
 
         let mockCIF = {
@@ -1867,9 +1862,12 @@
             '0987654321': 'TẬP ĐOÀN XYZ',
             '1122334455': 'NGÂN HÀNG DEF',
             '2233445566': 'CÔNG TY CP GHI',
-            '3344556677': 'TẬP ĐOÀN JKL'
+            '3344556677': 'TẬP ĐOÀN JKL',
+            '4455667788': 'CÔNG TY TNHH MNO',
+            '5566778899': 'TẬP ĐOÀN PQR'
         };
 
+        // Thêm trường balanceRate (tỷ giá cân đối) để tính lợi nhuận
         let mockTransactions = [
             {
                 id: 1,
@@ -1884,6 +1882,7 @@
                 sellCurr: 'VND',
                 amount: 100000,
                 rate: 25350.00,
+                balanceRate: 25300.00, // Tỷ giá cân đối
                 equivalent: 2535000000,
                 type: 'GN',
                 status: 'Thành công',
@@ -1894,7 +1893,7 @@
             {
                 id: 2,
                 pnv: 'L001',
-                pnvName: 'Trần Thị B',
+                pnvName: 'Lê Văn C',
                 date: '14/03/2026',
                 effectiveDate: '16/03/2026',
                 cif: '0987654321',
@@ -1904,16 +1903,40 @@
                 sellCurr: 'EUR',
                 amount: 50000,
                 rate: 27500.00,
+                balanceRate: 27450.00,
                 equivalent: 1375000000,
                 type: 'GN',
                 status: 'Thành công',
                 purpose: '2',
                 editedBy: null,
                 editTime: null
+            },
+            {
+                id: 3,
+                pnv: 'K001',
+                pnvName: 'Nguyễn Văn A',
+                date: '15/03/2026',
+                effectiveDate: '20/03/2026',
+                cif: '2233445566',
+                customerName: 'CÔNG TY CP GHI',
+                direction: 'MUA',
+                buyCurr: 'EUR',
+                sellCurr: 'VND',
+                amount: 75000,
+                rate: 27600.00,
+                balanceRate: 27550.00,
+                equivalent: 2070000000,
+                type: 'KH',
+                status: 'Thành công',
+                purpose: '3',
+                editedBy: null,
+                editTime: null
             }
         ];
 
         let pendingQuotes = [];
+        
+        // Chat messages structure: { id, from, to, message, time, read }
         let chatMessages = [];
 
         // ==========================================
@@ -1972,6 +1995,7 @@
             localStorage.setItem('mbnt_cif', JSON.stringify(mockCIF));
             localStorage.setItem('mbnt_transactions', JSON.stringify(mockTransactions));
             localStorage.setItem('mbnt_pendingQuotes', JSON.stringify(pendingQuotes));
+            localStorage.setItem('mbnt_chatMessages', JSON.stringify(chatMessages));
         }
 
         function loadFromLocalStorage() {
@@ -1979,11 +2003,13 @@
             const cif = localStorage.getItem('mbnt_cif');
             const trans = localStorage.getItem('mbnt_transactions');
             const quotes = localStorage.getItem('mbnt_pendingQuotes');
+            const chats = localStorage.getItem('mbnt_chatMessages');
 
             if (users) mockUsers = JSON.parse(users);
             if (cif) mockCIF = JSON.parse(cif);
             if (trans) mockTransactions = JSON.parse(trans);
             if (quotes) pendingQuotes = JSON.parse(quotes);
+            if (chats) chatMessages = JSON.parse(chats);
         }
 
         // ==========================================
@@ -2034,6 +2060,7 @@
                 loadCifTable();
                 loadPendingQuotes();
                 loadPqlBlotter();
+                loadPnvListForPqlChat(); // Load danh sách PNV cho chat
                 startPqlPolling();
             } else if (user.role === 'BGD') {
                 document.getElementById('bgdDashboard').style.display = 'block';
@@ -2099,6 +2126,8 @@
                 loadPendingQuotes();
             } else if (dashboard === 'pql' && tabName === 'blotter') {
                 loadPqlBlotter();
+            } else if (dashboard === 'pql' && tabName === 'chat') {
+                loadPnvListForPqlChat();
             } else if (dashboard === 'pnv' && tabName === 'blotter') {
                 loadPnvBlotter();
             }
@@ -2179,7 +2208,7 @@
             const select = document.getElementById('editUserManager');
             select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
             bgdUsers.forEach(u => {
-                const selected = u.id === selectedManager ? 'selected' : '';
+                                const selected = u.id === selectedManager ? 'selected' : '';
                 select.innerHTML += `<option value="${u.id}" ${selected}>${u.name} (${u.id})</option>`;
             });
         }
@@ -2344,6 +2373,7 @@
             pendingQuotes.push(quoteRequest);
             saveToLocalStorage();
 
+            // Lưu form data để khôi phục khi có giá chào
             localStorage.setItem('pnv_pending_form_' + quoteRequest.id, JSON.stringify({
                 quoteId: quoteRequest.id,
                 cif: cif,
@@ -2362,21 +2392,50 @@
             document.getElementById('transactionDate').value = formatDate(new Date());
         }
 
-        function startQuoteTimer(seconds, quoteId, rate) {
+        // ==========================================
+        // QUOTE ACCEPTANCE MODAL FUNCTIONS
+        // ==========================================
+        function showQuoteAcceptanceModal(quoteData, formData) {
+            const modal = document.getElementById('quoteAcceptanceModal');
+            
+            // Cập nhật thông tin
+            document.getElementById('modalQuotePrice').textContent = quoteData.rate.toLocaleString('vi-VN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 4
+            });
+            document.getElementById('modalQuotePair').textContent = `${formData.buyCurrency}/${formData.sellCurrency}`;
+            document.getElementById('modalQuotePnv').textContent = currentUser.name;
+            document.getElementById('modalQuoteCif').textContent = formData.cif;
+            document.getElementById('modalQuoteCifName').textContent = formData.customerName;
+            document.getElementById('modalQuoteDirection').textContent = formData.transactionType === 'buy' ? 'VCB MUA' : 'VCB BÁN';
+            document.getElementById('modalQuoteBuy').textContent = formData.buyCurrency;
+            document.getElementById('modalQuoteSell').textContent = formData.sellCurrency;
+            document.getElementById('modalQuoteAmount').textContent = parseFloat(formData.amount).toLocaleString('vi-VN');
+            document.getElementById('modalQuoteEffDate').textContent = formData.effectiveDate;
+            
+            // Hiển thị modal
+            modal.classList.add('active');
+            
+            // Bắt đầu đếm ngược
+            const duration = quoteData.duration || 2;
+            startQuoteModalTimer(duration * 60, quoteData.quoteId, quoteData.rate);
+        }
+
+        function startQuoteModalTimer(seconds, quoteId, rate) {
             quoteExpiryTime = Date.now() + (seconds * 1000);
             currentQuoteId = quoteId;
-            const timerDisplay = document.getElementById('quoteTimer');
+            const timerDisplay = document.getElementById('modalQuoteTimer');
             
             if (quoteTimer) clearInterval(quoteTimer);
             
             quoteTimer = setInterval(() => {
+                // Kiểm tra interrupt
                 const storedQuote = localStorage.getItem('pql_quote_' + quoteId);
                 if (storedQuote) {
                     const quoteData = JSON.parse(storedQuote);
                     if (quoteData.interrupted) {
                         clearInterval(quoteTimer);
-                        timerDisplay.textContent = '00:00';
-                        document.getElementById('quoteResponse').classList.add('hidden');
+                        closeQuoteModal();
                         showNotification('⛔ Giao dịch đã bị PQL Interrupt! Không thể chấp nhận giá.', 'error');
                         currentQuoteId = null;
                         localStorage.removeItem('pnv_pending_form_' + quoteId);
@@ -2388,8 +2447,7 @@
                 
                 if (remaining <= 0) {
                     clearInterval(quoteTimer);
-                    timerDisplay.textContent = '00:00';
-                    document.getElementById('quoteResponse').classList.add('hidden');
+                    closeQuoteModal();
                     showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
                     currentQuoteId = null;
                     localStorage.removeItem('pnv_pending_form_' + quoteId);
@@ -2402,6 +2460,10 @@
             }, 1000);
         }
 
+        function closeQuoteModal() {
+            document.getElementById('quoteAcceptanceModal').classList.remove('active');
+        }
+
         function acceptPrice() {
             if (!currentQuoteId) return;
             
@@ -2411,16 +2473,22 @@
                 if (quoteData.interrupted) {
                     showNotification('⛔ Không thể chấp nhận - Giao dịch đã bị Interrupt!', 'error');
                     clearInterval(quoteTimer);
-                    document.getElementById('quoteResponse').classList.add('hidden');
+                    closeQuoteModal();
                     currentQuoteId = null;
                     return;
                 }
             }
             
             clearInterval(quoteTimer);
+            closeQuoteModal();
             
             const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
             const quoteData = storedQuote ? JSON.parse(storedQuote) : {};
+            
+            // Tính toán lợi nhuận: chênh lệch giữa giá thực hiện và giá cân đối
+            const executedRate = quoteData.rate || 0;
+            // Giả định giá cân đối = giá thực hiện - spread 0.5% (có thể điều chỉnh)
+            const balanceRate = executedRate * 0.995; 
             
             const transaction = {
                 id: generateId(),
@@ -2434,8 +2502,9 @@
                 buyCurr: formData.buyCurrency,
                 sellCurr: formData.sellCurrency,
                 amount: parseFloat(formData.amount),
-                rate: quoteData.rate || 0,
-                equivalent: parseFloat(formData.amount) * (quoteData.rate || 0),
+                rate: executedRate,
+                balanceRate: balanceRate, // Tỷ giá cân đối để tính lợi nhuận
+                equivalent: parseFloat(formData.amount) * executedRate,
                 type: calculateTransactionType(formData.effectiveDate, formatDate(new Date())),
                 status: 'Thành công',
                 purpose: formData.purpose,
@@ -2446,23 +2515,34 @@
             mockTransactions.push(transaction);
             saveToLocalStorage();
             
-            document.getElementById('quoteResponse').classList.add('hidden');
-            document.getElementById('askPriceForm').reset();
-            document.getElementById('transactionDate').value = formatDate(new Date());
+            // Cập nhật quote status
+            const quoteIndex = pendingQuotes.findIndex(q => q.id === currentQuoteId);
+            if (quoteIndex > -1) {
+                pendingQuotes[quoteIndex].status = 'accepted';
+                saveToLocalStorage();
+            }
+            
             currentQuoteId = null;
             localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
             localStorage.removeItem('pql_quote_' + formData.quoteId);
             
-            showNotification('✅ Giao dịch thành công!');
+            showNotification('✅ Giao dịch thành công! Đã thêm vào Blotter và Báo cáo.');
             loadPnvBlotter();
         }
 
         function rejectPrice() {
             clearInterval(quoteTimer);
-            document.getElementById('quoteResponse').classList.add('hidden');
+            closeQuoteModal();
             
             const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
             if (formData.quoteId) {
+                // Cập nhật quote status
+                const quoteIndex = pendingQuotes.findIndex(q => q.id === currentQuoteId);
+                if (quoteIndex > -1) {
+                    pendingQuotes[quoteIndex].status = 'rejected';
+                    saveToLocalStorage();
+                }
+                
                 localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
                 localStorage.removeItem('pql_quote_' + formData.quoteId);
             }
@@ -2502,7 +2582,7 @@
         }
 
         // ==========================================
-        // REAL EXCEL/ PDF EXPORT FOR PNV BLOTTER
+        // EXPORT FUNCTIONS
         // ==========================================
         function exportPnvBlotter(format) {
             const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
@@ -2536,7 +2616,6 @@
                 XLSX.writeFile(wb, `Blotter_PNV_${currentUser.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
                 showNotification('✅ Đã xuất file Excel thành công!');
             } else {
-                // PDF export using simple HTML to print
                 const printWindow = window.open('', '_blank');
                 let html = `
                     <html>
@@ -2576,6 +2655,9 @@
             }
         }
 
+        // ==========================================
+        // CHAT FUNCTIONS - MỚI: Broadcast PNV -> All PQL
+        // ==========================================
         function handleChatKeyPress(e) {
             if (e.key === 'Enter') sendChatMessage();
         }
@@ -2585,24 +2667,38 @@
             const message = input.value.trim();
             if (!message) return;
             
+            // PNV gửi đến tất cả PQL (broadcast)
+            const pqlUsers = mockUsers.filter(u => u.role === 'PQL');
+            
+            const chatMsg = {
+                id: generateId(),
+                from: currentUser.id,
+                fromName: currentUser.name,
+                to: 'ALL_PQL', // Broadcast đến tất cả PQL
+                toSpecific: null, // Chưa có PQL cụ thể nào nhận
+                message: message,
+                time: new Date().toISOString(),
+                read: false,
+                acceptedBy: null // PQL nào đã chấp nhận chat
+            };
+            
+            chatMessages.push(chatMsg);
+            saveToLocalStorage();
+            
+            // Hiển thị tin nhắn của mình
             const container = document.getElementById('pnvChatMessages');
             const div = document.createElement('div');
             div.className = 'chat-message sent';
-            div.innerHTML = `<strong>${currentUser.name}:</strong><br>${message}`;
+            div.innerHTML = `<strong>Bạn → Tất cả PQL:</strong><br>${message}<br><small style="opacity: 0.7;">${new Date().toLocaleTimeString()}</small>`;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
             input.value = '';
             
-            chatMessages.push({
-                from: currentUser.id,
-                to: 'PQL',
-                message: message,
-                time: new Date().toISOString()
-            });
+            showNotification('Đã gửi tin nhắn đến Phòng Quản lý', 'success');
         }
 
         // ==========================================
-        // PQL FUNCTIONS - FILE UPLOAD & REAL QUOTE SYSTEM
+        // PQL FUNCTIONS
         // ==========================================
         
         // FILE UPLOAD HANDLING
@@ -2642,7 +2738,6 @@
                     let successCount = 0;
                     let errorCount = 0;
                     
-                    // Process each row (skip header if exists)
                     for (let i = 0; i < jsonData.length; i++) {
                         const row = jsonData[i];
                         if (row.length >= 2) {
@@ -2661,7 +2756,6 @@
                     saveToLocalStorage();
                     loadCifTable();
                     
-                    // Reset file selection
                     selectedCifFile = null;
                     document.getElementById('cifUploadArea').classList.remove('has-file');
                     document.getElementById('cifFileName').textContent = '';
@@ -2841,9 +2935,10 @@
                 pendingQuotes[quoteIndex].quoteTime = now.toISOString();
                 pendingQuotes[quoteIndex].expiryTime = expiryTime.toISOString();
                 pendingQuotes[quoteIndex].interrupted = false;
+                pendingQuotes[quoteIndex].quotedBy = currentUser.id; // Lưu PQL nào chào giá
                 saveToLocalStorage();
                 
-                // Store quote for PNV to receive
+                // Store quote for PNV to receive - QUAN TRỌNG: Lưu để PNV polling nhận được
                 localStorage.setItem('pql_quote_' + quoteId, JSON.stringify({
                     quoteId: quoteId,
                     rate: rate,
@@ -2851,7 +2946,8 @@
                     pnv: pendingQuotes[quoteIndex].pnv,
                     expiryTime: expiryTime.toISOString(),
                     interrupted: false,
-                    timestamp: now.toISOString()
+                    timestamp: now.toISOString(),
+                    quotedBy: currentUser.id
                 }));
                 
                 showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
@@ -3073,15 +3169,43 @@
             showNotification('Đã cập nhật giao dịch!');
         }
 
-        function generateReport() {
+        // ==========================================
+        // BÁO CÁO LỢI NHUẬN MỚI
+        // ==========================================
+        function generateProfitReport() {
             const fromDate = document.getElementById('reportTransFrom').value;
             const toDate = document.getElementById('reportTransTo').value;
-            const pnv = document.getElementById('reportPnv').value;
-            const type = document.getElementById('reportType').value;
+            const pnvFilter = document.getElementById('reportPnv').value;
+            const currencyFilter = document.getElementById('reportCurrency').value;
             
-            let filtered = mockTransactions;
-            if (pnv) filtered = filtered.filter(t => t.pnv.includes(pnv));
-            if (type) filtered = filtered.filter(t => t.type === type);
+            let filtered = mockTransactions.filter(t => t.status === 'Thành công');
+            
+            if (fromDate) {
+                filtered = filtered.filter(t => new Date(t.date.split('/').reverse().join('-')) >= new Date(fromDate));
+            }
+            if (toDate) {
+                filtered = filtered.filter(t => new Date(t.date.split('/').reverse().join('-')) <= new Date(toDate));
+            }
+            if (pnvFilter) {
+                filtered = filtered.filter(t => t.pnv === pnvFilter);
+            }
+            if (currencyFilter) {
+                filtered = filtered.filter(t => t.buyCurr === currencyFilter || t.sellCurr === currencyFilter);
+            }
+            
+            // Sắp xếp: Phòng QL (PNV) -> Loại tiền -> Tên KH
+            filtered.sort((a, b) => {
+                // 1. Sắp xếp theo Phòng QL (PNV)
+                if (a.pnv !== b.pnv) return a.pnv.localeCompare(b.pnv);
+                
+                // 2. Sắp xếp theo Loại tiền (ngoại tệ, không phải VND)
+                const aCurr = a.buyCurr === 'VND' ? a.sellCurr : a.buyCurr;
+                const bCurr = b.buyCurr === 'VND' ? b.sellCurr : b.buyCurr;
+                if (aCurr !== bCurr) return aCurr.localeCompare(bCurr);
+                
+                // 3. Sắp xếp theo Tên KH
+                return a.customerName.localeCompare(b.customerName);
+            });
             
             const container = document.getElementById('reportResult');
             if (filtered.length === 0) {
@@ -3089,90 +3213,244 @@
                 return;
             }
             
+            // Tính toán nhóm và subtotal
+            let currentPnv = '';
+            let currentCurrency = '';
+            let pnvSubtotal = 0;
+            let currencySubtotal = 0;
+            let grandTotal = 0;
+            
             let html = `
-                <table>
+                <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                     <thead>
-                        <tr>
-                            <th>PNV</th>
-                            <th>Ngày GD</th>
-                            <th>CIF</th>
-                            <th>Chiều</th>
-                            <th>Mua</th>
-                            <th>Bán</th>
-                            <th>Số tiền</th>
-                            <th>Tỷ giá</th>
-                            <th>Loại</th>
+                        <tr style="background: #2E7D32; color: white;">
+                            <th style="padding: 10px; border: 1px solid #ddd;">Phòng QL</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Ngày GD</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">CIF</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Tên KH</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Loại tiền</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Chiều</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Số lượng</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Giá thực hiện</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Giá cân đối</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Chênh lệch</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Lợi nhuận</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
             
-            filtered.forEach(t => {
+            filtered.forEach((t, index) => {
+                const currency = t.buyCurr === 'VND' ? t.sellCurr : t.buyCurr;
+                const spread = t.rate - (t.balanceRate || t.rate * 0.995);
+                const profit = spread * t.amount;
+                
+                // Kiểm tra nhóm mới
+                if (t.pnv !== currentPnv) {
+                    // In subtotal cho currency cũ
+                    if (currentCurrency !== '') {
+                        html += `
+                            <tr style="background: #e8f5e9; font-weight: bold;">
+                                <td colspan="9" style="padding: 8px; border: 1px solid #ddd; text-align: right;">Subtotal ${currentCurrency}:</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">-</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: #2E7D32;">${currencySubtotal.toLocaleString('vi-VN')}</td>
+                            </tr>
+                        `;
+                    }
+                    // In subtotal cho PNV cũ
+                    if (currentPnv !== '') {
+                        html += `
+                            <tr style="background: #c8e6c9; font-weight: bold;">
+                                <td colspan="9" style="padding: 8px; border: 1px solid #ddd; text-align: right;">Subtotal Phòng ${currentPnv}:</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">-</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: #1B5E20; font-size: 14px;">${pnvSubtotal.toLocaleString('vi-VN')}</td>
+                            </tr>
+                        `;
+                    }
+                    currentPnv = t.pnv;
+                    currentCurrency = '';
+                    pnvSubtotal = 0;
+                    currencySubtotal = 0;
+                }
+                
+                if (currency !== currentCurrency && currentCurrency !== '') {
+                    // In subtotal cho currency cũ
+                    html += `
+                        <tr style="background: #e8f5e9; font-weight: bold;">
+                            <td colspan="9" style="padding: 8px; border: 1px solid #ddd; text-align: right;">Subtotal ${currentCurrency}:</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">-</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: #2E7D32;">${currencySubtotal.toLocaleString('vi-VN')}</td>
+                        </tr>
+                    `;
+                    currencySubtotal = 0;
+                }
+                currentCurrency = currency;
+                
+                pnvSubtotal += profit;
+                currencySubtotal += profit;
+                grandTotal += profit;
+                
                 html += `
                     <tr>
-                        <td>${t.pnv}</td>
-                        <td>${t.date}</td>
-                        <td>${t.cif}</td>
-                        <td>${t.direction}</td>
-                        <td>${t.buyCurr}</td>
-                        <td>${t.sellCurr}</td>
-                        <td>${t.amount.toLocaleString()}</td>
-                        <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                        <td>${t.type}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${t.pnv} - ${t.pnvName}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${t.date}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${t.cif}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${t.customerName}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${currency}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${t.direction}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${t.amount.toLocaleString('vi-VN')}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${(t.balanceRate || t.rate * 0.995).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${spread.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: 500;">${profit.toLocaleString('vi-VN')}</td>
                     </tr>
                 `;
             });
             
-            html += '</tbody></table>';
+            // In subtotal cho currency cuối
+            if (currentCurrency !== '') {
+                html += `
+                    <tr style="background: #e8f5e9; font-weight: bold;">
+                        <td colspan="9" style="padding: 8px; border: 1px solid #ddd; text-align: right;">Subtotal ${currentCurrency}:</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">-</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: #2E7D32;">${currencySubtotal.toLocaleString('vi-VN')}</td>
+                    </tr>
+                `;
+            }
+            // In subtotal cho PNV cuối
+            if (currentPnv !== '') {
+                html += `
+                    <tr style="background: #c8e6c9; font-weight: bold;">
+                        <td colspan="9" style="padding: 8px; border: 1px solid #ddd; text-align: right;">Subtotal Phòng ${currentPnv}:</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">-</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: #1B5E20; font-size: 14px;">${pnvSubtotal.toLocaleString('vi-VN')}</td>
+                    </tr>
+                `;
+            }
+            
+            // Grand Total
+            html += `
+                    <tr style="background: #2E7D32; color: white; font-weight: bold; font-size: 14px;">
+                        <td colspan="9" style="padding: 10px; border: 1px solid #ddd; text-align: right;">TỔNG LỢI NHUẬN:</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">-</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">${grandTotal.toLocaleString('vi-VN')}</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            `;
+            
             container.innerHTML = html;
-            showNotification(`Báo cáo có ${filtered.length} giao dịch`);
+            showNotification(`Báo cáo có ${filtered.length} giao dịch - Tổng lợi nhuận: ${grandTotal.toLocaleString('vi-VN')}`);
         }
 
-        function exportReport(format) {
+        function exportProfitReport(format) {
+            // Tương tự generateProfitReport nhưng xuất file
             const fromDate = document.getElementById('reportTransFrom').value;
             const toDate = document.getElementById('reportTransTo').value;
-            const pnv = document.getElementById('reportPnv').value;
-            const type = document.getElementById('reportType').value;
+            const pnvFilter = document.getElementById('reportPnv').value;
+            const currencyFilter = document.getElementById('reportCurrency').value;
             
-            let filtered = mockTransactions;
-            if (pnv) filtered = filtered.filter(t => t.pnv.includes(pnv));
-            if (type) filtered = filtered.filter(t => t.type === type);
+            let filtered = mockTransactions.filter(t => t.status === 'Thành công');
+            
+            if (fromDate) filtered = filtered.filter(t => new Date(t.date.split('/').reverse().join('-')) >= new Date(fromDate));
+            if (toDate) filtered = filtered.filter(t => new Date(t.date.split('/').reverse().join('-')) <= new Date(toDate));
+            if (pnvFilter) filtered = filtered.filter(t => t.pnv === pnvFilter);
+            if (currencyFilter) filtered = filtered.filter(t => t.buyCurr === currencyFilter || t.sellCurr === currencyFilter);
+            
+            filtered.sort((a, b) => {
+                if (a.pnv !== b.pnv) return a.pnv.localeCompare(b.pnv);
+                const aCurr = a.buyCurr === 'VND' ? a.sellCurr : a.buyCurr;
+                const bCurr = b.buyCurr === 'VND' ? b.sellCurr : b.buyCurr;
+                if (aCurr !== bCurr) return aCurr.localeCompare(bCurr);
+                return a.customerName.localeCompare(b.customerName);
+            });
             
             if (filtered.length === 0) {
                 showNotification('Không có dữ liệu để xuất!', 'error');
                 return;
             }
 
-            const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tương đương', 'Loại'];
-            const data = filtered.map(t => [t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction, t.buyCurr, t.sellCurr, t.amount, t.rate, t.equivalent, t.type]);
+            const headers = ['Phòng QL', 'Ngày GD', 'CIF', 'Tên KH', 'Loại tiền', 'Chiều', 'Số lượng', 'Giá thực hiện', 'Giá cân đối', 'Chênh lệch', 'Lợi nhuận'];
+            
+            let currentPnv = '';
+            let currentCurrency = '';
+            let pnvSubtotal = 0;
+            let currencySubtotal = 0;
+            let grandTotal = 0;
+            
+            const data = [];
+            
+            filtered.forEach(t => {
+                const currency = t.buyCurr === 'VND' ? t.sellCurr : t.buyCurr;
+                const spread = t.rate - (t.balanceRate || t.rate * 0.995);
+                const profit = spread * t.amount;
+                
+                if (t.pnv !== currentPnv && currentPnv !== '') {
+                    data.push([`Subtotal Phòng ${currentPnv}`, '', '', '', '', '', '', '', '', '', pnvSubtotal]);
+                    pnvSubtotal = 0;
+                }
+                
+                currentPnv = t.pnv;
+                pnvSubtotal += profit;
+                grandTotal += profit;
+                
+                data.push([
+                    `${t.pnv} - ${t.pnvName}`,
+                    t.date,
+                    t.cif,
+                    t.customerName,
+                    currency,
+                    t.direction,
+                    t.amount,
+                    t.rate,
+                    t.balanceRate || t.rate * 0.995,
+                    spread,
+                    profit
+                ]);
+            });
+            
+            if (currentPnv !== '') {
+                data.push([`Subtotal Phòng ${currentPnv}`, '', '', '', '', '', '', '', '', '', pnvSubtotal]);
+            }
+            data.push(['TỔNG LỢI NHUẬN', '', '', '', '', '', '', '', '', '', grandTotal]);
 
             if (format === 'excel') {
                 const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Báo cáo');
-                XLSX.writeFile(wb, `Bao_Cao_${new Date().toISOString().split('T')[0]}.xlsx`);
+                XLSX.utils.book_append_sheet(wb, ws, 'Báo cáo Lợi nhuận');
+                XLSX.writeFile(wb, `Bao_Cao_Loi_Nhuan_${new Date().toISOString().split('T')[0]}.xlsx`);
                 showNotification('✅ Đã xuất báo cáo Excel!');
             } else {
                 const printWindow = window.open('', '_blank');
                 let html = `
                     <html>
                     <head>
-                        <title>Báo cáo Giao dịch</title>
+                        <title>Báo cáo Lợi nhuận</title>
                         <style>
                             body { font-family: Arial, sans-serif; margin: 20px; }
                             h2 { color: #2E7D32; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
-                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }
+                            th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
                             th { background-color: #4CAF50; color: white; }
                             tr:nth-child(even) { background-color: #f2f2f2; }
+                            .subtotal { background-color: #c8e6c9; font-weight: bold; }
+                            .grandtotal { background-color: #2E7D32; color: white; font-weight: bold; }
                         </style>
                     </head>
                     <body>
-                        <h2>BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ</h2>
+                        <h2>BÁO CÁO LỢI NHUẬN GIAO DỊCH NGOẠI TỆ</h2>
                         <p>Ngày xuất: ${formatDate(new Date())}</p>
                         <table>
                             <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-                            <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+                            <tbody>
+                                ${data.map((row, i) => {
+                                    if (row[0].startsWith('Subtotal')) return `<tr class="subtotal">${row.map(c => `<td>${c}</td>`).join('')}</tr>`;
+                                    if (row[0] === 'TỔNG LỢI NHUẬN') return `<tr class="grandtotal">${row.map(c => `<td>${c}</td>`).join('')}</tr>`;
+                                    return `<tr>${row.map(c => `<td>${c}</td>`).join('')}</tr>`;
+                                }).join('')}
+                            </tbody>
                         </table>
                     </body>
                     </html>
@@ -3180,8 +3458,98 @@
                 printWindow.document.write(html);
                 printWindow.document.close();
                 printWindow.print();
-                showNotification('✅ Đã mở cửa sổ in báo cáo PDF!');
+                showNotification('✅ Đã mở cửa sổ in PDF!');
             }
+        }
+
+        // ==========================================
+        // PQL CHAT FUNCTIONS - Chọn PNV để chat riêng
+        // ==========================================
+        function loadPnvListForPqlChat() {
+            const select = document.getElementById('pqlChatPnvSelect');
+            const pnvUsers = mockUsers.filter(u => u.role === 'PNV');
+            
+            select.innerHTML = '<option value="">-- Chọn PNV --</option>';
+            pnvUsers.forEach(u => {
+                // Đếm số tin nhắn chưa đọc từ PNV này
+                const unreadCount = chatMessages.filter(m => 
+                    m.from === u.id && 
+                    m.to === 'ALL_PQL' && 
+                    !m.read &&
+                    m.acceptedBy !== currentUser.id
+                ).length;
+                
+                const badge = unreadCount > 0 ? ` (${unreadCount} tin mới)` : '';
+                select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})${badge}</option>`;
+            });
+        }
+
+        function loadPqlChatForPnv() {
+            const select = document.getElementById('pqlChatPnvSelect');
+            const pnvId = select.value;
+            
+            if (!pnvId) {
+                document.getElementById('pqlChatInput').disabled = true;
+                document.getElementById('pqlChatSendBtn').disabled = true;
+                document.getElementById('pqlChatMessages').innerHTML = `
+                    <div class="chat-message received">
+                        <strong>Hệ thống:</strong><br>Chọn PNV từ dropdown để xem và trả lời tin nhắn.
+                    </div>
+                `;
+                currentChatPnv = null;
+                return;
+            }
+            
+            currentChatPnv = pnvId;
+            document.getElementById('pqlChatInput').disabled = false;
+            document.getElementById('pqlChatSendBtn').disabled = false;
+            document.getElementById('pqlChatInput').placeholder = `Nhập tin nhắn gửi đến ${select.options[select.selectedIndex].text}...`;
+            
+            refreshPqlChatMessages();
+        }
+
+        function refreshPqlChatMessages() {
+            if (!currentChatPnv) return;
+            
+            const container = document.getElementById('pqlChatMessages');
+            container.innerHTML = '';
+            
+            // Lấy tất cả tin nhắn liên quan đến PNV này
+            const relevantMessages = chatMessages.filter(m => 
+                (m.from === currentChatPnv && (m.to === 'ALL_PQL' || m.to === currentUser.id || m.acceptedBy === currentUser.id)) ||
+                (m.from === currentUser.id && m.to === currentChatPnv) ||
+                (m.from === currentChatPnv && m.to === currentUser.id)
+            );
+            
+            // Đánh dấu đã đọc và chấp nhận chat
+            relevantMessages.forEach(m => {
+                if (m.from === currentChatPnv && !m.read && m.to === 'ALL_PQL') {
+                    m.read = true;
+                    m.acceptedBy = currentUser.id; // PQL này chấp nhận chat
+                }
+            });
+            saveToLocalStorage();
+            
+            if (relevantMessages.length === 0) {
+                container.innerHTML = '<div class="chat-message received"><strong>Hệ thống:</strong><br>Chưa có tin nhắn nào. Hãy gửi tin nhắn đầu tiên!</div>';
+                return;
+            }
+            
+            relevantMessages.sort((a, b) => new Date(a.time) - new Date(b.time));
+            
+            relevantMessages.forEach(m => {
+                const div = document.createElement('div');
+                const isMe = m.from === currentUser.id;
+                div.className = `chat-message ${isMe ? 'sent' : 'received'}`;
+                
+                const time = new Date(m.time).toLocaleTimeString();
+                const sender = isMe ? 'Bạn' : (mockUsers.find(u => u.id === m.from)?.name || m.from);
+                
+                div.innerHTML = `<strong>${sender}:</strong><br>${m.message}<br><small style="opacity: 0.7;">${time}</small>`;
+                container.appendChild(div);
+            });
+            
+            container.scrollTop = container.scrollHeight;
         }
 
         function handlePqlChatKeyPress(e) {
@@ -3189,24 +3557,34 @@
         }
 
         function sendPqlChatMessage() {
+            if (!currentChatPnv) {
+                showNotification('Vui lòng chọn PNV trước khi gửi tin nhắn!', 'error');
+                return;
+            }
+            
             const input = document.getElementById('pqlChatInput');
             const message = input.value.trim();
             if (!message) return;
             
-            const container = document.getElementById('pqlChatMessages');
-            const div = document.createElement('div');
-            div.className = 'chat-message sent';
-            div.innerHTML = `<strong>${currentUser.name} (PQL):</strong><br>${message}`;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            const chatMsg = {
+                id: generateId(),
+                from: currentUser.id,
+                fromName: currentUser.name,
+                to: currentChatPnv, // Gửi riêng đến PNV đã chọn
+                toSpecific: currentChatPnv,
+                message: message,
+                time: new Date().toISOString(),
+                read: false,
+                acceptedBy: currentUser.id
+            };
+            
+            chatMessages.push(chatMsg);
+            saveToLocalStorage();
+            
+            refreshPqlChatMessages();
             input.value = '';
             
-            chatMessages.push({
-                from: currentUser.id,
-                to: 'PNV',
-                message: message,
-                time: new Date().toISOString()
-            });
+            showNotification(`Đã gửi tin nhắn đến ${mockUsers.find(u => u.id === currentChatPnv)?.name}`, 'success');
         }
 
         // ==========================================
@@ -3279,7 +3657,7 @@
             }
         }
 
-        // ==========================================
+               // ==========================================
         // POLLING & REALTIME UPDATES
         // ==========================================
         let pnvPollInterval = null;
@@ -3290,7 +3668,7 @@
             pnvPollInterval = setInterval(() => {
                 if (currentUser?.role !== 'PNV') return;
                 
-                // Tìm quote cho PNV này
+                // Tìm quote cho PNV này đang ở trạng thái quoted và chưa hiển thị
                 const myQuotes = pendingQuotes.filter(q => 
                     q.pnv === currentUser.id && 
                     q.status === 'quoted' && 
@@ -3301,39 +3679,60 @@
                 myQuotes.forEach(q => {
                     const stored = localStorage.getItem('pql_quote_' + q.id);
                     if (stored) {
-                        const data = JSON.parse(stored);
-                        // Nếu chưa hiển thị thì hiển thị
-                        if (!document.getElementById('quoteResponse').classList.contains('hidden')) return;
+                        const quoteData = JSON.parse(stored);
+                        
+                        // Kiểm tra nếu đang hiển thị modal thì không hiển thị lại
+                        if (document.getElementById('quoteAcceptanceModal').classList.contains('active')) return;
                         
                         const now = new Date();
-                        const expiry = new Date(data.expiryTime);
-                        if (now < expiry && !data.interrupted) {
-                            // Hiển thị giá chào
+                        const expiry = new Date(quoteData.expiryTime);
+                        
+                        if (now < expiry && !quoteData.interrupted) {
                             const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + q.id) || '{}');
-                            document.getElementById('quoteResponse').classList.remove('hidden');
-                            document.getElementById('quotePrice').textContent = data.rate.toLocaleString('vi-VN', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 4
-                            });
-                            document.getElementById('quotePair').textContent = `${formData.buyCurrency}/${formData.sellCurrency}`;
                             
-                            const remainingSeconds = Math.floor((expiry - now) / 1000);
-                            startQuoteTimer(remainingSeconds, q.id, data.rate);
-                            showNotification('🔔 PQL đã chào giá! Vui lòng chấp nhận trong thời gian quy định.', 'warning');
+                            // HIỂN THỊ MODAL TỰ ĐỘNG
+                            showQuoteAcceptanceModal(quoteData, formData);
                         }
                     }
                 });
+                
+                // PNV cũng kiểm tra tin nhắn mới từ PQL (chat riêng)
+                if (document.getElementById('pnv-chat').classList.contains('active')) {
+                    const myChatMessages = chatMessages.filter(m => 
+                        m.to === currentUser.id && 
+                        !m.read
+                    );
+                    
+                    if (myChatMessages.length > 0) {
+                        refreshPnvChatMessages();
+                    }
+                }
             }, 2000);
         }
 
         function startPqlPolling() {
-            // PQL kiểm tra có yêu cầu hỏi giá mới không
+            // PQL kiểm tra có yêu cầu hỏi giá mới và tin nhắn mới
             pqlPollInterval = setInterval(() => {
                 if (currentUser?.role !== 'PQL') return;
                 
                 const currentTab = document.querySelector('#pql-quotes.tab-content');
                 if (currentTab && currentTab.classList.contains('active')) {
                     loadPendingQuotes();
+                }
+                
+                // Kiểm tra tin nhắn mới từ PNV để cập nhật dropdown
+                const unreadPnvMessages = chatMessages.filter(m => 
+                    m.to === 'ALL_PQL' && 
+                    !m.read && 
+                    m.acceptedBy !== currentUser.id
+                );
+                
+                if (unreadPnvMessages.length > 0) {
+                    loadPnvListForPqlChat();
+                    
+                    if (document.getElementById('pql-chat').classList.contains('active') && currentChatPnv) {
+                        refreshPqlChatMessages();
+                    }
                 }
             }, 3000);
         }
@@ -3344,10 +3743,66 @@
         }
 
         // ==========================================
+        // PNV CHAT REFRESH
+        // ==========================================
+        function refreshPnvChatMessages() {
+            const container = document.getElementById('pnvChatMessages');
+            
+            const myMessages = chatMessages.filter(m => 
+                m.from === currentUser.id || 
+                m.to === currentUser.id ||
+                (m.from !== currentUser.id && m.to === 'ALL_PQL' && m.acceptedBy)
+            );
+            
+            const displayedCount = container.querySelectorAll('.chat-message').length;
+            const relevantCount = myMessages.length;
+            
+            if (relevantCount > displayedCount - 1) {
+                container.innerHTML = `
+                    <div class="chat-message received">
+                        <strong>Hệ thống:</strong><br>
+                        Chào mừng! Bạn có thể chat trực tiếp với PQL tại đây.
+                    </div>
+                `;
+                
+                myMessages.sort((a, b) => new Date(a.time) - new Date(b.time));
+                
+                myMessages.forEach(m => {
+                    const div = document.createElement('div');
+                    const isMe = m.from === currentUser.id;
+                    div.className = `chat-message ${isMe ? 'sent' : 'received'}`;
+                    
+                    const time = new Date(m.time).toLocaleTimeString();
+                    const sender = isMe ? 'Bạn' : (mockUsers.find(u => u.id === m.from)?.name || 'PQL');
+                    
+                    div.innerHTML = `<strong>${sender}:</strong><br>${m.message}<br><small style="opacity: 0.7;">${time}</small>`;
+                    container.appendChild(div);
+                });
+                
+                container.scrollTop = container.scrollHeight;
+                
+                myMessages.forEach(m => {
+                    if (m.to === currentUser.id && !m.read) {
+                        m.read = true;
+                    }
+                });
+                saveToLocalStorage();
+            }
+        }
+
+        // ==========================================
         // INITIALIZATION
         // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
             loadFromLocalStorage();
+            
+            // Thêm balanceRate cho transactions cũ nếu chưa có
+            mockTransactions.forEach(t => {
+                if (!t.balanceRate) {
+                    t.balanceRate = t.rate * 0.995;
+                }
+            });
+            saveToLocalStorage();
             
             const today = new Date();
             document.getElementById('pnvFilterFromDate').value = formatDateYYYYMMDD(today);
@@ -3365,16 +3820,19 @@
                 uploadArea.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     uploadArea.style.borderColor = '#4CAF50';
+                    uploadArea.style.background = '#f0f8f0';
                 });
                 
                 uploadArea.addEventListener('dragleave', (e) => {
                     e.preventDefault();
                     uploadArea.style.borderColor = '#C8E6C9';
+                    uploadArea.style.background = '#E8F5E9';
                 });
                 
                 uploadArea.addEventListener('drop', (e) => {
                     e.preventDefault();
                     uploadArea.style.borderColor = '#C8E6C9';
+                    uploadArea.style.background = '#E8F5E9';
                     
                     const files = e.dataTransfer.files;
                     if (files.length > 0) {
@@ -3389,6 +3847,24 @@
                             showNotification('Chỉ chấp nhận file .xlsx, .xls, .csv!', 'error');
                         }
                     }
+                });
+            }
+
+            // Load PNV list cho báo cáo
+            const reportPnvSelect = document.getElementById('reportPnv');
+            if (reportPnvSelect) {
+                const pnvUsers = mockUsers.filter(u => u.role === 'PNV');
+                pnvUsers.forEach(u => {
+                    reportPnvSelect.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+                });
+            }
+
+            // Load PNV list cho filter blotter PQL
+            const pqlFilterPnv = document.getElementById('pqlFilterPnv');
+            if (pqlFilterPnv) {
+                const pnvUsers = mockUsers.filter(u => u.role === 'PNV');
+                pnvUsers.forEach(u => {
+                    pqlFilterPnv.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
                 });
             }
         });
