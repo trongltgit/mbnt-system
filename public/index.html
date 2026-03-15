@@ -26,14 +26,77 @@
             --info: #2196F3;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        /* Sửa body để luôn có đủ chỗ cho header và footer */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header - Bỏ display: none mặc định, luôn hiển thị */
+.header {
+    background: linear-gradient(135deg, var(--dark-green) 0%, var(--primary-green) 100%);
+    color: var(--white);
+    padding: 10px 20px;
+    display: flex; /* LUÔN HIỂN THỊ */
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 70px;
+}
+
+/* Ẩn phần user-info khi chưa đăng nhập */
+.user-info.hidden {
+    display: none !important;
+}
+
+/* Main Content - Luôn có margin cho header và footer */
+.main-content {
+    margin-top: 70px;    /* Chiều cao header */
+    margin-bottom: 50px; /* Chiều cao footer */
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Footer - Bỏ display: none, luôn hiển thị */
+.footer {
+    background: var(--dark-green);
+    color: var(--white);
+    text-align: center;
+    padding: 15px;
+    font-size: 13px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    display: flex; /* LUÔN HIỂN THỊ */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Login Container - Căn giữa trong không gian còn lại */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 20px;
+    min-height: calc(100vh - 120px); /* Trừ header và footer */
+}
 
         /* Header Styles */
         .header {
