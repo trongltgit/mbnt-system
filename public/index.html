@@ -46,6 +46,104 @@ body {
     color: white;
 }
 
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #1a5f1a 0%, #2e7d2e 100%);
+    padding: 10px 20px;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 0 0 auto;
+}
+
+#brand-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Căn giữa ngang */
+    justify-content: center;
+    line-height: 1.3;
+}
+
+.bank-name {
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center; /* Căn giữa text */
+}
+
+.branch-name {
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    text-align: center; /* Căn giữa text */
+    margin-top: 2px;
+}
+
+/* CĂN GIỮA TUYỆT ĐỐI - Ghi đè lên center */
+.page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: rgba(0, 0, 139, 0.8); /* Màu xanh dương đậm như ảnh */
+    padding: 8px 20px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 0 0 auto;
+    margin-left: auto; /* Đẩy sang phải */
+}
+
+.user-details {
+    text-align: right;
+    color: white;
+    font-size: 12px;
+}
+
+.user-name {
+    font-weight: bold;
+}
+
+.logout-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+.logout-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
 .logo-section {
     display: flex;
     align-items: center;
@@ -924,15 +1022,17 @@ body {
     <!-- Header -->
     <header class="header" id="header">
     <div class="logo-section">
-        <!-- Sửa: Thêm kiểm tra đường dẫn và thuộc tính onerror -->
-        <img src="/static/Logo.png" alt="Vietcombank Logo" id="brand-logo" onerror="this.style.display='none'">
+        <!-- Kiểm tra đường dẫn logo - thử đường dẫn tương đối hoặc tuyệt đối -->
+        <img src="./static/Logo.png" alt="Vietcombank Logo" id="brand-logo" onerror="this.src='https://via.placeholder.com/50x50/006600/FFFFFF?text=VC'; console.log('Logo load failed')">
+        
         <div class="logo-text">
-            <!-- Thêm class cho căn chỉnh -->
-            <span class="bank-name justified-text">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
-            <span class="branch-name justified-text">CHI NHÁNH TP.HCM</span>
+            <!-- Căn giữa cả 2 dòng -->
+            <span class="bank-name">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
+            <span class="branch-name">CHI NHÁNH TP.HCM</span>
         </div>
     </div>
     
+    <!-- Căn giữa hoàn toàn -->
     <div class="page-title" id="pageTitle">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</div>
     
     <div class="user-info">
@@ -942,8 +1042,7 @@ body {
         </div>
         <button class="logout-btn" onclick="logout()">Đăng xuất</button>
     </div>
-    </header>
-
+</header>
 <style>
 /* CSS cho căn đều text (justify) */
 .justified-text {
