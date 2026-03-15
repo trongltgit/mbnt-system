@@ -1068,7 +1068,7 @@ body {
 <script>
 // Kiểm tra và log lỗi nếu logo không load
 document.getElementById('brand-logo').addEventListener('error', function() {
-    console.error('Không thể tải logo từ:', this.src);
+    console.error('Không thể tải logo từ:', this src);
     // Thử đường dẫn khác nếu cần
     // this.src = './static/Logo.png';
 });
@@ -1860,17 +1860,17 @@ document.getElementById('brand-logo').addEventListener('error', function() {
                         <option value="PNV-L1">KHBL1 (L1)</option>
                         <option value="PNV-L2">KHBL2 (L2)</option>
                         <option value="PNV-L3">KHBL3 (L3)</option>
-                        <option value="PNV-TĐT">PGD TĐT</option>
-                        <option value="PNV-ML">PGD ML</option>
-                        <option value="PNV-ĐK">PGD ĐK</option>
-                        <option value="PNV-CH">PGD CH</option>
-                        <option value="PNV-VVK">PGD VVK</option>
-                        <option value="PNV-LTT">PGD LTT</option>                        
+                        <option value="PNV-TĐT">PGD TĐT (TĐT)</option>
+                        <option value="PNV-ML">PGD ML (ML)</option>
+                        <option value="PNV-ĐK">PGD ĐK (ĐK)</option>
+                        <option value="PNV-CH">PGD CH (CH)</option>
+                        <option value="PNV-VVK">PGD VVK (VVK)</option>
+                        <option value="PNV-LTT">PGD LTT (LTT)</option>                        
                         <option value="PNV-TN">DV KHTN (TN)</option>
                         <option value="PNV-T1">DVKHTC1 (T1)</option>
                          <option value="PNV-T2">DVKHTC2 (T2)</option>                        
-                        <option value="PQL-KT">PQL - Kế toán</option>
-                        <option value="BGD">Ban Giám đốc</option>
+                        <option value="PQL-KT">PQL - Kế toán (KT)</option>
+                        <option value="BGD">Ban Giám đốc (BGĐ)</option>
                     </select>
                 </div>
                 <div class="form-group" id="managerSelect" style="display: none;">
@@ -1906,13 +1906,24 @@ document.getElementById('brand-logo').addEventListener('error', function() {
             <div class="form-group">
                 <label>Phòng ban</label>
                 <select id="editUserDept" onchange="updateEditUserRole()" required>
-                    <option value="BGD">BGD - Ban Giám Đốc</option>
-                    <option value="PNS">PNS - Phòng Nhân Sự</option>
-                    <option value="PKT">PKT - Phòng Kế Toán</option>
-                    <option value="PNV-01">PNV-01 - Phòng Nghiệp Vụ 1</option>
-                    <option value="PNV-02">PNV-02 - Phòng Nghiệp Vụ 2</option>
-                    <option value="PNV-03">PNV-03 - Phòng Nghiệp Vụ 3</option>
-                    <option value="IT">IT - Phòng Công Nghệ</option>
+                    <option value="">Chọn phòng ban...</option>
+                        <option value="PNV-K1">KHDN1 (K1)</option>
+                        <option value="PNV-K2">KHDN2 (K2)</option>
+                        <option value="PNV-K3">KHDN3 (K3)</option>                        
+                        <option value="PNV-L1">KHBL1 (L1)</option>
+                        <option value="PNV-L2">KHBL2 (L2)</option>
+                        <option value="PNV-L3">KHBL3 (L3)</option>
+                        <option value="PNV-TĐT">PGD TĐT (TĐT)</option>
+                        <option value="PNV-ML">PGD ML (ML)</option>
+                        <option value="PNV-ĐK">PGD ĐK (ĐK)</option>
+                        <option value="PNV-CH">PGD CH (CH)</option>
+                        <option value="PNV-VVK">PGD VVK (VVK)</option>
+                        <option value="PNV-LTT">PGD LTT (LTT)</option>                        
+                        <option value="PNV-TN">DV KHTN (TN)</option>
+                        <option value="PNV-T1">DVKHTC1 (T1)</option>
+                         <option value="PNV-T2">DVKHTC2 (T2)</option>                        
+                        <option value="PQL-KT">PQL - Kế toán (KT)</option>
+                        <option value="BGD">Ban Giám đốc (BGĐ)</option>
                 </select>
             </div>
             <div class="form-group" id="editManagerSelect" style="display: none;">
