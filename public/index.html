@@ -924,10 +924,12 @@ body {
     <!-- Header -->
     <header class="header" id="header">
     <div class="logo-section">
-        <img src="/static/Logo.png" alt="Vietcombank Logo" id="brand-logo">
+        <!-- Sửa: Thêm kiểm tra đường dẫn và thuộc tính onerror -->
+        <img src="/static/Logo.png" alt="Vietcombank Logo" id="brand-logo" onerror="this.style.display='none'">
         <div class="logo-text">
-            <span class="bank-name">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
-            <span class="branch-name">CHI NHÁNH TP.HCM</span>
+            <!-- Thêm class cho căn chỉnh -->
+            <span class="bank-name justified-text">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
+            <span class="branch-name justified-text">CHI NHÁNH TP.HCM</span>
         </div>
     </div>
     
@@ -941,6 +943,38 @@ body {
         <button class="logout-btn" onclick="logout()">Đăng xuất</button>
     </div>
     </header>
+
+<style>
+/* CSS cho căn đều text (justify) */
+.justified-text {
+    text-align: justify;
+    text-align-last: justify; /* Căn đều cả dòng cuối */
+    display: block; /* Bắt buộc để justify hoạt động */
+    width: 100%;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* CSS cho logo */
+#brand-logo {
+    height: 50px; /* Điều chỉnh kích thước */
+    width: auto;
+    object-fit: contain;
+}
+</style>
+
+<script>
+// Kiểm tra và log lỗi nếu logo không load
+document.getElementById('brand-logo').addEventListener('error', function() {
+    console.error('Không thể tải logo từ:', this.src);
+    // Thử đường dẫn khác nếu cần
+    // this.src = './static/Logo.png';
+});
+</script>
 
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
