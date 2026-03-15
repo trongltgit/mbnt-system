@@ -26,226 +26,23 @@
             --info: #2196F3;
         }
 
-        /* Sửa body để luôn có đủ chỗ cho header và footer */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-light);
-    color: var(--text-dark);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-/* Header - Bỏ display: none mặc định, luôn hiển thị */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background-color: #003366; /* Vietcombank blue */
-    color: white;
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: linear-gradient(135deg, #1a5f1a 0%, #2e7d2e 100%);
-    padding: 10px 20px;
-    height: 60px;
-    box-sizing: border-box;
-}
-
-.logo-section {
-    display: flex;
-    align-items: left;
-    gap: 15px;
-    flex: 0 0 auto;
-}
-
-#brand-logo {
-    height: 40px;
-    width: auto;
-    object-fit: contain;
-}
-
-.logo-text {
-    display: flex;
-    flex-direction: column;
-    align-items: left; /* Căn giữa ngang */
-    justify-content: center;
-    line-height: 1.3;
-}
-
-.bank-name {
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-align: center; /* Căn giữa text */
-}
-
-.branch-name {
-    color: white;
-    font-size: 13px;
-    font-weight: 500;
-    text-transform: uppercase;
-    text-align: center; /* Căn giữa text */
-    margin-top: 2px;
-}
-
-/* CĂN GIỮA TUYỆT ĐỐI - Ghi đè lên center */
-.page-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    background: rgba(0, 0, 139, 0.8); /* Màu xanh dương đậm như ảnh */
-    padding: 8px 20px;
-    border-radius: 4px;
-    white-space: nowrap;
-    z-index: 10;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex: 0 0 auto;
-    margin-left: auto; /* Đẩy sang phải */
-}
-
-.user-details {
-    text-align: right;
-    color: white;
-    font-size: 12px;
-}
-
-.user-name {
-    font-weight: bold;
-}
-
-.logout-btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.4);
-    color: white;
-    padding: 6px 16px;
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.3s;
-}
-
-.logout-btn:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-.logo-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.logo-text {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
-
-.bank-name {
-    font-weight: bold;
-}
-
-.page-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    flex: 1;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.user-details {
-    text-align: right;
-    font-size: 0.85rem;
-}
-
-.logout-btn {
-    padding: 0.5rem 1rem;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.logout-btn:hover {
-    background-color: #c82333;
-}
-
-/* Ẩn phần user-info khi chưa đăng nhập */
-.user-info.hidden {
-    display: none !important;
-}
-
-/* Main Content - Luôn có margin cho header và footer */
-.main-content {
-    margin-top: 70px;    /* Chiều cao header */
-    margin-bottom: 50px; /* Chiều cao footer */
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    min-height: calc(100vh - 120px);
-    display: flex;
-    flex-direction: column;
-}
-
-/* Footer - Bỏ display: none, luôn hiển thị */
-.footer {
-    background: var(--dark-green);
-    color: var(--white);
-    text-align: center;
-    padding: 15px;
-    font-size: 13px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
-    display: flex; /* LUÔN HIỂN THỊ */
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-/* Login Container - Căn giữa trong không gian còn lại */
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    padding: 20px;
-    min-height: calc(100vh - 120px); /* Trừ header và footer */
-}
-
-        /* Header Styles */
+        /* Header - Sửa lại để logo hiển thị đúng */
         .header {
-            background: linear-gradient(135deg, var(--dark-green) 0%, var(--primary-green) 100%);
-            color: var(--white);
-            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #1a5f1a 0%, #2e7d2e 100%);
+            color: white;
             position: fixed;
             top: 0;
             left: 0;
@@ -258,66 +55,77 @@ body {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex: 0 0 auto;
         }
 
-        .logo {
-            width: 50px;
+        #brand-logo {
             height: 50px;
-            background: var(--white);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--primary-green);
-            font-size: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: auto;
+            object-fit: contain;
+            display: block; /* Đảm bảo hiển thị */
         }
 
         .logo-text {
-            font-size: 14px;
-            font-weight: 600;
-            line-height: 1.2;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.3;
         }
 
-        .page-title {
-            flex: 1;
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
+        .bank-name {
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+        }
+
+        .branch-name {
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Tiêu đề căn giữa - CHỈ MÀU TRẮNG, KHÔNG HIGHLIGHT */
+        .page-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+            /* Bỏ background, padding, border-radius - chỉ giữ màu trắng */
         }
 
         .user-info {
             display: flex;
             align-items: center;
             gap: 15px;
-            font-size: 14px;
+            flex: 0 0 auto;
+            margin-left: auto;
         }
 
         .user-details {
             text-align: right;
+            color: white;
+            font-size: 12px;
         }
 
         .user-name {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .user-dept {
-            font-size: 12px;
-            opacity: 0.9;
+            font-weight: bold;
         }
 
         .logout-btn {
             background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.4);
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 16px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             transition: all 0.3s;
         }
 
@@ -349,6 +157,7 @@ body {
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
         }
 
         /* Login Page */
@@ -869,8 +678,10 @@ body {
             }
 
             .page-title {
-                font-size: 14px;
+                position: static;
+                transform: none;
                 margin: 10px 0;
+                font-size: 14px;
             }
 
             .main-content {
@@ -1019,60 +830,31 @@ body {
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header - Đã sửa lại -->
     <header class="header" id="header">
-    <!-- Logo bên trái trên cùng -->
-    <div class="logo-section" style="margin-right: auto;">
-        <img src="/static/Logo.png" alt="Vietcombank Logo" id="brand-logo" onerror="this.src='https://via.placeholder.com/50x50/006600/FFFFFF?text=VC'; console.log('Logo load failed')">
+        <!-- Logo bên trái -->
+        <div class="logo-section">
+            <!-- Sửa lại đường dẫn logo - dùng placeholder nếu không có file -->
+            <img src="./static/Logo.png" alt="Vietcombank Logo" id="brand-logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect width=%2250%22 height=%2250%22 fill=%22%23ffffff%22/%3E%3Ctext x=%2225%22 y=%2230%22 font-size=%2212%22 text-anchor=%22middle%22 fill=%22%231a5f1a%22%3EVCB%3C/text%3E%3C/svg%3E'; this.onerror=null;">
+            
+            <div class="logo-text">
+                <span class="bank-name">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
+                <span class="branch-name">CHI NHÁNH TP.HCM</span>
+            </div>
+        </div>
         
-        <div class="logo-text">
-            <span class="bank-name">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
-            <span class="branch-name">CHI NHÁNH TP.HCM</span>
+        <!-- Tiêu đề căn giữa - CHỈ MÀU TRẮNG -->
+        <div class="page-title" id="pageTitle">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</div>
+        
+        <!-- User info bên phải -->
+        <div class="user-info hidden" id="userInfoSection">
+            <div class="user-details">
+                <div class="user-name" id="displayUserName">User Name</div>
+                <div class="user-dept" id="displayUserDept">Department</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
         </div>
-    </div>
-    
-    <!-- Tiêu đề căn giữa - MÀU TRẮNG -->
-    <div class="page-title" id="pageTitle" font-weight: bold;">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</div>
-    
-    <div class="user-info">
-        <div class="user-details">
-            <div class="user-name" id="displayUserName">User Name</div>
-            <div class="user-dept" id="displayUserDept">Department</div>
-        </div>
-        <button class="logout-btn" onclick="logout()">Đăng xuất</button>
-    </div>
-</header>
-<style>
-/* CSS cho căn đều text (justify) */
-.justified-text {
-    text-align: justify;
-    text-align-last: justify; /* Căn đều cả dòng cuối */
-    display: block; /* Bắt buộc để justify hoạt động */
-    width: 100%;
-}
-
-.logo-text {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-/* CSS cho logo */
-#brand-logo {
-    height: 50px; /* Điều chỉnh kích thước */
-    width: auto;
-    object-fit: contain;
-}
-</style>
-
-<script>
-// Kiểm tra và log lỗi nếu logo không load
-document.getElementById('brand-logo').addEventListener('error', function() {
-    console.error('Không thể tải logo từ:', this src);
-    // Thử đường dẫn khác nếu cần
-    // this.src = './static/Logo.png';
-});
-</script>
+    </header>
 
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
@@ -1888,25 +1670,25 @@ document.getElementById('brand-logo').addEventListener('error', function() {
     </div>
 
     <!-- Edit User Modal -->
-<div id="editUserModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Sửa thông tin User</h3>
-            <button class="close-btn" onclick="closeEditUserModal()">&times;</button>
-        </div>
-        <form id="editUserForm" onsubmit="handleEditUser(event)">
-            <div class="form-group">
-                <label>ID User (không thể sửa)</label>
-                <input type="text" id="editUserId" disabled>
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Sửa thông tin User</h3>
+                <button class="close-btn" onclick="closeEditUserModal()">&times;</button>
             </div>
-            <div class="form-group">
-                <label>Họ tên</label>
-                <input type="text" id="editUserName" required>
-            </div>
-            <div class="form-group">
-                <label>Phòng ban</label>
-                <select id="editUserDept" onchange="updateEditUserRole()" required>
-                    <option value="">Chọn phòng ban...</option>
+            <form id="editUserForm" onsubmit="handleEditUser(event)">
+                <div class="form-group">
+                    <label>ID User (không thể sửa)</label>
+                    <input type="text" id="editUserId" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Họ tên</label>
+                    <input type="text" id="editUserName" required>
+                </div>
+                <div class="form-group">
+                    <label>Phòng ban</label>
+                    <select id="editUserDept" onchange="updateEditUserRole()" required>
+                        <option value="">Chọn phòng ban...</option>
                         <option value="PNV-K1">KHDN1 (K1)</option>
                         <option value="PNV-K2">KHDN2 (K2)</option>
                         <option value="PNV-K3">KHDN3 (K3)</option>                        
@@ -1921,24 +1703,24 @@ document.getElementById('brand-logo').addEventListener('error', function() {
                         <option value="PNV-LTT">PGD LTT (LTT)</option>                        
                         <option value="PNV-TN">DV KHTN (TN)</option>
                         <option value="PNV-T1">DVKHTC1 (T1)</option>
-                         <option value="PNV-T2">DVKHTC2 (T2)</option>                        
+                        <option value="PNV-T2">DVKHTC2 (T2)</option>                        
                         <option value="PQL-KT">PQL - Kế toán (KT)</option>
                         <option value="BGD">Ban Giám đốc (BGĐ)</option>
-                </select>
-            </div>
-            <div class="form-group" id="editManagerSelect" style="display: none;">
-                <label>Quản lý bởi BGĐ</label>
-                <select id="editUserManager">
-                    <option value="">Chọn BGĐ quản lý...</option>
-                </select>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Hủy</button>
-                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-            </div>
-        </form>
+                    </select>
+                </div>
+                <div class="form-group" id="editManagerSelect" style="display: none;">
+                    <label>Quản lý bởi BGĐ</label>
+                    <select id="editUserManager">
+                        <option value="">Chọn BGĐ quản lý...</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
     <!-- Modal Edit Transaction -->
     <div class="modal" id="editTransactionModal">
@@ -2018,7 +1800,6 @@ document.getElementById('brand-logo').addEventListener('error', function() {
         let quoteTimer = null;
         let quoteExpiryTime = null;
         let currentQuoteId = null;
-        let editingTransactionId = null;
 
         // ==========================================
         // MOCK DATA INITIALIZATION
@@ -2029,7 +1810,7 @@ document.getElementById('brand-logo').addEventListener('error', function() {
             { id: 'L001', name: 'Trần Thị B', dept: 'KHBL1 (L1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
             { id: 'TN001', name: 'Lê Văn C', dept: 'DV KHTN (TN)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
             { id: 'KT001', name: 'Phạm Văn C', dept: 'PQL - Kế toán', role: 'PQL', password: 'Vcb@1234', manager: null },
-            { id: 'BGD001', name: 'Lê Văn D', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null },
+                        { id: 'BGD001', name: 'Lê Văn D', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null },
             { id: 'BGD002', name: 'Nguyễn Thị E', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null }
         ];
 
@@ -2086,6 +1867,8 @@ document.getElementById('brand-logo').addEventListener('error', function() {
 
         let pendingQuotes = [];
         let chatMessages = [];
+        let editingTransactionId = null;
+        let currentEditingUserId = null;
 
         // ==========================================
         // UTILITY FUNCTIONS
@@ -2100,7 +1883,6 @@ document.getElementById('brand-logo').addEventListener('error', function() {
         }
 
         function parseDate(dateStr) {
-            // Parse dd/mm/yyyy or ddmmyyyy
             if (dateStr.length === 8 && !dateStr.includes('/')) {
                 const day = dateStr.substring(0, 2);
                 const month = dateStr.substring(2, 4);
@@ -2133,9 +1915,6 @@ document.getElementById('brand-logo').addEventListener('error', function() {
             const trans = parseDate(transDateStr);
             const diffTime = Math.abs(eff - trans);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            // Simple calculation: <= 2 working days = GN, > 2 = KH
-            // In real app, need to exclude weekends and holidays
             return diffDays <= 2 ? 'GN' : 'KH';
         }
 
@@ -2161,7 +1940,7 @@ document.getElementById('brand-logo').addEventListener('error', function() {
             if (quotes) pendingQuotes = JSON.parse(quotes);
         }
 
-                // ==========================================
+        // ==========================================
         // AUTHENTICATION
         // ==========================================
         function handleLogin(e) {
@@ -2190,6 +1969,7 @@ document.getElementById('brand-logo').addEventListener('error', function() {
             // Show header and footer
             document.getElementById('header').style.display = 'flex';
             document.getElementById('footer').style.display = 'flex';
+            document.getElementById('userInfoSection').classList.remove('hidden');
             
             // Update user info
             document.getElementById('displayUserName').textContent = user.name;
@@ -2217,8 +1997,6 @@ document.getElementById('brand-logo').addEventListener('error', function() {
             }
 
             showNotification(`Chào mừng ${user.name}!`);
-            
-            // Start polling for updates
             startPolling();
         }
 
@@ -2257,7 +2035,6 @@ document.getElementById('brand-logo').addEventListener('error', function() {
             }
             saveToLocalStorage();
             
-            // Reset form
             e.target.reset();
             showNotification('Đổi mật khẩu thành công!');
         }
@@ -2266,17 +2043,14 @@ document.getElementById('brand-logo').addEventListener('error', function() {
         // TAB SWITCHING
         // ==========================================
         function switchTab(dashboard, tabName) {
-            // Update tab buttons
             const tabs = document.querySelectorAll(`#${dashboard}Dashboard .tab`);
             tabs.forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Update tab content
             const contents = document.querySelectorAll(`#${dashboard}Dashboard .tab-content`);
             contents.forEach(content => content.classList.remove('active'));
             document.getElementById(`${dashboard}-${tabName}`).classList.add('active');
 
-            // Load data if needed
             if (dashboard === 'pql' && tabName === 'quotes') {
                 loadPendingQuotes();
             } else if (dashboard === 'pql' && tabName === 'blotter') {
@@ -2287,838 +2061,789 @@ document.getElementById('brand-logo').addEventListener('error', function() {
         }
 
         // ==========================================
-// ADMIN FUNCTIONS
-// ==========================================
-
-// Biến lưu trữ user đang được edit
-let currentEditingUserId = null;
-
-function loadUserList() {
-    const container = document.getElementById('userList');
-    container.innerHTML = '';
-    
-    mockUsers.forEach(user => {
-        if (user.id === 'admin') return;
-        
-        const card = document.createElement('div');
-        card.className = 'user-card';
-        card.innerHTML = `
-            <h4>${user.name}</h4>
-            <div class="user-info-text">ID: ${user.id}</div>
-            <div class="user-info-text">Phòng: ${user.dept}</div>
-            <div class="user-info-text">Vai trò: ${user.role}</div>
-            ${user.manager ? `<div class="user-info-text">Quản lý bởi: ${user.manager}</div>` : ''}
-            <div class="user-actions">
-                <button class="btn btn-small btn-primary" onclick="openEditUserModal('${user.id}')">Sửa</button>
-                <button class="btn btn-small btn-warning" onclick="resetPassword('${user.id}')">Reset MK</button>
-                <button class="btn btn-small btn-danger" onclick="deleteUser('${user.id}')">Xóa</button>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// ========== ADD USER FUNCTIONS ==========
-function openAddUserModal() {
-    document.getElementById('addUserModal').classList.add('active');
-    // Load BGD list for manager select
-    const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
-    const select = document.getElementById('newUserManager');
-    select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
-    bgdUsers.forEach(u => {
-        select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
-    });
-}
-
-function closeAddUserModal() {
-    document.getElementById('addUserModal').classList.remove('active');
-}
-
-// ========== EDIT USER FUNCTIONS ==========
-function openEditUserModal(userId) {
-    const user = mockUsers.find(u => u.id === userId);
-    if (!user) return;
-    
-    currentEditingUserId = userId;
-    
-    // Điền thông tin user vào form edit
-    document.getElementById('editUserId').value = user.id;
-    document.getElementById('editUserName').value = user.name;
-    
-    // Set giá trị phòng ban
-    const deptSelect = document.getElementById('editUserDept');
-    // Tìm option có text khớp với user.dept
-    for (let i = 0; i < deptSelect.options.length; i++) {
-        if (deptSelect.options[i].text === user.dept) {
-            deptSelect.selectedIndex = i;
-            break;
-        }
-    }
-    
-    // Load danh sách BGD cho manager select
-    loadBGDListForEdit(user.manager);
-    
-    // Hiển thị/ẩn phần chọn manager dựa trên phòng ban
-    updateEditUserRole();
-    
-    // Hiển thị modal
-    document.getElementById('editUserModal').classList.add('active');
-}
-
-function closeEditUserModal() {
-    document.getElementById('editUserModal').classList.remove('active');
-    currentEditingUserId = null;
-}
-
-function loadBGDListForEdit(selectedManager) {
-    const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
-    const select = document.getElementById('editUserManager');
-    select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
-    bgdUsers.forEach(u => {
-        const selected = u.id === selectedManager ? 'selected' : '';
-        select.innerHTML += `<option value="${u.id}" ${selected}>${u.name} (${u.id})</option>`;
-    });
-}
-
-function updateEditUserRole() {
-    const dept = document.getElementById('editUserDept').value;
-    const managerDiv = document.getElementById('editManagerSelect');
-    
-    if (dept.startsWith('PNV')) {
-        managerDiv.style.display = 'block';
-    } else {
-        managerDiv.style.display = 'none';
-        document.getElementById('editUserManager').value = '';
-    }
-}
-
-function handleEditUser(e) {
-    e.preventDefault();
-    
-    if (!currentEditingUserId) return;
-    
-    const user = mockUsers.find(u => u.id === currentEditingUserId);
-    if (!user) return;
-    
-    const newName = document.getElementById('editUserName').value.trim();
-    const deptValue = document.getElementById('editUserDept').value;
-    const deptText = document.getElementById('editUserDept').options[document.getElementById('editUserDept').selectedIndex].text;
-    const manager = document.getElementById('editUserManager').value;
-    
-    // Cập nhật thông tin user
-    user.name = newName;
-    user.dept = deptText;
-    user.role = deptValue.split('-')[0];
-    user.manager = deptValue.startsWith('PNV') ? (manager || null) : null;
-    
-    saveToLocalStorage();
-    closeEditUserModal();
-    loadUserList();
-    showNotification('Cập nhật user thành công!');
-}
-
-// ========== ADD USER HANDLER ==========
-function handleAddUser(e) {
-    e.preventDefault();
-    const id = document.getElementById('newUserId').value.trim();
-    const name = document.getElementById('newUserName').value.trim();
-    const deptValue = document.getElementById('newUserDept').value;
-    const deptText = document.getElementById('newUserDept').options[document.getElementById('newUserDept').selectedIndex].text;
-    const manager = document.getElementById('newUserManager').value;
-
-    if (mockUsers.find(u => u.id === id)) {
-        showNotification('ID đã tồn tại!', 'error');
-        return;
-    }
-
-    const newUser = {
-        id: id,
-        name: name,
-        dept: deptText,
-        role: deptValue.split('-')[0],
-        password: 'Vcb@1234',
-        manager: manager || null
-    };
-    
-    mockUsers.push(newUser);
-    saveToLocalStorage();
-    closeAddUserModal();
-    e.target.reset();
-    loadUserList();
-    showNotification('Thêm user thành công!');
-}
-
-// ========== OTHER FUNCTIONS ==========
-function updateUserRole() {
-    const dept = document.getElementById('newUserDept').value;
-    const managerDiv = document.getElementById('managerSelect');
-    
-    if (dept.startsWith('PNV')) {
-        managerDiv.style.display = 'block';
-    } else {
-        managerDiv.style.display = 'none';
-        document.getElementById('newUserManager').value = '';
-    }
-}
-
-function resetPassword(userId) {
-    const user = mockUsers.find(u => u.id === userId);
-    if (user) {
-        user.password = 'Vcb@1234';
-        saveToLocalStorage();
-        showNotification(`Đã reset mật khẩu cho ${user.name} về mặc định (Vcb@1234)`);
-    }
-}
-
-function deleteUser(userId) {
-    if (confirm('Bạn có chắc muốn xóa user này?')) {
-        const index = mockUsers.findIndex(u => u.id === userId);
-        if (index > -1) {
-            mockUsers.splice(index, 1);
-            saveToLocalStorage();
-            loadUserList();
-            showNotification('Đã xóa user');
-        }
-    }
-}
-
+        // ADMIN FUNCTIONS
         // ==========================================
-// PNV FUNCTIONS - ĐÚNG NGUYÊN TẮC GIAO DỊCH
-// ==========================================
-
-function lookupCustomerName() {
-    const cif = document.getElementById('cif').value.trim();
-    const nameInput = document.getElementById('customerName');
-    
-    if (mockCIF[cif]) {
-        nameInput.value = mockCIF[cif];
-        nameInput.style.color = 'green';
-    } else {
-        nameInput.value = 'Không tìm thấy KH - Vui lòng kiểm tra lại CIF';
-        nameInput.style.color = 'red';
-    }
-}
-
-function updatePurposeLabel() {
-    const type = document.getElementById('transactionType').value;
-    const label = document.getElementById('purposeLabel');
-    label.textContent = type === 'buy' ? 'Nguồn (1-12)' : 'Mục đích (1-12)';
-}
-
-// PNV GỬI YÊU CẦU HỎI GIÁ - CHỜ PQL PHẢN HỒI
-function submitAskPrice(e) {
-    e.preventDefault();
-    
-    const buyCurr = document.getElementById('buyCurrency').value;
-    const sellCurr = document.getElementById('sellCurrency').value;
-    
-    if (buyCurr === sellCurr) {
-        showNotification('Đồng tiền mua và bán không được giống nhau!', 'error');
-        return;
-    }
-
-    const cif = document.getElementById('cif').value.trim();
-    if (!mockCIF[cif]) {
-        showNotification('CIF không tồn tại trong hệ thống!', 'error');
-        return;
-    }
-
-    // Tạo yêu cầu hỏi giá - CHỜ PQL CHÀO
-    const quoteRequest = {
-        id: generateId(),
-        pnv: currentUser.id,
-        pnvName: currentUser.name,
-        cif: cif,
-        customerName: document.getElementById('customerName').value,
-        direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
-        date: formatDate(new Date()),
-        effectiveDate: document.getElementById('effectiveDate').value,
-        currency: document.getElementById('currencyCode').value,
-        buyCurr: buyCurr,
-        sellCurr: sellCurr,
-        amount: parseFloat(document.getElementById('amount').value),
-        purpose: document.getElementById('purpose').value,
-        status: 'pending', // CHỜ PQL CHÀO GIÁ
-        interrupted: false,
-        timestamp: new Date().toISOString()
-    };
-
-    pendingQuotes.push(quoteRequest);
-    saveToLocalStorage();
-
-    // Lưu form data để dùng khi accept sau này
-    localStorage.setItem('pnv_pending_form_' + quoteRequest.id, JSON.stringify({
-        quoteId: quoteRequest.id,
-        cif: cif,
-        customerName: document.getElementById('customerName').value,
-        transactionType: document.getElementById('transactionType').value,
-        effectiveDate: document.getElementById('effectiveDate').value,
-        buyCurrency: buyCurr,
-        sellCurrency: sellCurr,
-        amount: document.getElementById('amount').value,
-        purpose: document.getElementById('purpose').value
-    }));
-
-    showNotification('Đã gửi yêu cầu hỏi giá đến PQL! Đang chờ phản hồi...', 'info');
-    
-    // Reset form
-    document.getElementById('askPriceForm').reset();
-    document.getElementById('transactionDate').value = formatDate(new Date());
-}
-
-// PNV NHẬN GIÁ TỪ PQL - HIỂN THỊ TIMER
-function showQuoteToPnv(quoteData) {
-    const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + quoteData.quoteId) || '{}');
-    
-    // Hiển thị giá chào
-    document.getElementById('quoteResponse').classList.remove('hidden');
-    document.getElementById('quotePrice').textContent = quoteData.rate.toLocaleString('vi-VN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 4
-    });
-    document.getElementById('quotePair').textContent = `${formData.buyCurrency}/${formData.sellCurrency}`;
-    
-    // Tính thời gian còn lại
-    const now = new Date().getTime();
-    const expiry = new Date(quoteData.expiryTime).getTime();
-    const remainingSeconds = Math.max(0, Math.floor((expiry - now) / 1000));
-    
-    // Bắt đầu đếm ngược
-    startQuoteTimer(remainingSeconds, quoteData.quoteId, quoteData.rate);
-    
-    showNotification('PQL đã chào giá! Vui lòng chấp nhận trong thời gian quy định.', 'warning');
-}
-
-// TIMER ĐẾM NGƯỢC - KIỂM TRA INTERRUPT MỖI GIÂY
-function startQuoteTimer(seconds, quoteId, rate) {
-    quoteExpiryTime = Date.now() + (seconds * 1000);
-    currentQuoteId = quoteId;
-    const timerDisplay = document.getElementById('quoteTimer');
-    
-    if (quoteTimer) clearInterval(quoteTimer);
-    
-    quoteTimer = setInterval(() => {
-        // KIỂM TRA INTERRUPT MỖI GIÂY
-        const storedQuote = localStorage.getItem('pql_quote_' + quoteId);
-        if (storedQuote) {
-            const quoteData = JSON.parse(storedQuote);
-            if (quoteData.interrupted) {
-                clearInterval(quoteTimer);
-                timerDisplay.textContent = '00:00';
-                document.getElementById('quoteResponse').classList.add('hidden');
-                showNotification('⛔ Giao dịch đã bị PQL Interrupt! Không thể chấp nhận giá.', 'error');
-                currentQuoteId = null;
-                localStorage.removeItem('pnv_pending_form_' + quoteId);
-                return;
-            }
+        function loadUserList() {
+            const container = document.getElementById('userList');
+            container.innerHTML = '';
+            
+            mockUsers.forEach(user => {
+                if (user.id === 'admin') return;
+                
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `
+                    <h4>${user.name}</h4>
+                    <div class="user-info-text">ID: ${user.id}</div>
+                    <div class="user-info-text">Phòng: ${user.dept}</div>
+                    <div class="user-info-text">Vai trò: ${user.role}</div>
+                    ${user.manager ? `<div class="user-info-text">Quản lý bởi: ${user.manager}</div>` : ''}
+                    <div class="user-actions">
+                        <button class="btn btn-small btn-primary" onclick="openEditUserModal('${user.id}')">Sửa</button>
+                        <button class="btn btn-small btn-warning" onclick="resetPassword('${user.id}')">Reset MK</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteUser('${user.id}')">Xóa</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
-        
-        const remaining = Math.ceil((quoteExpiryTime - Date.now()) / 1000);
-        
-        // HẾT HẠN
-        if (remaining <= 0) {
-            clearInterval(quoteTimer);
-            timerDisplay.textContent = '00:00';
-            document.getElementById('quoteResponse').classList.add('hidden');
-            showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
-            currentQuoteId = null;
-            localStorage.removeItem('pnv_pending_form_' + quoteId);
-            return;
+
+        function openAddUserModal() {
+            document.getElementById('addUserModal').classList.add('active');
+            const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
+            const select = document.getElementById('newUserManager');
+            select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
+            bgdUsers.forEach(u => {
+                select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+            });
         }
-        
-        const mins = Math.floor(remaining / 60);
-        const secs = remaining % 60;
-        timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }, 1000);
-}
 
-// PNV CHẤP NHẬN GIÁ - KIỂM TRA INTERRUPT TRƯỚC
-function acceptPrice() {
-    if (!currentQuoteId) return;
-    
-    // KIỂM TRA INTERRUPT TRƯỚC KHI ACCEPT
-    const storedQuote = localStorage.getItem('pql_quote_' + currentQuoteId);
-    if (storedQuote) {
-        const quoteData = JSON.parse(storedQuote);
-        if (quoteData.interrupted) {
-            showNotification('⛔ Không thể chấp nhận - Giao dịch đã bị Interrupt!', 'error');
-            clearInterval(quoteTimer);
-            document.getElementById('quoteResponse').classList.add('hidden');
-            currentQuoteId = null;
-            localStorage.removeItem('pnv_pending_form_' + currentQuoteId);
-            return;
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').classList.remove('active');
         }
-    }
-    
-    clearInterval(quoteTimer);
-    
-    const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
-    const quoteData = storedQuote ? JSON.parse(storedQuote) : {};
-    
-    // Tạo giao dịch thành công
-    const transaction = {
-        id: generateId(),
-        pnv: currentUser.id,
-        pnvName: currentUser.name,
-        date: formatDate(new Date()),
-        effectiveDate: formData.effectiveDate,
-        cif: formData.cif,
-        customerName: formData.customerName,
-        direction: formData.transactionType === 'buy' ? 'MUA' : 'BÁN',
-        buyCurr: formData.buyCurrency,
-        sellCurr: formData.sellCurrency,
-        amount: parseFloat(formData.amount),
-        rate: quoteData.rate || 0,
-        equivalent: parseFloat(formData.amount) * (quoteData.rate || 0),
-        type: calculateTransactionType(formData.effectiveDate, formatDate(new Date())),
-        status: 'Thành công',
-        purpose: formData.purpose,
-        editedBy: null,
-        editTime: null
-    };
-    
-    mockTransactions.push(transaction);
-    saveToLocalStorage();
-    
-    // Cleanup
-    document.getElementById('quoteResponse').classList.add('hidden');
-    document.getElementById('askPriceForm').reset();
-    document.getElementById('transactionDate').value = formatDate(new Date());
-    currentQuoteId = null;
-    localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
-    localStorage.removeItem('pql_quote_' + formData.quoteId);
-    
-    showNotification('✅ Giao dịch thành công!');
-    loadPnvBlotter();
-}
 
-// PNV TỪ CHỐI GIÁ
-function rejectPrice() {
-    clearInterval(quoteTimer);
-    document.getElementById('quoteResponse').classList.add('hidden');
-    
-    const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
-    if (formData.quoteId) {
-        localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
-        localStorage.removeItem('pql_quote_' + formData.quoteId);
-    }
-    
-    currentQuoteId = null;
-    showNotification('Đã từ chối tỷ giá', 'warning');
-}
-
-function loadPnvBlotter() {
-    const tbody = document.getElementById('pnvBlotterBody');
-    tbody.innerHTML = '';
-    
-    const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
-    
-    userTrans.forEach(t => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-            <td>${t.date}</td>
-            <td>${t.effectiveDate}</td>
-            <td>${t.cif}</td>
-            <td>${t.customerName}</td>
-            <td>${t.direction}</td>
-            <td>${t.buyCurr}</td>
-            <td>${t.sellCurr}</td>
-            <td>${t.amount.toLocaleString('vi-VN')}</td>
-            <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-            <td>${t.equivalent.toLocaleString('vi-VN')}</td>
-            <td><span class="badge badge-success">${t.type}</span></td>
-            <td class="status-success">${t.status}</td>
-        `;
-    });
-}
-
-function filterPnvBlotter() {
-    loadPnvBlotter();
-    showNotification('Đã áp dụng bộ lọc');
-}
-
-function exportPnvBlotter(format) {
-    showNotification(`Đang xuất file ${format.toUpperCase()}...`);
-    setTimeout(() => {
-        showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
-    }, 1000);
-}
-        // ==========================================
-// PQL FUNCTIONS - ĐÚNG NGUYÊN TẮC GIAO DỊCH
-// ==========================================
-
-function loadCifTable() {
-    const tbody = document.getElementById('cifTableBody');
-    tbody.innerHTML = '';
-    
-    Object.entries(mockCIF).forEach(([cif, name]) => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-            <td>${cif}</td>
-            <td>${name}</td>
-            <td>
-                <button class="btn btn-small btn-danger" onclick="deleteCif('${cif}')">Xóa</button>
-            </td>
-        `;
-    });
-}
-
-function deleteCif(cif) {
-    if (confirm('Xóa CIF này?')) {
-        delete mockCIF[cif];
-        saveToLocalStorage();
-        loadCifTable();
-        showNotification('Đã xóa CIF');
-    }
-}
-
-function uploadCIFData(e) {
-    e.preventDefault();
-    const manualData = document.getElementById('cifManualData').value.trim();
-    
-    if (manualData) {
-        const lines = manualData.split('\n');
-        lines.forEach(line => {
-            const parts = line.split(',');
-            if (parts.length >= 2) {
-                const cif = parts[0].trim();
-                const name = parts[1].trim();
-                if (cif && name) {
-                    mockCIF[cif] = name;
+        function openEditUserModal(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (!user) return;
+            
+            currentEditingUserId = userId;
+            
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUserName').value = user.name;
+            
+            const deptSelect = document.getElementById('editUserDept');
+            for (let i = 0; i < deptSelect.options.length; i++) {
+                if (deptSelect.options[i].text === user.dept) {
+                    deptSelect.selectedIndex = i;
+                    break;
                 }
             }
-        });
-        saveToLocalStorage();
-        loadCifTable();
-        document.getElementById('cifManualData').value = '';
-        showNotification('Đã lưu dữ liệu CIF!');
-    }
-}
-
-// PQL XEM DANH SÁCH YÊU CẦU CHỜ CHÀO GIÁ
-function loadPendingQuotes() {
-    const container = document.getElementById('pendingQuotes');
-    const pending = pendingQuotes.filter(q => q.status === 'pending' && !q.interrupted);
-    
-    if (pending.length === 0) {
-        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
-        return;
-    }
-    
-    container.innerHTML = '';
-    pending.forEach(quote => {
-        const div = document.createElement('div');
-        div.className = 'pending-quote';
-        div.onclick = () => selectQuote(quote.id);
-        div.innerHTML = `
-            <div class="pending-quote-header">
-                <span class="pending-quote-title">${quote.pnvName} (${quote.pnv})</span>
-                <span class="pending-quote-time">${new Date(quote.timestamp).toLocaleTimeString()}</span>
-            </div>
-            <div class="pending-quote-details">
-                CIF: ${quote.cif} | ${quote.customerName}<br>
-                Chiều: ${quote.direction} | ${quote.buyCurr} → ${quote.sellCurr}<br>
-                Số lượng: ${quote.amount.toLocaleString()} | Ngày hiệu lực: ${quote.effectiveDate}
-            </div>
-        `;
-        container.appendChild(div);
-    });
-}
-
-// PQL CHỌN YÊU CẦU ĐỂ CHÀO GIÁ
-function selectQuote(quoteId) {
-    const quote = pendingQuotes.find(q => q.id === quoteId);
-    if (!quote || quote.interrupted) return;
-    
-    document.getElementById('quoteFormCard').classList.remove('hidden');
-    document.getElementById('quoteRequestId').value = quoteId;
-    document.getElementById('quotePnv').value = `${quote.pnvName} (${quote.pnv})`;
-    document.getElementById('quoteCif').value = quote.cif;
-    document.getElementById('quoteCifName').value = quote.customerName;
-    document.getElementById('quoteDirection').value = quote.direction;
-    document.getElementById('quoteBuyCurr').value = quote.buyCurr;
-    document.getElementById('quoteSellCurr').value = quote.sellCurr;
-    document.getElementById('quoteAmount').value = quote.amount.toLocaleString();
-    document.getElementById('quoteEffDate').value = quote.effectiveDate;
-    
-    // Reset và focus vào nhập giá
-    document.getElementById('quoteRate').value = '';
-    document.getElementById('quoteDuration').value = '2';
-    document.getElementById('quoteRate').focus();
-}
-
-function cancelQuote() {
-    document.getElementById('quoteFormCard').classList.add('hidden');
-}
-
-// PQL SUBMIT CHÀO GIÁ - LƯU VÀO STORAGE ĐỂ PNV NHẬN
-function submitQuote(e) {
-    e.preventDefault();
-    const quoteId = document.getElementById('quoteRequestId').value;
-    const rate = parseFloat(document.getElementById('quoteRate').value);
-    const duration = parseInt(document.getElementById('quoteDuration').value);
-    
-    if (!rate || rate <= 0) {
-        showNotification('Vui lòng nhập tỷ giá hợp lệ!', 'error');
-        return;
-    }
-    
-    // Tính thời gian hết hạn
-    const now = new Date();
-    const expiryTime = new Date(now.getTime() + duration * 60000);
-    
-    // Cập nhật quote
-    const quoteIndex = pendingQuotes.findIndex(q => q.id === quoteId);
-    if (quoteIndex > -1) {
-        pendingQuotes[quoteIndex].status = 'quoted';
-        pendingQuotes[quoteIndex].rate = rate;
-        pendingQuotes[quoteIndex].duration = duration;
-        pendingQuotes[quoteIndex].quoteTime = now.toISOString();
-        pendingQuotes[quoteIndex].expiryTime = expiryTime.toISOString();
-        pendingQuotes[quoteIndex].interrupted = false;
-        saveToLocalStorage();
-        
-        // LƯU VÀO STORAGE ĐỂ PNV NHẬN ĐƯỢC
-        localStorage.setItem('pql_quote_' + quoteId, JSON.stringify({
-            quoteId: quoteId,
-            rate: rate,
-            duration: duration,
-            pnv: pendingQuotes[quoteIndex].pnv,
-            expiryTime: expiryTime.toISOString(),
-            interrupted: false,
-            timestamp: now.toISOString()
-        }));
-        
-        showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
-    }
-    
-    document.getElementById('quoteFormCard').classList.add('hidden');
-    loadPendingQuotes();
-}
-
-// INTERRUPT MỘT GIAO DỊCH CỤ THỂ
-function interruptCurrent() {
-    // Tìm quote đang active (vừa chào gần nhất)
-    const activeQuotes = pendingQuotes.filter(q => 
-        q.status === 'quoted' && 
-        !q.interrupted && 
-        new Date(q.expiryTime) > new Date()
-    );
-    
-    if (activeQuotes.length === 0) {
-        showNotification('Không có giao dịch nào đang chào giá để Interrupt!', 'warning');
-        return;
-    }
-    
-    // Lấy quote mới nhất
-    const latestQuote = activeQuotes.sort((a, b) => 
-        new Date(b.quoteTime) - new Date(a.quoteTime)
-    )[0];
-    
-    // Đánh dấu interrupt
-    latestQuote.interrupted = true;
-    latestQuote.status = 'interrupted';
-    saveToLocalStorage();
-    
-    // Cập nhật storage để PNV biết
-    const stored = localStorage.getItem('pql_quote_' + latestQuote.id);
-    if (stored) {
-        const data = JSON.parse(stored);
-        data.interrupted = true;
-        localStorage.setItem('pql_quote_' + latestQuote.id, JSON.stringify(data));
-    }
-    
-    showNotification(`⛔ Đã Interrupt giao dịch của ${latestQuote.pnvName}!`, 'error');
-    loadPendingQuotes();
-}
-
-// INTERRUPT TẤT CẢ GIAO DỊCH ĐANG CHÀO
-function interruptAll() {
-    let interruptedCount = 0;
-    
-    pendingQuotes.forEach(q => {
-        if (q.status === 'quoted' && !q.interrupted && new Date(q.expiryTime) > new Date()) {
-            q.interrupted = true;
-            q.status = 'interrupted';
-            interruptedCount++;
             
-            // Cập nhật từng quote trong storage
-            const stored = localStorage.getItem('pql_quote_' + q.id);
+            loadBGDListForEdit(user.manager);
+            updateEditUserRole();
+            
+            document.getElementById('editUserModal').classList.add('active');
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').classList.remove('active');
+            currentEditingUserId = null;
+        }
+
+        function loadBGDListForEdit(selectedManager) {
+            const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
+            const select = document.getElementById('editUserManager');
+            select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
+            bgdUsers.forEach(u => {
+                const selected = u.id === selectedManager ? 'selected' : '';
+                select.innerHTML += `<option value="${u.id}" ${selected}>${u.name} (${u.id})</option>`;
+            });
+        }
+
+        function updateEditUserRole() {
+            const dept = document.getElementById('editUserDept').value;
+            const managerDiv = document.getElementById('editManagerSelect');
+            
+            if (dept.startsWith('PNV')) {
+                managerDiv.style.display = 'block';
+            } else {
+                managerDiv.style.display = 'none';
+                document.getElementById('editUserManager').value = '';
+            }
+        }
+
+        function handleEditUser(e) {
+            e.preventDefault();
+            
+            if (!currentEditingUserId) return;
+            
+            const user = mockUsers.find(u => u.id === currentEditingUserId);
+            if (!user) return;
+            
+            const newName = document.getElementById('editUserName').value.trim();
+            const deptValue = document.getElementById('editUserDept').value;
+            const deptText = document.getElementById('editUserDept').options[document.getElementById('editUserDept').selectedIndex].text;
+            const manager = document.getElementById('editUserManager').value;
+            
+            user.name = newName;
+            user.dept = deptText;
+            user.role = deptValue.split('-')[0];
+            user.manager = deptValue.startsWith('PNV') ? (manager || null) : null;
+            
+            saveToLocalStorage();
+            closeEditUserModal();
+            loadUserList();
+            showNotification('Cập nhật user thành công!');
+        }
+
+        function handleAddUser(e) {
+            e.preventDefault();
+            const id = document.getElementById('newUserId').value.trim();
+            const name = document.getElementById('newUserName').value.trim();
+            const deptValue = document.getElementById('newUserDept').value;
+            const deptText = document.getElementById('newUserDept').options[document.getElementById('newUserDept').selectedIndex].text;
+            const manager = document.getElementById('newUserManager').value;
+
+            if (mockUsers.find(u => u.id === id)) {
+                showNotification('ID đã tồn tại!', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: id,
+                name: name,
+                dept: deptText,
+                role: deptValue.split('-')[0],
+                password: 'Vcb@1234',
+                manager: manager || null
+            };
+            
+            mockUsers.push(newUser);
+            saveToLocalStorage();
+            closeAddUserModal();
+            e.target.reset();
+            loadUserList();
+            showNotification('Thêm user thành công!');
+        }
+
+        function updateUserRole() {
+            const dept = document.getElementById('newUserDept').value;
+            const managerDiv = document.getElementById('managerSelect');
+            
+            if (dept.startsWith('PNV')) {
+                managerDiv.style.display = 'block';
+            } else {
+                managerDiv.style.display = 'none';
+                document.getElementById('newUserManager').value = '';
+            }
+        }
+
+        function resetPassword(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (user) {
+                user.password = 'Vcb@1234';
+                saveToLocalStorage();
+                showNotification(`Đã reset mật khẩu cho ${user.name} về mặc định (Vcb@1234)`);
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Bạn có chắc muốn xóa user này?')) {
+                const index = mockUsers.findIndex(u => u.id === userId);
+                if (index > -1) {
+                    mockUsers.splice(index, 1);
+                    saveToLocalStorage();
+                    loadUserList();
+                    showNotification('Đã xóa user');
+                }
+            }
+        }
+
+        // ==========================================
+        // PNV FUNCTIONS
+        // ==========================================
+        function lookupCustomerName() {
+            const cif = document.getElementById('cif').value.trim();
+            const nameInput = document.getElementById('customerName');
+            
+            if (mockCIF[cif]) {
+                nameInput.value = mockCIF[cif];
+                nameInput.style.color = 'green';
+            } else {
+                nameInput.value = 'Không tìm thấy KH - Vui lòng kiểm tra lại CIF';
+                nameInput.style.color = 'red';
+            }
+        }
+
+        function updatePurposeLabel() {
+            const type = document.getElementById('transactionType').value;
+            const label = document.getElementById('purposeLabel');
+            label.textContent = type === 'buy' ? 'Nguồn (1-12)' : 'Mục đích (1-12)';
+        }
+
+        function submitAskPrice(e) {
+            e.preventDefault();
+            
+            const buyCurr = document.getElementById('buyCurrency').value;
+            const sellCurr = document.getElementById('sellCurrency').value;
+            
+            if (buyCurr === sellCurr) {
+                showNotification('Đồng tiền mua và bán không được giống nhau!', 'error');
+                return;
+            }
+
+            const cif = document.getElementById('cif').value.trim();
+            if (!mockCIF[cif]) {
+                showNotification('CIF không tồn tại trong hệ thống!', 'error');
+                return;
+            }
+
+            const quoteRequest = {
+                id: generateId(),
+                pnv: currentUser.id,
+                pnvName: currentUser.name,
+                cif: cif,
+                customerName: document.getElementById('customerName').value,
+                direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
+                date: formatDate(new Date()),
+                effectiveDate: document.getElementById('effectiveDate').value,
+                currency: document.getElementById('currencyCode').value,
+                buyCurr: buyCurr,
+                sellCurr: sellCurr,
+                amount: parseFloat(document.getElementById('amount').value),
+                purpose: document.getElementById('purpose').value,
+                status: 'pending',
+                interrupted: false,
+                timestamp: new Date().toISOString()
+            };
+
+            pendingQuotes.push(quoteRequest);
+            saveToLocalStorage();
+
+            localStorage.setItem('pnv_pending_form_' + quoteRequest.id, JSON.stringify({
+                quoteId: quoteRequest.id,
+                cif: cif,
+                customerName: document.getElementById('customerName').value,
+                transactionType: document.getElementById('transactionType').value,
+                effectiveDate: document.getElementById('effectiveDate').value,
+                buyCurrency: buyCurr,
+                sellCurrency: sellCurr,
+                amount: document.getElementById('amount').value,
+                purpose: document.getElementById('purpose').value
+            }));
+
+            showNotification('Đã gửi yêu cầu hỏi giá đến PQL! Đang chờ phản hồi...', 'info');
+            
+            document.getElementById('askPriceForm').reset();
+            document.getElementById('transactionDate').value = formatDate(new Date());
+        }
+
+        function showQuoteToPnv(quoteData) {
+            const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + quoteData.quoteId) || '{}');
+            
+            document.getElementById('quoteResponse').classList.remove('hidden');
+            document.getElementById('quotePrice').textContent = quoteData.rate.toLocaleString('vi-VN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 4
+            });
+            document.getElementById('quotePair').textContent = `${formData.buyCurrency}/${formData.sellCurrency}`;
+            
+            const now = new Date().getTime();
+            const expiry = new Date(quoteData.expiryTime).getTime();
+            const remainingSeconds = Math.max(0, Math.floor((expiry - now) / 1000));
+            
+            startQuoteTimer(remainingSeconds, quoteData.quoteId, quoteData.rate);
+            
+            showNotification('PQL đã chào giá! Vui lòng chấp nhận trong thời gian quy định.', 'warning');
+        }
+
+        function startQuoteTimer(seconds, quoteId, rate) {
+            quoteExpiryTime = Date.now() + (seconds * 1000);
+            currentQuoteId = quoteId;
+            const timerDisplay = document.getElementById('quoteTimer');
+            
+            if (quoteTimer) clearInterval(quoteTimer);
+            
+            quoteTimer = setInterval(() => {
+                const storedQuote = localStorage.getItem('pql_quote_' + quoteId);
+                if (storedQuote) {
+                    const quoteData = JSON.parse(storedQuote);
+                    if (quoteData.interrupted) {
+                        clearInterval(quoteTimer);
+                        timerDisplay.textContent = '00:00';
+                        document.getElementById('quoteResponse').classList.add('hidden');
+                        showNotification('⛔ Giao dịch đã bị PQL Interrupt! Không thể chấp nhận giá.', 'error');
+                        currentQuoteId = null;
+                        localStorage.removeItem('pnv_pending_form_' + quoteId);
+                        return;
+                    }
+                }
+                
+                const remaining = Math.ceil((quoteExpiryTime - Date.now()) / 1000);
+                
+                if (remaining <= 0) {
+                    clearInterval(quoteTimer);
+                    timerDisplay.textContent = '00:00';
+                    document.getElementById('quoteResponse').classList.add('hidden');
+                    showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
+                    currentQuoteId = null;
+                    localStorage.removeItem('pnv_pending_form_' + quoteId);
+                    return;
+                }
+                
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function acceptPrice() {
+            if (!currentQuoteId) return;
+            
+            const storedQuote = localStorage.getItem('pql_quote_' + currentQuoteId);
+            if (storedQuote) {
+                const quoteData = JSON.parse(storedQuote);
+                if (quoteData.interrupted) {
+                    showNotification('⛔ Không thể chấp nhận - Giao dịch đã bị Interrupt!', 'error');
+                    clearInterval(quoteTimer);
+                    document.getElementById('quoteResponse').classList.add('hidden');
+                    currentQuoteId = null;
+                    localStorage.removeItem('pnv_pending_form_' + currentQuoteId);
+                    return;
+                }
+            }
+            
+            clearInterval(quoteTimer);
+            
+            const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
+            const quoteData = storedQuote ? JSON.parse(storedQuote) : {};
+            
+            const transaction = {
+                id: generateId(),
+                pnv: currentUser.id,
+                pnvName: currentUser.name,
+                date: formatDate(new Date()),
+                effectiveDate: formData.effectiveDate,
+                cif: formData.cif,
+                customerName: formData.customerName,
+                direction: formData.transactionType === 'buy' ? 'MUA' : 'BÁN',
+                buyCurr: formData.buyCurrency,
+                sellCurr: formData.sellCurrency,
+                amount: parseFloat(formData.amount),
+                rate: quoteData.rate || 0,
+                equivalent: parseFloat(formData.amount) * (quoteData.rate || 0),
+                type: calculateTransactionType(formData.effectiveDate, formatDate(new Date())),
+                status: 'Thành công',
+                purpose: formData.purpose,
+                editedBy: null,
+                editTime: null
+            };
+            
+            mockTransactions.push(transaction);
+            saveToLocalStorage();
+            
+            document.getElementById('quoteResponse').classList.add('hidden');
+            document.getElementById('askPriceForm').reset();
+            document.getElementById('transactionDate').value = formatDate(new Date());
+            currentQuoteId = null;
+            localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
+            localStorage.removeItem('pql_quote_' + formData.quoteId);
+            
+            showNotification('✅ Giao dịch thành công!');
+            loadPnvBlotter();
+        }
+
+        function rejectPrice() {
+            clearInterval(quoteTimer);
+            document.getElementById('quoteResponse').classList.add('hidden');
+            
+            const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
+            if (formData.quoteId) {
+                localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
+                localStorage.removeItem('pql_quote_' + formData.quoteId);
+            }
+            
+            currentQuoteId = null;
+            showNotification('Đã từ chối tỷ giá', 'warning');
+        }
+
+        function loadPnvBlotter() {
+            const tbody = document.getElementById('pnvBlotterBody');
+            tbody.innerHTML = '';
+            
+            const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
+            
+            userTrans.forEach(t => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${t.date}</td>
+                    <td>${t.effectiveDate}</td>
+                    <td>${t.cif}</td>
+                    <td>${t.customerName}</td>
+                    <td>${t.direction}</td>
+                    <td>${t.buyCurr}</td>
+                    <td>${t.sellCurr}</td>
+                    <td>${t.amount.toLocaleString('vi-VN')}</td>
+                    <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
+                    <td><span class="badge badge-success">${t.type}</span></td>
+                    <td class="status-success">${t.status}</td>
+                `;
+            });
+        }
+
+        function filterPnvBlotter() {
+            loadPnvBlotter();
+            showNotification('Đã áp dụng bộ lọc');
+        }
+
+        function exportPnvBlotter(format) {
+            showNotification(`Đang xuất file ${format.toUpperCase()}...`);
+            setTimeout(() => {
+                showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
+            }, 1000);
+        }
+
+        // ==========================================
+        // PQL FUNCTIONS
+        // ==========================================
+        function loadCifTable() {
+            const tbody = document.getElementById('cifTableBody');
+            tbody.innerHTML = '';
+            
+            Object.entries(mockCIF).forEach(([cif, name]) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${cif}</td>
+                    <td>${name}</td>
+                    <td>
+                        <button class="btn btn-small btn-danger" onclick="deleteCif('${cif}')">Xóa</button>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteCif(cif) {
+            if (confirm('Xóa CIF này?')) {
+                delete mockCIF[cif];
+                saveToLocalStorage();
+                loadCifTable();
+                showNotification('Đã xóa CIF');
+            }
+        }
+
+        function uploadCIFData(e) {
+            e.preventDefault();
+            const manualData = document.getElementById('cifManualData').value.trim();
+            
+            if (manualData) {
+                const lines = manualData.split('\n');
+                lines.forEach(line => {
+                    const parts = line.split(',');
+                    if (parts.length >= 2) {
+                        const cif = parts[0].trim();
+                        const name = parts[1].trim();
+                        if (cif && name) {
+                            mockCIF[cif] = name;
+                        }
+                    }
+                });
+                saveToLocalStorage();
+                loadCifTable();
+                document.getElementById('cifManualData').value = '';
+                showNotification('Đã lưu dữ liệu CIF!');
+            }
+        }
+
+        function loadPendingQuotes() {
+            const container = document.getElementById('pendingQuotes');
+            const pending = pendingQuotes.filter(q => q.status === 'pending' && !q.interrupted);
+            
+            if (pending.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            pending.forEach(quote => {
+                const div = document.createElement('div');
+                div.className = 'pending-quote';
+                div.onclick = () => selectQuote(quote.id);
+                div.innerHTML = `
+                    <div class="pending-quote-header">
+                        <span class="pending-quote-title">${quote.pnvName} (${quote.pnv})</span>
+                        <span class="pending-quote-time">${new Date(quote.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                    <div class="pending-quote-details">
+                        CIF: ${quote.cif} | ${quote.customerName}<br>
+                        Chiều: ${quote.direction} | ${quote.buyCurr} → ${quote.sellCurr}<br>
+                        Số lượng: ${quote.amount.toLocaleString()} | Ngày hiệu lực: ${quote.effectiveDate}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function selectQuote(quoteId) {
+            const quote = pendingQuotes.find(q => q.id === quoteId);
+            if (!quote || quote.interrupted) return;
+            
+            document.getElementById('quoteFormCard').classList.remove('hidden');
+            document.getElementById('quoteRequestId').value = quoteId;
+            document.getElementById('quotePnv').value = `${quote.pnvName} (${quote.pnv})`;
+            document.getElementById('quoteCif').value = quote.cif;
+            document.getElementById('quoteCifName').value = quote.customerName;
+            document.getElementById('quoteDirection').value = quote.direction;
+            document.getElementById('quoteBuyCurr').value = quote.buyCurr;
+            document.getElementById('quoteSellCurr').value = quote.sellCurr;
+            document.getElementById('quoteAmount').value = quote.amount.toLocaleString();
+            document.getElementById('quoteEffDate').value = quote.effectiveDate;
+            
+            document.getElementById('quoteRate').value = '';
+            document.getElementById('quoteDuration').value = '2';
+            document.getElementById('quoteRate').focus();
+        }
+
+        function cancelQuote() {
+            document.getElementById('quoteFormCard').classList.add('hidden');
+        }
+
+        function submitQuote(e) {
+            e.preventDefault();
+            const quoteId = document.getElementById('quoteRequestId').value;
+            const rate = parseFloat(document.getElementById('quoteRate').value);
+            const duration = parseInt(document.getElementById('quoteDuration').value);
+            
+            if (!rate || rate <= 0) {
+                showNotification('Vui lòng nhập tỷ giá hợp lệ!', 'error');
+                return;
+            }
+            
+            const now = new Date();
+            const expiryTime = new Date(now.getTime() + duration * 60000);
+            
+            const quoteIndex = pendingQuotes.findIndex(q => q.id === quoteId);
+            if (quoteIndex > -1) {
+                pendingQuotes[quoteIndex].status = 'quoted';
+                pendingQuotes[quoteIndex].rate = rate;
+                pendingQuotes[quoteIndex].duration = duration;
+                pendingQuotes[quoteIndex].quoteTime = now.toISOString();
+                pendingQuotes[quoteIndex].expiryTime = expiryTime.toISOString();
+                pendingQuotes[quoteIndex].interrupted = false;
+                saveToLocalStorage();
+                
+                localStorage.setItem('pql_quote_' + quoteId, JSON.stringify({
+                    quoteId: quoteId,
+                    rate: rate,
+                    duration: duration,
+                    pnv: pendingQuotes[quoteIndex].pnv,
+                    expiryTime: expiryTime.toISOString(),
+                    interrupted: false,
+                    timestamp: now.toISOString()
+                }));
+                
+                showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
+            }
+            
+            document.getElementById('quoteFormCard').classList.add('hidden');
+            loadPendingQuotes();
+        }
+
+        function interruptCurrent() {
+            const activeQuotes = pendingQuotes.filter(q => 
+                q.status === 'quoted' && 
+                !q.interrupted && 
+                new Date(q.expiryTime) > new Date()
+            );
+            
+            if (activeQuotes.length === 0) {
+                showNotification('Không có giao dịch nào đang chào giá để Interrupt!', 'warning');
+                return;
+            }
+            
+            const latestQuote = activeQuotes.sort((a, b) => 
+                new Date(b.quoteTime) - new Date(a.quoteTime)
+            )[0];
+            
+            latestQuote.interrupted = true;
+            latestQuote.status = 'interrupted';
+            saveToLocalStorage();
+            
+            const stored = localStorage.getItem('pql_quote_' + latestQuote.id);
             if (stored) {
                 const data = JSON.parse(stored);
                 data.interrupted = true;
-                localStorage.setItem('pql_quote_' + q.id, JSON.stringify(data));
+                localStorage.setItem('pql_quote_' + latestQuote.id, JSON.stringify(data));
             }
+            
+            showNotification(`⛔ Đã Interrupt giao dịch của ${latestQuote.pnvName}!`, 'error');
+            loadPendingQuotes();
         }
-    });
-    
-    saveToLocalStorage();
-    
-    if (interruptedCount > 0) {
-        showNotification(`⛔⛔⛔ Đã Interrupt ALL ${interruptedCount} giao dịch đang chào giá!`, 'error');
-    } else {
-        showNotification('Không có giao dịch nào đang chào giá.', 'warning');
-    }
-    
-    loadPendingQuotes();
-}
 
-function loadPqlBlotter() {
-    const tbody = document.getElementById('pqlBlotterBody');
-    tbody.innerHTML = '';
-    
-    mockTransactions.forEach(t => {
-        const row = tbody.insertRow();
-        const editInfo = t.editedBy ? `<br><small style="color: orange;">Sửa: ${t.editedBy}</small>` : '';
-        
-        row.innerHTML = `
-            <td>${t.pnv}<br><small>${t.pnvName}</small></td>
-            <td>${t.date}</td>
-            <td>${t.effectiveDate}</td>
-            <td>${t.cif}</td>
-            <td>${t.customerName}</td>
-            <td>${t.direction}</td>
-            <td>${t.buyCurr}</td>
-            <td>${t.sellCurr}</td>
-            <td>${t.amount.toLocaleString('vi-VN')}</td>
-            <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-            <td>${t.equivalent.toLocaleString('vi-VN')}</td>
-            <td><span class="badge ${t.type === 'GN' ? 'badge-success' : t.type === 'KH' ? 'badge-warning' : 'badge-info'}">${t.type}</span></td>
-            <td>${t.editedBy || '-'}</td>
-            <td>
-                <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
-            </td>
-        `;
-    });
-}
+        function interruptAll() {
+            let interruptedCount = 0;
+            
+            pendingQuotes.forEach(q => {
+                if (q.status === 'quoted' && !q.interrupted && new Date(q.expiryTime) > new Date()) {
+                    q.interrupted = true;
+                    q.status = 'interrupted';
+                    interruptedCount++;
+                    
+                    const stored = localStorage.getItem('pql_quote_' + q.id);
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        data.interrupted = true;
+                        localStorage.setItem('pql_quote_' + q.id, JSON.stringify(data));
+                    }
+                }
+            });
+            
+            saveToLocalStorage();
+            
+            if (interruptedCount > 0) {
+                showNotification(`⛔⛔⛔ Đã Interrupt ALL ${interruptedCount} giao dịch đang chào giá!`, 'error');
+            } else {
+                showNotification('Không có giao dịch nào đang chào giá.', 'warning');
+            }
+            
+            loadPendingQuotes();
+        }
 
-function filterPqlBlotter() {
-    loadPqlBlotter();
-    showNotification('Đã áp dụng bộ lọc');
-}
+        function loadPqlBlotter() {
+            const tbody = document.getElementById('pqlBlotterBody');
+            tbody.innerHTML = '';
+            
+            mockTransactions.forEach(t => {
+                const row = tbody.insertRow();
+                const editInfo = t.editedBy ? `<br><small style="color: orange;">Sửa: ${t.editedBy}</small>` : '';
+                
+                row.innerHTML = `
+                    <td>${t.pnv}<br><small>${t.pnvName}</small></td>
+                    <td>${t.date}</td>
+                    <td>${t.effectiveDate}</td>
+                    <td>${t.cif}</td>
+                    <td>${t.customerName}</td>
+                    <td>${t.direction}</td>
+                    <td>${t.buyCurr}</td>
+                    <td>${t.sellCurr}</td>
+                    <td>${t.amount.toLocaleString('vi-VN')}</td>
+                    <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
+                    <td><span class="badge ${t.type === 'GN' ? 'badge-success' : t.type === 'KH' ? 'badge-warning' : 'badge-info'}">${t.type}</span></td>
+                    <td>${t.editedBy || '-'}</td>
+                    <td>
+                        <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
+                    </td>
+                `;
+            });
+        }
 
-function exportPqlBlotter(format) {
-    showNotification(`Đang xuất file ${format.toUpperCase()}...`);
-    setTimeout(() => {
-        showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
-    }, 1000);
-}
+        function filterPqlBlotter() {
+            loadPqlBlotter();
+            showNotification('Đã áp dụng bộ lọc');
+        }
 
-function openEditTransaction(transId) {
-    const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
-    if (!t) {
-        showNotification('Không tìm thấy giao dịch!', 'error');
-        return;
-    }
-    
-    editingTransactionId = t.id;
-    document.getElementById('editTransId').value = t.id;
-    document.getElementById('editCif').value = t.cif;
-    document.getElementById('editCifName').value = t.customerName;
-    document.getElementById('editEffDate').value = t.effectiveDate;
-    document.getElementById('editBuyCurr').value = t.buyCurr;
-    document.getElementById('editSellCurr').value = t.sellCurr;
-    document.getElementById('editAmount').value = t.amount;
-    document.getElementById('editRate').value = t.rate;
-    document.getElementById('editType').value = t.type;
-    
-    document.getElementById('editTransactionModal').classList.add('active');
-}
+        function exportPqlBlotter(format) {
+            showNotification(`Đang xuất file ${format.toUpperCase()}...`);
+            setTimeout(() => {
+                showNotification(`Xuất file ${format.toUpperCase()} thành công!`);
+            }, 1000);
+        }
 
-function closeEditModal() {
-    document.getElementById('editTransactionModal').classList.remove('active');
-    editingTransactionId = null;
-}
+        function openEditTransaction(transId) {
+            const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
+            if (!t) {
+                showNotification('Không tìm thấy giao dịch!', 'error');
+                return;
+            }
+            
+            editingTransactionId = t.id;
+            document.getElementById('editTransId').value = t.id;
+            document.getElementById('editCif').value = t.cif;
+            document.getElementById('editCifName').value = t.customerName;
+            document.getElementById('editEffDate').value = t.effectiveDate;
+            document.getElementById('editBuyCurr').value = t.buyCurr;
+            document.getElementById('editSellCurr').value = t.sellCurr;
+            document.getElementById('editAmount').value = t.amount;
+            document.getElementById('editRate').value = t.rate;
+            document.getElementById('editType').value = t.type;
+            
+            document.getElementById('editTransactionModal').classList.add('active');
+        }
 
-function saveEditTransaction(e) {
-    e.preventDefault();
-    const t = mockTransactions.find(tr => tr.id === editingTransactionId);
-    if (!t) return;
-    
-    t.cif = document.getElementById('editCif').value;
-    t.customerName = document.getElementById('editCifName').value;
-    t.effectiveDate = document.getElementById('editEffDate').value;
-    t.buyCurr = document.getElementById('editBuyCurr').value;
-    t.sellCurr = document.getElementById('editSellCurr').value;
-    t.amount = parseFloat(document.getElementById('editAmount').value);
-    t.rate = parseFloat(document.getElementById('editRate').value);
-    t.type = document.getElementById('editType').value;
-    t.editedBy = currentUser.id;
-    t.editTime = new Date().toISOString();
-    
-    t.equivalent = t.amount * t.rate;
-    
-    saveToLocalStorage();
-    closeEditModal();
-    loadPqlBlotter();
-    showNotification('Đã cập nhật giao dịch!');
-}
+        function closeEditModal() {
+            document.getElementById('editTransactionModal').classList.remove('active');
+            editingTransactionId = null;
+        }
 
-function generateReport() {
-    const fromDate = document.getElementById('reportTransFrom').value;
-    const toDate = document.getElementById('reportTransTo').value;
-    const pnv = document.getElementById('reportPnv').value;
-    const type = document.getElementById('reportType').value;
-    
-    let filtered = mockTransactions;
-    if (pnv) filtered = filtered.filter(t => t.pnv.includes(pnv));
-    if (type) filtered = filtered.filter(t => t.type === type);
-    
-    const container = document.getElementById('reportResult');
-    if (filtered.length === 0) {
-        container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
-        return;
-    }
-    
-    let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>PNV</th>
-                    <th>Ngày GD</th>
-                    <th>CIF</th>
-                    <th>Chiều</th>
-                    <th>Mua</th>
-                    <th>Bán</th>
-                    <th>Số tiền</th>
-                    <th>Tỷ giá</th>
-                    <th>Loại</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    
-    filtered.forEach(t => {
-        html += `
-            <tr>
-                <td>${t.pnv}</td>
-                <td>${t.date}</td>
-                <td>${t.cif}</td>
-                <td>${t.direction}</td>
-                <td>${t.buyCurr}</td>
-                <td>${t.sellCurr}</td>
-                <td>${t.amount.toLocaleString()}</td>
-                <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                <td>${t.type}</td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
-    showNotification(`Báo cáo có ${filtered.length} giao dịch`);
-}
+        function saveEditTransaction(e) {
+            e.preventDefault();
+            const t = mockTransactions.find(tr => tr.id === editingTransactionId);
+            if (!t) return;
+            
+            t.cif = document.getElementById('editCif').value;
+            t.customerName = document.getElementById('editCifName').value;
+            t.effectiveDate = document.getElementById('editEffDate').value;
+            t.buyCurr = document.getElementById('editBuyCurr').value;
+            t.sellCurr = document.getElementById('editSellCurr').value;
+            t.amount = parseFloat(document.getElementById('editAmount').value);
+            t.rate = parseFloat(document.getElementById('editRate').value);
+            t.type = document.getElementById('editType').value;
+            t.editedBy = currentUser.id;
+            t.editTime = new Date().toISOString();
+            
+            t.equivalent = t.amount * t.rate;
+            
+            saveToLocalStorage();
+            closeEditModal();
+            loadPqlBlotter();
+            showNotification('Đã cập nhật giao dịch!');
+        }
 
-function exportReport(format) {
-    showNotification(`Xuất báo cáo dạng ${format.toUpperCase()}...`);
-}
+        function generateReport() {
+            const fromDate = document.getElementById('reportTransFrom').value;
+            const toDate = document.getElementById('reportTransTo').value;
+            const pnv = document.getElementById('reportPnv').value;
+            const type = document.getElementById('reportType').value;
+            
+            let filtered = mockTransactions;
+            if (pnv) filtered = filtered.filter(t => t.pnv.includes(pnv));
+            if (type) filtered = filtered.filter(t => t.type === type);
+            
+            const container = document.getElementById('reportResult');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PNV</th>
+                            <th>Ngày GD</th>
+                            <th>CIF</th>
+                            <th>Chiều</th>
+                            <th>Mua</th>
+                            <th>Bán</th>
+                            <th>Số tiền</th>
+                            <th>Tỷ giá</th>
+                            <th>Loại</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filtered.forEach(t => {
+                html += `
+                    <tr>
+                        <td>${t.pnv}</td>
+                        <td>${t.date}</td>
+                        <td>${t.cif}</td>
+                        <td>${t.direction}</td>
+                        <td>${t.buyCurr}</td>
+                        <td>${t.sellCurr}</td>
+                        <td>${t.amount.toLocaleString()}</td>
+                        <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                        <td>${t.type}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            showNotification(`Báo cáo có ${filtered.length} giao dịch`);
+        }
+
+        function exportReport(format) {
+            showNotification(`Xuất báo cáo dạng ${format.toUpperCase()}...`);
+        }
 
         // ==========================================
         // BGĐ FUNCTIONS
         // ==========================================
         function loadBgdPnvList() {
             const select = document.getElementById('bgdFilterPnv');
-            // Get PNVs managed by this BGD
             const managedPnvs = mockUsers.filter(u => u.role === 'PNV' && u.manager === currentUser.id);
             
             select.innerHTML = '<option value="">Tất cả PNV</option>';
@@ -3131,7 +2856,6 @@ function exportReport(format) {
             const tbody = document.getElementById('bgdViewBody');
             tbody.innerHTML = '';
             
-            // Get transactions of managed PNVs
             const managedPnvIds = mockUsers
                 .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
                 .map(u => u.id);
@@ -3189,7 +2913,6 @@ function exportReport(format) {
             container.scrollTop = container.scrollHeight;
             input.value = '';
             
-            // Store message
             chatMessages.push({
                 from: currentUser.id,
                 to: 'PQL',
@@ -3225,7 +2948,6 @@ function exportReport(format) {
         let pollInterval = null;
 
         function startPolling() {
-            // Poll every 3 seconds for updates
             pollInterval = setInterval(() => {
                 checkForUpdates();
             }, 3000);
@@ -3239,33 +2961,24 @@ function exportReport(format) {
         }
 
         function checkForUpdates() {
-            // Check for new quotes for PNV
             if (currentUser?.role === 'PNV') {
-                const quoteData = localStorage.getItem('currentQuoteData');
-                if (quoteData) {
-                    const data = JSON.parse(quoteData);
-                    const quoteTime = new Date(data.timestamp);
-                    const now = new Date();
-                    const age = (now - quoteTime) / 1000; // seconds
-                    
-                    // If quote is recent (within last 5 minutes) and not yet shown
-                    if (age < 300 && data.quoteId && !document.getElementById('quoteResponse').classList.contains('hidden') === false) {
-                        // Show quote to PNV
-                        document.getElementById('quoteResponse').classList.remove('hidden');
-                        document.getElementById('quotePrice').textContent = data.rate.toLocaleString('vi-VN');
-                        
-                        // Determine currency pair
-                        const buyCurr = document.getElementById('buyCurrency').value;
-                        const sellCurr = document.getElementById('sellCurrency').value;
-                        document.getElementById('quotePair').textContent = `${buyCurr}/${sellCurr}`;
-                        
-                        startQuoteTimer(data.duration * 60, data.quoteId);
-                        showNotification('PQL đã chào giá! Vui lòng chấp nhận trong thời gian quy định.', 'warning');
+                // Check for new quotes from PQL
+                pendingQuotes.forEach(q => {
+                    if (q.pnv === currentUser.id && q.status === 'quoted' && !q.interrupted) {
+                        const stored = localStorage.getItem('pql_quote_' + q.id);
+                        if (stored) {
+                            const data = JSON.parse(stored);
+                            const now = new Date();
+                            const expiry = new Date(data.expiryTime);
+                            
+                            if (now < expiry && !data.interrupted && !document.getElementById('quoteResponse').classList.contains('hidden') === false) {
+                                showQuoteToPnv(data);
+                            }
+                        }
                     }
-                }
+                });
             }
             
-            // Check for new quote requests for PQL
             if (currentUser?.role === 'PQL') {
                 const currentTab = document.querySelector('#pql-quotes.tab-content');
                 if (currentTab && currentTab.classList.contains('active')) {
@@ -3280,7 +2993,6 @@ function exportReport(format) {
         document.addEventListener('DOMContentLoaded', function() {
             loadFromLocalStorage();
             
-            // Set default dates
             const today = new Date();
             document.getElementById('pnvFilterFromDate').value = formatDateYYYYMMDD(today);
             document.getElementById('pnvFilterToDate').value = formatDateYYYYMMDD(today);
@@ -3292,7 +3004,6 @@ function exportReport(format) {
             document.getElementById('bgdToDate').value = formatDateYYYYMMDD(today);
         });
 
-        // Handle page unload
         window.addEventListener('beforeunload', function() {
             stopPolling();
         });
