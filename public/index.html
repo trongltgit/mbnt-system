@@ -58,7 +58,7 @@ body {
 
 .logo-section {
     display: flex;
-    align-items: center;
+    align-items: left;
     gap: 15px;
     flex: 0 0 auto;
 }
@@ -72,7 +72,7 @@ body {
 .logo-text {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Căn giữa ngang */
+    align-items: left; /* Căn giữa ngang */
     justify-content: center;
     line-height: 1.3;
 }
@@ -1855,10 +1855,20 @@ document.getElementById('brand-logo').addEventListener('error', function() {
                     <select id="newUserDept" required onchange="updateUserRole()">
                         <option value="">Chọn phòng ban...</option>
                         <option value="PNV-K1">KHDN1 (K1)</option>
+                        <option value="PNV-K2">KHDN2 (K2)</option>
+                        <option value="PNV-K3">KHDN3 (K3)</option>                        
                         <option value="PNV-L1">KHBL1 (L1)</option>
+                        <option value="PNV-L2">KHBL2 (L2)</option>
+                        <option value="PNV-L3">KHBL3 (L3)</option>
+                        <option value="PNV-TĐT">PGD TĐT</option>
+                        <option value="PNV-ML">PGD ML</option>
+                        <option value="PNV-ĐK">PGD ĐK</option>
+                        <option value="PNV-CH">PGD CH</option>
+                        <option value="PNV-VVK">PGD VVK</option>
+                        <option value="PNV-LTT">PGD LTT</option>                        
                         <option value="PNV-TN">DV KHTN (TN)</option>
                         <option value="PNV-T1">DVKHTC1 (T1)</option>
-                        <option value="PNV-TĐT">PGD TĐT</option>
+                         <option value="PNV-T2">DVKHTC2 (T2)</option>                        
                         <option value="PQL-KT">PQL - Kế toán</option>
                         <option value="BGD">Ban Giám đốc</option>
                     </select>
@@ -1876,6 +1886,48 @@ document.getElementById('brand-logo').addEventListener('error', function() {
             </form>
         </div>
     </div>
+
+    <!-- Edit User Modal -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Sửa thông tin User</h3>
+            <button class="close-btn" onclick="closeEditUserModal()">&times;</button>
+        </div>
+        <form id="editUserForm" onsubmit="handleEditUser(event)">
+            <div class="form-group">
+                <label>ID User (không thể sửa)</label>
+                <input type="text" id="editUserId" disabled>
+            </div>
+            <div class="form-group">
+                <label>Họ tên</label>
+                <input type="text" id="editUserName" required>
+            </div>
+            <div class="form-group">
+                <label>Phòng ban</label>
+                <select id="editUserDept" onchange="updateEditUserRole()" required>
+                    <option value="BGD">BGD - Ban Giám Đốc</option>
+                    <option value="PNS">PNS - Phòng Nhân Sự</option>
+                    <option value="PKT">PKT - Phòng Kế Toán</option>
+                    <option value="PNV-01">PNV-01 - Phòng Nghiệp Vụ 1</option>
+                    <option value="PNV-02">PNV-02 - Phòng Nghiệp Vụ 2</option>
+                    <option value="PNV-03">PNV-03 - Phòng Nghiệp Vụ 3</option>
+                    <option value="IT">IT - Phòng Công Nghệ</option>
+                </select>
+            </div>
+            <div class="form-group" id="editManagerSelect" style="display: none;">
+                <label>Quản lý bởi BGĐ</label>
+                <select id="editUserManager">
+                    <option value="">Chọn BGĐ quản lý...</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Hủy</button>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
 
     <!-- Modal Edit Transaction -->
     <div class="modal" id="editTransactionModal">
@@ -2224,109 +2276,200 @@ document.getElementById('brand-logo').addEventListener('error', function() {
         }
 
         // ==========================================
-        // ADMIN FUNCTIONS
-        // ==========================================
-        function loadUserList() {
-            const container = document.getElementById('userList');
-            container.innerHTML = '';
-            
-            mockUsers.forEach(user => {
-                if (user.id === 'admin') return;
-                
-                const card = document.createElement('div');
-                card.className = 'user-card';
-                card.innerHTML = `
-                    <h4>${user.name}</h4>
-                    <div class="user-info-text">ID: ${user.id}</div>
-                    <div class="user-info-text">Phòng: ${user.dept}</div>
-                    <div class="user-info-text">Vai trò: ${user.role}</div>
-                    ${user.manager ? `<div class="user-info-text">Quản lý bởi: ${user.manager}</div>` : ''}
-                    <div class="user-actions">
-                        <button class="btn btn-small btn-warning" onclick="resetPassword('${user.id}')">Reset MK</button>
-                        <button class="btn btn-small btn-danger" onclick="deleteUser('${user.id}')">Xóa</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+// ADMIN FUNCTIONS
+// ==========================================
+
+// Biến lưu trữ user đang được edit
+let currentEditingUserId = null;
+
+function loadUserList() {
+    const container = document.getElementById('userList');
+    container.innerHTML = '';
+    
+    mockUsers.forEach(user => {
+        if (user.id === 'admin') return;
+        
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        card.innerHTML = `
+            <h4>${user.name}</h4>
+            <div class="user-info-text">ID: ${user.id}</div>
+            <div class="user-info-text">Phòng: ${user.dept}</div>
+            <div class="user-info-text">Vai trò: ${user.role}</div>
+            ${user.manager ? `<div class="user-info-text">Quản lý bởi: ${user.manager}</div>` : ''}
+            <div class="user-actions">
+                <button class="btn btn-small btn-primary" onclick="openEditUserModal('${user.id}')">Sửa</button>
+                <button class="btn btn-small btn-warning" onclick="resetPassword('${user.id}')">Reset MK</button>
+                <button class="btn btn-small btn-danger" onclick="deleteUser('${user.id}')">Xóa</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// ========== ADD USER FUNCTIONS ==========
+function openAddUserModal() {
+    document.getElementById('addUserModal').classList.add('active');
+    // Load BGD list for manager select
+    const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
+    const select = document.getElementById('newUserManager');
+    select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
+    bgdUsers.forEach(u => {
+        select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+    });
+}
+
+function closeAddUserModal() {
+    document.getElementById('addUserModal').classList.remove('active');
+}
+
+// ========== EDIT USER FUNCTIONS ==========
+function openEditUserModal(userId) {
+    const user = mockUsers.find(u => u.id === userId);
+    if (!user) return;
+    
+    currentEditingUserId = userId;
+    
+    // Điền thông tin user vào form edit
+    document.getElementById('editUserId').value = user.id;
+    document.getElementById('editUserName').value = user.name;
+    
+    // Set giá trị phòng ban
+    const deptSelect = document.getElementById('editUserDept');
+    // Tìm option có text khớp với user.dept
+    for (let i = 0; i < deptSelect.options.length; i++) {
+        if (deptSelect.options[i].text === user.dept) {
+            deptSelect.selectedIndex = i;
+            break;
         }
+    }
+    
+    // Load danh sách BGD cho manager select
+    loadBGDListForEdit(user.manager);
+    
+    // Hiển thị/ẩn phần chọn manager dựa trên phòng ban
+    updateEditUserRole();
+    
+    // Hiển thị modal
+    document.getElementById('editUserModal').classList.add('active');
+}
 
-        function openAddUserModal() {
-            document.getElementById('addUserModal').classList.add('active');
-            // Load BGD list for manager select
-            const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
-            const select = document.getElementById('newUserManager');
-            select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
-            bgdUsers.forEach(u => {
-                select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
-            });
-        }
+function closeEditUserModal() {
+    document.getElementById('editUserModal').classList.remove('active');
+    currentEditingUserId = null;
+}
 
-        function closeAddUserModal() {
-            document.getElementById('addUserModal').classList.remove('active');
-        }
+function loadBGDListForEdit(selectedManager) {
+    const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
+    const select = document.getElementById('editUserManager');
+    select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
+    bgdUsers.forEach(u => {
+        const selected = u.id === selectedManager ? 'selected' : '';
+        select.innerHTML += `<option value="${u.id}" ${selected}>${u.name} (${u.id})</option>`;
+    });
+}
 
-        function updateUserRole() {
-            const dept = document.getElementById('newUserDept').value;
-            const managerDiv = document.getElementById('managerSelect');
-            
-            if (dept.startsWith('PNV')) {
-                managerDiv.style.display = 'block';
-            } else {
-                managerDiv.style.display = 'none';
-                document.getElementById('newUserManager').value = '';
-            }
-        }
+function updateEditUserRole() {
+    const dept = document.getElementById('editUserDept').value;
+    const managerDiv = document.getElementById('editManagerSelect');
+    
+    if (dept.startsWith('PNV')) {
+        managerDiv.style.display = 'block';
+    } else {
+        managerDiv.style.display = 'none';
+        document.getElementById('editUserManager').value = '';
+    }
+}
 
-        function handleAddUser(e) {
-            e.preventDefault();
-            const id = document.getElementById('newUserId').value.trim();
-            const name = document.getElementById('newUserName').value.trim();
-            const deptValue = document.getElementById('newUserDept').value;
-            const deptText = document.getElementById('newUserDept').options[document.getElementById('newUserDept').selectedIndex].text;
-            const manager = document.getElementById('newUserManager').value;
+function handleEditUser(e) {
+    e.preventDefault();
+    
+    if (!currentEditingUserId) return;
+    
+    const user = mockUsers.find(u => u.id === currentEditingUserId);
+    if (!user) return;
+    
+    const newName = document.getElementById('editUserName').value.trim();
+    const deptValue = document.getElementById('editUserDept').value;
+    const deptText = document.getElementById('editUserDept').options[document.getElementById('editUserDept').selectedIndex].text;
+    const manager = document.getElementById('editUserManager').value;
+    
+    // Cập nhật thông tin user
+    user.name = newName;
+    user.dept = deptText;
+    user.role = deptValue.split('-')[0];
+    user.manager = deptValue.startsWith('PNV') ? (manager || null) : null;
+    
+    saveToLocalStorage();
+    closeEditUserModal();
+    loadUserList();
+    showNotification('Cập nhật user thành công!');
+}
 
-            if (mockUsers.find(u => u.id === id)) {
-                showNotification('ID đã tồn tại!', 'error');
-                return;
-            }
+// ========== ADD USER HANDLER ==========
+function handleAddUser(e) {
+    e.preventDefault();
+    const id = document.getElementById('newUserId').value.trim();
+    const name = document.getElementById('newUserName').value.trim();
+    const deptValue = document.getElementById('newUserDept').value;
+    const deptText = document.getElementById('newUserDept').options[document.getElementById('newUserDept').selectedIndex].text;
+    const manager = document.getElementById('newUserManager').value;
 
-            const newUser = {
-                id: id,
-                name: name,
-                dept: deptText,
-                role: deptValue.split('-')[0],
-                password: 'Vcb@1234',
-                manager: manager || null
-            };
-            
-            mockUsers.push(newUser);
+    if (mockUsers.find(u => u.id === id)) {
+        showNotification('ID đã tồn tại!', 'error');
+        return;
+    }
+
+    const newUser = {
+        id: id,
+        name: name,
+        dept: deptText,
+        role: deptValue.split('-')[0],
+        password: 'Vcb@1234',
+        manager: manager || null
+    };
+    
+    mockUsers.push(newUser);
+    saveToLocalStorage();
+    closeAddUserModal();
+    e.target.reset();
+    loadUserList();
+    showNotification('Thêm user thành công!');
+}
+
+// ========== OTHER FUNCTIONS ==========
+function updateUserRole() {
+    const dept = document.getElementById('newUserDept').value;
+    const managerDiv = document.getElementById('managerSelect');
+    
+    if (dept.startsWith('PNV')) {
+        managerDiv.style.display = 'block';
+    } else {
+        managerDiv.style.display = 'none';
+        document.getElementById('newUserManager').value = '';
+    }
+}
+
+function resetPassword(userId) {
+    const user = mockUsers.find(u => u.id === userId);
+    if (user) {
+        user.password = 'Vcb@1234';
+        saveToLocalStorage();
+        showNotification(`Đã reset mật khẩu cho ${user.name} về mặc định (Vcb@1234)`);
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Bạn có chắc muốn xóa user này?')) {
+        const index = mockUsers.findIndex(u => u.id === userId);
+        if (index > -1) {
+            mockUsers.splice(index, 1);
             saveToLocalStorage();
-            closeAddUserModal();
-            e.target.reset();
             loadUserList();
-            showNotification('Thêm user thành công!');
+            showNotification('Đã xóa user');
         }
-
-        function resetPassword(userId) {
-            const user = mockUsers.find(u => u.id === userId);
-            if (user) {
-                user.password = 'Vcb@1234';
-                saveToLocalStorage();
-                showNotification(`Đã reset mật khẩu cho ${user.name} về mặc định (Vcb@1234)`);
-            }
-        }
-
-        function deleteUser(userId) {
-            if (confirm('Bạn có chắc muốn xóa user này?')) {
-                const index = mockUsers.findIndex(u => u.id === userId);
-                if (index > -1) {
-                    mockUsers.splice(index, 1);
-                    saveToLocalStorage();
-                    loadUserList();
-                    showNotification('Đã xóa user');
-                }
-            }
-        }
+    }
+}
 
         // ==========================================
 // PNV FUNCTIONS - ĐÚNG NGUYÊN TẮC GIAO DỊCH
