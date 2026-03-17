@@ -25,6 +25,8 @@
             --danger: #F44336;
             --success: #4CAF50;
             --info: #2196F3;
+            --ocean-blue: #0066CC;
+            --light-blue: #E3F2FD;
         }
 
         body {
@@ -63,6 +65,9 @@
             width: auto;
             object-fit: contain;
             display: block;
+            background: white;
+            padding: 5px;
+            border-radius: 5px;
         }
 
         .logo-text {
@@ -144,7 +149,7 @@
         }
 
         .footer {
-            background: var(--dark-green);
+            background: var(--ocean-blue);
             color: var(--white);
             text-align: center;
             padding: 15px;
@@ -158,6 +163,7 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            font-weight: 600;
         }
 
         .login-container {
@@ -270,6 +276,14 @@
 
         .btn-info {
             background: var(--info);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-ocean {
+            background: var(--ocean-blue);
         }
 
         .error-msg {
@@ -480,6 +494,13 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
+        .chat-message.broadcast {
+            background: var(--light-blue);
+            border: 1px solid var(--info);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
         .chat-input-area {
             display: flex;
             padding: 15px;
@@ -559,6 +580,10 @@
             max-height: 90vh;
             overflow-y: auto;
             animation: slideUp 0.3s;
+        }
+
+        .modal-content.large {
+            max-width: 800px;
         }
 
         @keyframes slideUp {
@@ -769,6 +794,11 @@
             color: white;
         }
 
+        .badge-info {
+            background: var(--info);
+            color: white;
+        }
+
         .file-upload-area {
             border: 2px dashed var(--border);
             border-radius: 10px;
@@ -776,6 +806,7 @@
             text-align: center;
             background: var(--bg-light);
             transition: all 0.3s;
+            margin-bottom: 15px;
         }
 
         .file-upload-area:hover {
@@ -806,6 +837,66 @@
             margin-top: 10px;
             font-weight: 600;
             color: var(--primary-green);
+        }
+
+        .edit-log {
+            background: #FFF3E0;
+            border-left: 4px solid var(--warning);
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .auto-fill {
+            background-color: #E3F2FD !important;
+            color: var(--info) !important;
+            font-weight: 600;
+        }
+
+        .chat-user-select {
+            margin-bottom: 10px;
+        }
+
+        .chat-message-meta {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .report-summary {
+            background: var(--light-blue);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #BBDEFB;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: var(--ocean-blue);
+        }
+
+        .summary-value {
+            font-weight: 700;
+            color: var(--text-dark);
         }
 
         @media (max-width: 768px) {
@@ -955,12 +1046,15 @@
                             <div class="form-group">
                                 <label>CIF (10 ký tự)</label>
                                 <input type="text" id="cif" maxlength="10" required 
-                                       onblur="lookupCustomerName()">
+                                       onblur="formatCIF(); lookupCustomerName();"
+                                       oninput="formatCIF()"
+                                       placeholder="Nhập CIF">
                             </div>
                             <div class="form-group">
                                 <label>Tên khách hàng</label>
                                 <input type="text" id="customerName" readonly 
-                                       placeholder="Tự động hiển thị từ CIF">
+                                       placeholder="Tự động hiển thị từ CIF"
+                                       class="auto-fill">
                             </div>
                             <div class="form-group">
                                 <label>Chiều giao dịch</label>
@@ -975,9 +1069,9 @@
                                 <input type="text" id="transactionDate" readonly>
                             </div>
                             <div class="form-group">
-                                <label>Ngày hiệu lực (ddmmyyyy)</label>
-                                <input type="text" id="effectiveDate" maxlength="8" required 
-                                       placeholder="Ví dụ: 15032026">
+                                <label>Ngày hiệu lực</label>
+                                <input type="date" id="effectiveDate" required 
+                                       onchange="validateEffectiveDate()">
                             </div>
                             <div class="form-group">
                                 <label>Mã tiền tệ giao dịch</label>
@@ -1047,36 +1141,22 @@
                                 <input type="number" id="amount" required step="0.01">
                             </div>
                             <div class="form-group">
-                                <label id="purposeLabel">Mục đích/Nguồn (1-12)</label>
-                                <input type="number" id="purpose" min="1" max="12" required>
+                                <label id="purposeCodeLabel">Mã mục đích/Nguồn</label>
+                                <input type="text" id="purposeCode" maxlength="2" required
+                                       oninput="lookupPurposeName()"
+                                       placeholder="Nhập mã (VD: 01, 02...)">
+                            </div>
+                            <div class="form-group">
+                                <label id="purposeNameLabel">Tên mục đích/Nguồn</label>
+                                <input type="text" id="purposeName" readonly 
+                                       placeholder="Tự động hiển thị"
+                                       class="auto-fill">
                             </div>
                         </div>
                         <div class="btn-group">
-                            <button type="submit" class="btn">Gửi hỏi giá</button>
+                            <button type="submit" class="btn">Gửi hỏi giá cho PQL</button>
                         </div>
                     </form>
-                </div>
-
-                <!-- Quote Response Area - CHỈ HIỂN THỊ KHI PQL CHÀO GIÁ -->
-                <div id="quoteResponse" class="hidden">
-                    <div class="quote-box">
-                        <div class="quote-header">
-                            <span style="font-weight: 600;">Tỷ giá từ PQL</span>
-                            <span class="quote-timer" id="quoteTimer">02:00</span>
-                        </div>
-                        <div class="quote-price" id="quotePrice">0.00</div>
-                        <div style="text-align: center; color: #666; margin-bottom: 15px;">
-                            <span id="quotePair">VND/USD</span> | Thời gian còn lại để chấp nhận
-                        </div>
-                        <div class="quote-actions">
-                            <button class="btn btn-small" onclick="acceptPrice()" style="background: var(--success);">
-                                ✓ Chấp nhận giá
-                            </button>
-                            <button class="btn btn-small btn-danger" onclick="rejectPrice()">
-                                ✗ Từ chối giá
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -1130,6 +1210,7 @@
                                     <th>Tỷ giá</th>
                                     <th>Thành tiền</th>
                                     <th>Loại</th>
+                                    <th>Mục đích</th>
                                     <th>Trạng thái</th>
                                 </tr>
                             </thead>
@@ -1148,6 +1229,7 @@
                             <div class="chat-message received">
                                 <strong>Hệ thống:</strong><br>
                                 Chào mừng! Bạn có thể chat trực tiếp với PQL tại đây.
+                                <div class="chat-message-meta">Tin nhắn của bạn sẽ được gửi đến tất cả PQL</div>
                             </div>
                         </div>
                         <div class="chat-input-area">
@@ -1207,17 +1289,16 @@
                 <button class="tab" onclick="switchTab('pql', 'changePassword')">Đổi mật khẩu</button>
             </div>
 
-            <!-- Tab Nhập dữ liệu - ĐÃ SỬA ĐỂ UPLOAD FILE -->
+            <!-- Tab Nhập dữ liệu -->
             <div id="pql-dataEntry" class="tab-content active">
+                <!-- Upload CIF -->
                 <div class="card">
                     <div class="card-title">Upload dữ liệu CIF - Tên KH</div>
-                    
-                    <!-- FILE UPLOAD AREA -->
                     <div class="file-upload-area" id="cifUploadArea">
                         <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
                         <div style="font-weight: 600; margin-bottom: 5px;">Kéo thả file hoặc click để chọn file</div>
                         <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
-                            Hỗ trợ: .xlsx, .xls, .csv
+                            Hỗ trợ: .xlsx, .xls, .csv (Cột A: CIF, Cột B: Tên KH)
                         </div>
                         <label class="upload-btn">
                             Chọn file
@@ -1225,29 +1306,18 @@
                         </label>
                         <div class="file-name" id="cifFileName"></div>
                     </div>
-
                     <div style="margin-top: 20px;">
-                        <button class="btn" onclick="processCifFile()" id="uploadCifBtn" style="display: none;">
-                            📤 Upload và Xử lý file
+                        <button class="btn btn-small" onclick="processCifFile()" id="uploadCifBtn" style="display: none; width: auto;">
+                            📤 Upload CIF
+                        </button>
+                        <button class="btn btn-small btn-secondary" onclick="exportCifToExcel()" style="width: auto;">
+                            📊 Xuất CIF hiện tại
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="clearAllCif()" style="width: auto;">
+                            🗑️ Xóa tất cả CIF
                         </button>
                     </div>
-
-                    <hr style="margin: 30px 0; border: none; border-top: 1px solid var(--border);">
-
-                    <div class="card-title">Hoặc nhập thủ công</div>
-                    <form onsubmit="uploadCIFManual(event)">
-                        <div class="form-group">
-                            <label>Nhập thủ công (CIF,Tên KH mỗi dòng)</label>
-                            <textarea id="cifManualData" rows="10" style="width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-family: monospace;" 
-                                      placeholder="1234567890,CÔNG TY TNHH ABC&#10;0987654321,TẬP ĐOÀN XYZ&#10;1122334455,NGÂN HÀNG DEF"></textarea>
-                        </div>
-                        <button type="submit" class="btn">Lưu dữ liệu CIF thủ công</button>
-                    </form>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">Danh sách CIF hiện tại (<span id="cifCount">0</span> bản ghi)</div>
-                    <div class="table-container">
+                    <div class="table-container" style="margin-top: 20px; max-height: 300px; overflow-y: auto;">
                         <table id="cifTable">
                             <thead>
                                 <tr>
@@ -1259,9 +1329,108 @@
                             <tbody id="cifTableBody"></tbody>
                         </table>
                     </div>
-                    <div class="btn-group" style="margin-top: 15px;">
-                        <button class="btn btn-small btn-danger" onclick="clearAllCif()">Xóa tất cả CIF</button>
-                        <button class="btn btn-small btn-secondary" onclick="exportCifToExcel()">Xuất Excel</button>
+                </div>
+
+                <!-- Upload Purpose -->
+                <div class="card">
+                    <div class="card-title">Upload dữ liệu Mục đích/Nguồn</div>
+                    <div class="file-upload-area" id="purposeUploadArea">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📋</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Upload file Purpose</div>
+                        <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
+                            Hỗ trợ: .xlsx, .xls, .csv (Cột A: Mã mục đích, Cột B: Tên mục đích)
+                        </div>
+                        <label class="upload-btn">
+                            Chọn file
+                            <input type="file" id="purposeFileInput" accept=".xlsx,.xls,.csv" onchange="handlePurposeFileSelect(event)">
+                        </label>
+                        <div class="file-name" id="purposeFileName"></div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-small" onclick="processPurposeFile()" id="uploadPurposeBtn" style="display: none; width: auto;">
+                            📤 Upload Purpose
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="clearAllPurpose()" style="width: auto;">
+                            🗑️ Xóa tất cả Purpose
+                        </button>
+                    </div>
+                    <div class="table-container" style="margin-top: 20px; max-height: 300px; overflow-y: auto;">
+                        <table id="purposeTable">
+                            <thead>
+                                <tr>
+                                    <th>Mã mục đích</th>
+                                    <th>Tên mục đích</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purposeTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Upload Mã Phòng -->
+                <div class="card">
+                    <div class="card-title">Upload Mã Phòng</div>
+                    <div class="file-upload-area" id="roomUploadArea">
+                        <div style="font-size: 48px; margin-bottom: 10px;">🏢</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Upload file Mã Phòng</div>
+                        <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
+                            Hỗ trợ: .xlsx, .xls, .csv (Cột A: Mã phòng, Cột B: Tên phòng)
+                        </div>
+                        <label class="upload-btn">
+                            Chọn file
+                            <input type="file" id="roomFileInput" accept=".xlsx,.xls,.csv" onchange="handleRoomFileSelect(event)">
+                        </label>
+                        <div class="file-name" id="roomFileName"></div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-small" onclick="processRoomFile()" id="uploadRoomBtn" style="display: none; width: auto;">
+                            📤 Upload Mã Phòng
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upload TG Thống kê -->
+                <div class="card">
+                    <div class="card-title">Upload Tỷ giá thống kê</div>
+                    <div class="file-upload-area" id="rateUploadArea">
+                        <div style="font-size: 48px; margin-bottom: 10px;">💱</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Upload file Tỷ giá thống kê</div>
+                        <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
+                            Hỗ trợ: .xlsx, .xls, .csv (Cột A: Mã tiền, Cột B: Tỷ giá mua, Cột C: Tỷ giá bán)
+                        </div>
+                        <label class="upload-btn">
+                            Chọn file
+                            <input type="file" id="rateFileInput" accept=".xlsx,.xls,.csv" onchange="handleRateFileSelect(event)">
+                        </label>
+                        <div class="file-name" id="rateFileName"></div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-small" onclick="processRateFile()" id="uploadRateBtn" style="display: none; width: auto;">
+                            📤 Upload Tỷ giá
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upload Chân hàng -->
+                <div class="card">
+                    <div class="card-title">Upload Chân hàng</div>
+                    <div class="file-upload-area" id="legUploadArea">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📦</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Upload file Chân hàng</div>
+                        <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
+                            Hỗ trợ: .xlsx, .xls, .csv
+                        </div>
+                        <label class="upload-btn">
+                            Chọn file
+                            <input type="file" id="legFileInput" accept=".xlsx,.xls,.csv" onchange="handleLegFileSelect(event)">
+                        </label>
+                        <div class="file-name" id="legFileName"></div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-small" onclick="processLegFile()" id="uploadLegBtn" style="display: none; width: auto;">
+                            📤 Upload Chân hàng
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1319,7 +1488,7 @@
                             <div class="form-col">
                                 <div class="form-group">
                                     <label>Đồng tiền bán</label>
-                                    <input type=" text" id="quoteSellCurr" readonly>
+                                    <input type="text" id="quoteSellCurr" readonly>
                                 </div>
                             </div>
                         </div>
@@ -1353,7 +1522,7 @@
                             </div>
                         </div>
                         <div class="btn-group">
-                            <button type="submit" class="btn">Gửi chào giá</button>
+                            <button type="submit" class="btn">Gửi chào giá cho PNV</button>
                             <button type="button" class="btn btn-secondary" onclick="cancelQuote()">Hủy</button>
                         </div>
                     </form>
@@ -1370,22 +1539,6 @@
                                 <label>PNV</label>
                                 <select id="pqlFilterPnv">
                                     <option value="">Tất cả PNV</option>
-                                    <option value="K1">KHDN1 (K1)</option>
-                                    <option value="K2">KHDN2 (K2)</option>
-                                    <option value="K3">KHDN3 (K3)</option>
-                                    <option value="FDI">FDI (FDI)</option>                                    
-                                    <option value="L1">KHBL1 (L1)</option>
-                                    <option value="L2">KHBL2 (L2)</option>
-                                    <option value="L3">KHBL3 (L3)</option>
-                                    <option value="PGD TĐT">PGD TĐT (TĐT)</option>
-                                    <option value="PGD ML">PGD ML (ML)</option>
-                                    <option value="PGD ĐK">PGD ĐK (ĐK)</option>
-                                    <option value="PGD CH">PGD CH (CH)</option>
-                                    <option value="PGD VVK">PGD VVK (VVK)</option>
-                                    <option value="PGD LTT">PGD LTT (LTT)</option>                                    
-                                    <option value="TN">DV KHTN (TN)</option>
-                                    <option value="T1">DVKHTC1 (T1)</option>
-                                    <option value="T2">DVKHTC2 (T2)</option>
                                 </select>
                             </div>
                             <div class="filter-group">
@@ -1423,8 +1576,10 @@
                                     <th>Bán</th>
                                     <th>Số lượng</th>
                                     <th>Tỷ giá</th>
+                                    <th>Tỷ giá cân đối</th>
                                     <th>Tương đương</th>
                                     <th>Loại</th>
+                                    <th>Lợi nhuận</th>
                                     <th>Người sửa</th>
                                     <th>Thao tác</th>
                                 </tr>
@@ -1438,84 +1593,79 @@
             <!-- Tab Báo cáo -->
             <div id="pql-reports" class="tab-content">
                 <div class="card">
-                    <div class="card-title">Báo cáo giao dịch</div>
+                    <div class="card-title">Báo cáo giao dịch - Mẫu BC KDNT</div>
+                    
+                    <!-- Summary Section -->
+                    <div class="report-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Tổng số giao dịch:</span>
+                            <span class="summary-value" id="reportTotalCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Tổng khối lượng giao dịch:</span>
+                            <span class="summary-value" id="reportTotalVolume">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Tổng lợi nhuận:</span>
+                            <span class="summary-value" id="reportTotalProfit">0 VND</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Tỷ giá cân đối trung bình:</span>
+                            <span class="summary-value" id="reportAvgBalancedRate">0</span>
+                        </div>
+                    </div>
+
                     <div class="filter-section">
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Ngày giao dịch từ</label>
-                                    <input type="date" id="reportTransFrom">
-                                </div>
+                        <div class="report-grid">
+                            <div class="form-group">
+                                <label>Ngày giao dịch từ</label>
+                                <input type="date" id="reportTransFrom">
                             </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Ngày giao dịch đến</label>
-                                    <input type="date" id="reportTransTo">
-                                </div>
+                            <div class="form-group">
+                                <label>Ngày giao dịch đến</label>
+                                <input type="date" id="reportTransTo">
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Ngày hiệu lực từ</label>
-                                    <input type="date" id="reportEffFrom">
-                                </div>
+                            <div class="form-group">
+                                <label>Ngày hiệu lực từ</label>
+                                <input type="date" id="reportEffFrom">
                             </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Ngày hiệu lực đến</label>
-                                    <input type="date" id="reportEffTo">
-                                </div>
+                            <div class="form-group">
+                                <label>Ngày hiệu lực đến</label>
+                                <input type="date" id="reportEffTo">
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Mã đồng tiền bán</label>
-                                    <select id="reportSellCurr">
-                                        <option value="">Tất cả</option>
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                        <option value="GBP">GBP</option>
-                                        <option value="JPY">JPY</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label>Mã đồng tiền bán</label>
+                                <select id="reportSellCurr">
+                                    <option value="">Tất cả</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="JPY">JPY</option>
+                                </select>
                             </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Mã đồng tiền mua</label>
-                                    <select id="reportBuyCurr">
-                                        <option value="">Tất cả</option>
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                        <option value="VND">VND</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label>Mã đồng tiền mua</label>
+                                <select id="reportBuyCurr">
+                                    <option value="">Tất cả</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="VND">VND</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Mã PNV</label>
-                                    <select id="reportPnv">
-                                        <option value="">Tất cả</option>
-                                        <option value="K1">K1</option>
-                                        <option value="L1">L1</option>
-                                        <option value="TN">TN</option>
-                                        <option value="T1">T1</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label>Mã PNV</label>
+                                <select id="reportPnv">
+                                    <option value="">Tất cả</option>
+                                </select>
                             </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Loại giao dịch</label>
-                                    <select id="reportType">
-                                        <option value="">Tất cả</option>
-                                        <option value="GN">GN (Giao ngay)</option>
-                                        <option value="KH">KH (Kỳ hạn)</option>
-                                        <option value="HĐ">HĐ (Hợp đồng)</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label>Loại giao dịch</label>
+                                <select id="reportType">
+                                    <option value="">Tất cả</option>
+                                    <option value="GN">GN (Giao ngay)</option>
+                                    <option value="KH">KH (Kỳ hạn)</option>
+                                    <option value="HĐ">HĐ (Hoán đổi)</option>
+                                </select>
                             </div>
                         </div>
                         <div class="btn-group">
@@ -1536,11 +1686,18 @@
             <div id="pql-chat" class="tab-content">
                 <div class="card">
                     <div class="card-title">Chat với Phòng Nghiệp vụ</div>
+                    <div class="chat-user-select">
+                        <label>Chọn PNV để chat riêng (để trống để gửi broadcast):</label>
+                        <select id="pqlChatTarget" style="width: 100%; padding: 10px; margin-top: 5px;">
+                            <option value="">-- Gửi đến tất cả PNV --</option>
+                        </select>
+                    </div>
                     <div class="chat-container">
                         <div class="chat-messages" id="pqlChatMessages">
                             <div class="chat-message received">
                                 <strong>Hệ thống:</strong><br>
                                 Sẵn sàng nhận tin nhắn từ PNV.
+                                <div class="chat-message-meta">Tin nhắn từ PNV sẽ hiển thị ở đây</div>
                             </div>
                         </div>
                         <div class="chat-input-area">
@@ -1624,6 +1781,7 @@
                                     <th>Bán</th>
                                     <th>Số tiền</th>
                                     <th>Tỷ giá</th>
+                                    <th>Tỷ giá cân đối</th>
                                     <th>Loại</th>
                                 </tr>
                             </thead>
@@ -1658,7 +1816,7 @@
 
     <!-- Footer -->
     <footer class="footer" id="footer" style="display: none;">
-        <span>Developed by Forex Development Team - Developer: Lại Thế Trọng | © 2026 Vietcombank</span>
+        <span>Developed by Forex Development Team - Developer: <span style="color: #FFD700; font-weight: bold;">Lại Thế Trọng</span> | © 2026 Vietcombank</span>
     </footer>
 
     <!-- Modal Thêm User -->
@@ -1683,7 +1841,8 @@
                         <option value="">Chọn phòng ban...</option>
                         <option value="PNV-K1">KHDN1 (K1)</option>
                         <option value="PNV-K2">KHDN2 (K2)</option>
-                        <option value="PNV-K3">KHDN3 (K3)</option>                        
+                        <option value="PNV-K3">KHDN3 (K3)</option>
+                        <option value="PNV-FDI">FDI (FDI)</option>
                         <option value="PNV-L1">KHBL1 (L1)</option>
                         <option value="PNV-L2">KHBL2 (L2)</option>
                         <option value="PNV-L3">KHBL3 (L3)</option>
@@ -1692,10 +1851,10 @@
                         <option value="PNV-ĐK">PGD ĐK (ĐK)</option>
                         <option value="PNV-CH">PGD CH (CH)</option>
                         <option value="PNV-VVK">PGD VVK (VVK)</option>
-                        <option value="PNV-LTT">PGD LTT (LTT)</option>                        
+                        <option value="PNV-LTT">PGD LTT (LTT)</option>
                         <option value="PNV-TN">DV KHTN (TN)</option>
                         <option value="PNV-T1">DVKHTC1 (T1)</option>
-                        <option value="PNV-T2">DVKHTC2 (T2)</option>                        
+                        <option value="PNV-T2">DVKHTC2 (T2)</option>
                         <option value="PQL-KT">PQL - Kế toán (KT)</option>
                         <option value="BGD">Ban Giám đốc (BGĐ)</option>
                     </select>
@@ -1736,7 +1895,8 @@
                         <option value="">Chọn phòng ban...</option>
                         <option value="PNV-K1">KHDN1 (K1)</option>
                         <option value="PNV-K2">KHDN2 (K2)</option>
-                        <option value="PNV-K3">KHDN3 (K3)</option>                        
+                        <option value="PNV-K3">KHDN3 (K3)</option>
+                        <option value="PNV-FDI">FDI (FDI)</option>
                         <option value="PNV-L1">KHBL1 (L1)</option>
                         <option value="PNV-L2">KHBL2 (L2)</option>
                         <option value="PNV-L3">KHBL3 (L3)</option>
@@ -1745,10 +1905,10 @@
                         <option value="PNV-ĐK">PGD ĐK (ĐK)</option>
                         <option value="PNV-CH">PGD CH (CH)</option>
                         <option value="PNV-VVK">PGD VVK (VVK)</option>
-                        <option value="PNV-LTT">PGD LTT (LTT)</option>                        
+                        <option value="PNV-LTT">PGD LTT (LTT)</option>
                         <option value="PNV-TN">DV KHTN (TN)</option>
                         <option value="PNV-T1">DVKHTC1 (T1)</option>
-                        <option value="PNV-T2">DVKHTC2 (T2)</option>                        
+                        <option value="PNV-T2">DVKHTC2 (T2)</option>
                         <option value="PQL-KT">PQL - Kế toán (KT)</option>
                         <option value="BGD">Ban Giám đốc (BGĐ)</option>
                     </select>
@@ -1759,17 +1919,50 @@
                         <option value="">Chọn BGĐ quản lý...</option>
                     </select>
                 </div>
-                <div class="modal-actions">
+                <div class="btn-group">
                     <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <button type="submit" class="btn">Lưu thay đổi</button>
                 </div>
             </form>
         </div>
     </div>
 
-       <!-- Modal Edit Transaction -->
+    <!-- Quote Response Modal (PNV) -->
+    <div class="modal" id="quoteResponseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🎯 TỶ GIÁ TỪ PQL</h3>
+                <button class="close-btn" onclick="rejectPrice()">&times;</button>
+            </div>
+            <div class="quote-box" style="margin: 0;">
+                <div class="quote-header">
+                    <span style="font-weight: 600;">Thời gian còn lại:</span>
+                    <span class="quote-timer" id="modalQuoteTimer">02:00</span>
+                </div>
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Cặp tiền: <strong id="modalQuotePair">USD/VND</strong></div>
+                    <div style="font-size: 14px; color: #666;">PNV: <strong id="modalQuotePnv">-</strong></div>
+                    <div style="font-size: 14px; color: #666;">Số lượng: <strong id="modalQuoteAmount">-</strong></div>
+                </div>
+                <div class="quote-price" id="modalQuotePrice">0.00</div>
+                <div style="text-align: center; color: #666; margin-bottom: 20px; font-size: 13px;">
+                    Vui lòng chấp nhận hoặc từ chối tỷ giá này trong thời gian còn lại
+                </div>
+                <div class="quote-actions">
+                    <button class="btn btn-small btn-success" onclick="acceptPrice()" style="font-size: 16px; padding: 12px 30px;">
+                        ✓ CHẤP NHẬN GIÁ
+                    </button>
+                    <button class="btn btn-small btn-danger" onclick="rejectPrice()" style="font-size: 16px; padding: 12px 30px;">
+                        ✗ TỪ CHỐI GIÁ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Transaction Modal -->
     <div class="modal" id="editTransactionModal">
-        <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-content large">
             <div class="modal-header">
                 <h3 class="modal-title">Chỉnh sửa giao dịch</h3>
                 <button class="close-btn" onclick="closeEditModal()">&times;</button>
@@ -1779,7 +1972,7 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>CIF</label>
-                        <input type="text" id="editCif" required>
+                        <input type="text" id="editCif" required onblur="formatEditCIF()">
                     </div>
                     <div class="form-group">
                         <label>Tên KH</label>
@@ -1787,7 +1980,7 @@
                     </div>
                     <div class="form-group">
                         <label>Ngày hiệu lực</label>
-                        <input type="text" id="editEffDate" required>
+                        <input type="date" id="editEffDate" required>
                     </div>
                     <div class="form-group">
                         <label>Đồng tiền mua</label>
@@ -1818,12 +2011,22 @@
                         <input type="number" id="editRate" step="0.0001" required>
                     </div>
                     <div class="form-group">
+                        <label>Tỷ giá cân đối</label>
+                        <input type="number" id="editBalancedRate" step="0.0001" 
+                               placeholder="Tự động tính hoặc nhập tay">
+                    </div>
+                    <div class="form-group">
                         <label>Loại giao dịch</label>
                         <select id="editType" required>
                             <option value="GN">GN - Giao ngay</option>
                             <option value="KH">KH - Kỳ hạn</option>
-                            <option value="HĐ">HĐ - Hợp đồng</option>
+                            <option value="HĐ">HĐ - Hoán đổi</option>
                         </select>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Ghi chú thay đổi (bắt buộc)</label>
+                        <textarea id="editNote" rows="3" required 
+                                  placeholder="Ghi rõ lý do thay đổi thông tin này..."></textarea>
                     </div>
                 </div>
                 <div class="btn-group">
@@ -1848,6 +2051,10 @@
         let editingTransactionId = null;
         let currentEditingUserId = null;
         let selectedCifFile = null;
+        let selectedPurposeFile = null;
+        let selectedRoomFile = null;
+        let selectedRateFile = null;
+        let selectedLegFile = null;
 
         // ==========================================
         // MOCK DATA INITIALIZATION
@@ -1855,20 +2062,39 @@
         let mockUsers = [
             { id: 'admin', name: 'Administrator', dept: 'IT', role: 'admin', password: 'Vcb@1234', manager: null },
             { id: 'K001', name: 'Nguyễn Văn A', dept: 'KHDN1 (K1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
-            { id: 'L001', name: 'Trần Thị B', dept: 'KHBL1 (L1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
-            { id: 'TN001', name: 'Lê Văn C', dept: 'DV KHTN (TN)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
-            { id: 'KT001', name: 'Phạm Văn C', dept: 'PQL - Kế toán', role: 'PQL', password: 'Vcb@1234', manager: null },
-            { id: 'BGD001', name: 'Lê Văn D', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null },
-            { id: 'BGD002', name: 'Nguyễn Thị E', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null }
+            { id: 'K002', name: 'Trần Thị B', dept: 'KHDN2 (K2)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
+            { id: 'L001', name: 'Lê Văn C', dept: 'KHBL1 (L1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
+            { id: 'TN001', name: 'Phạm Thị D', dept: 'DV KHTN (TN)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
+            { id: 'KT001', name: 'Hoàng Văn E', dept: 'PQL - Kế toán', role: 'PQL', password: 'Vcb@1234', manager: null },
+            { id: 'BGD001', name: 'Giám đốc A', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null },
+            { id: 'BGD002', name: 'Giám đốc B', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null }
         ];
 
         let mockCIF = {
-            '1234567890': 'CÔNG TY TNHH ABC',
-            '0987654321': 'TẬP ĐOÀN XYZ',
-            '1122334455': 'NGÂN HÀNG DEF',
-            '2233445566': 'CÔNG TY CP GHI',
-            '3344556677': 'TẬP ĐOÀN JKL'
+            '0000123456': 'CÔNG TY TNHH ABC',
+            '0000987654': 'TẬP ĐOÀN XYZ',
+            '0001122334': 'NGÂN HÀNG DEF',
+            '0002233445': 'CÔNG TY CP GHI',
+            '0003344556': 'TẬP ĐOÀN JKL'
         };
+
+        let mockPurpose = {
+            '01': 'Thanh toán hàng nhập khẩu',
+            '02': 'Thanh toán dịch vụ',
+            '03': 'Trả nợ nước ngoài',
+            '04': 'Đầu tư ra nước ngoài',
+            '05': 'Chuyển lợi nhuận',
+            '06': 'Nhận tiền xuất khẩu',
+            '07': 'Nhận tiền chuyển nhượng vốn',
+            '08': 'Vay ngắn hạn',
+            '09': 'Vay dài hạn',
+            '10': 'Đầu tư gián tiếp',
+            '11': 'Khác'
+        };
+
+        let mockRoomData = {};
+        let mockRateStats = {};
+        let mockLegData = {};
 
         let mockTransactions = [
             {
@@ -1877,39 +2103,47 @@
                 pnvName: 'Nguyễn Văn A',
                 date: '15/03/2026',
                 effectiveDate: '17/03/2026',
-                cif: '1234567890',
+                cif: '0000123456',
                 customerName: 'CÔNG TY TNHH ABC',
                 direction: 'MUA',
                 buyCurr: 'USD',
                 sellCurr: 'VND',
                 amount: 100000,
                 rate: 25350.00,
+                balancedRate: 25400.00,
                 equivalent: 2535000000,
                 type: 'GN',
                 status: 'Thành công',
-                purpose: '1',
+                purposeCode: '01',
+                purposeName: 'Thanh toán hàng nhập khẩu',
                 editedBy: null,
-                editTime: null
+                editTime: null,
+                editNote: null,
+                profit: 5000000
             },
             {
                 id: 2,
                 pnv: 'L001',
-                pnvName: 'Trần Thị B',
+                pnvName: 'Lê Văn C',
                 date: '14/03/2026',
                 effectiveDate: '16/03/2026',
-                cif: '0987654321',
+                cif: '0000987654',
                 customerName: 'TẬP ĐOÀN XYZ',
                 direction: 'BÁN',
                 buyCurr: 'VND',
                 sellCurr: 'EUR',
                 amount: 50000,
                 rate: 27500.00,
+                balancedRate: 27450.00,
                 equivalent: 1375000000,
                 type: 'GN',
                 status: 'Thành công',
-                purpose: '2',
+                purposeCode: '02',
+                purposeName: 'Thanh toán dịch vụ',
                 editedBy: null,
-                editTime: null
+                editTime: null,
+                editNote: null,
+                profit: 2500000
             }
         ];
 
@@ -1929,14 +2163,11 @@
         }
 
         function parseDate(dateStr) {
-            if (dateStr.length === 8 && !dateStr.includes('/')) {
-                const day = dateStr.substring(0, 2);
-                const month = dateStr.substring(2, 4);
-                const year = dateStr.substring(4, 8);
-                return new Date(year, month - 1, day);
-            }
             const parts = dateStr.split('/');
-            return new Date(parts[2], parts[1] - 1, parts[0]);
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            return new Date(dateStr);
         }
 
         function validatePassword(password) {
@@ -1964,26 +2195,50 @@
             return diffDays <= 2 ? 'GN' : 'KH';
         }
 
+        function calculateProfit(direction, amount, rate, balancedRate) {
+            if (!balancedRate || balancedRate <= 0) return 0;
+            if (direction === 'MUA') {
+                return amount * (balancedRate - rate);
+            } else {
+                return amount * (rate - balancedRate);
+            }
+        }
+
         // ==========================================
         // LOCAL STORAGE MANAGEMENT
         // ==========================================
         function saveToLocalStorage() {
             localStorage.setItem('mbnt_users', JSON.stringify(mockUsers));
             localStorage.setItem('mbnt_cif', JSON.stringify(mockCIF));
+            localStorage.setItem('mbnt_purpose', JSON.stringify(mockPurpose));
+            localStorage.setItem('mbnt_room', JSON.stringify(mockRoomData));
+            localStorage.setItem('mbnt_ratestats', JSON.stringify(mockRateStats));
+            localStorage.setItem('mbnt_leg', JSON.stringify(mockLegData));
             localStorage.setItem('mbnt_transactions', JSON.stringify(mockTransactions));
             localStorage.setItem('mbnt_pendingQuotes', JSON.stringify(pendingQuotes));
+            localStorage.setItem('mbnt_chat', JSON.stringify(chatMessages));
         }
 
         function loadFromLocalStorage() {
             const users = localStorage.getItem('mbnt_users');
             const cif = localStorage.getItem('mbnt_cif');
+            const purpose = localStorage.getItem('mbnt_purpose');
+            const room = localStorage.getItem('mbnt_room');
+            const ratestats = localStorage.getItem('mbnt_ratestats');
+            const leg = localStorage.getItem('mbnt_leg');
             const trans = localStorage.getItem('mbnt_transactions');
             const quotes = localStorage.getItem('mbnt_pendingQuotes');
+            const chat = localStorage.getItem('mbnt_chat');
 
             if (users) mockUsers = JSON.parse(users);
             if (cif) mockCIF = JSON.parse(cif);
+            if (purpose) mockPurpose = JSON.parse(purpose);
+            if (room) mockRoomData = JSON.parse(room);
+            if (ratestats) mockRateStats = JSON.parse(ratestats);
+            if (leg) mockLegData = JSON.parse(leg);
             if (trans) mockTransactions = JSON.parse(trans);
             if (quotes) pendingQuotes = JSON.parse(quotes);
+            if (chat) chatMessages = JSON.parse(chat);
         }
 
         // ==========================================
@@ -1999,12 +2254,6 @@
             
             if (!user) {
                 errorDiv.textContent = 'ID hoặc mật khẩu không đúng!';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            if (!validatePassword(password) && password !== 'Vcb@1234') {
-                errorDiv.textContent = 'Mật khẩu không đúng định dạng yêu cầu! (8+ ký tự, Hoa, thường, số, đặc biệt)';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -2032,8 +2281,9 @@
             } else if (user.role === 'PQL') {
                 document.getElementById('pqlDashboard').style.display = 'block';
                 loadCifTable();
-                loadPendingQuotes();
+                loadPurposeTable();
                 loadPqlBlotter();
+                loadPnvListForChat();
                 startPqlPolling();
             } else if (user.role === 'BGD') {
                 document.getElementById('bgdDashboard').style.display = 'block';
@@ -2087,11 +2337,12 @@
         // TAB SWITCHING
         // ==========================================
         function switchTab(dashboard, tabName) {
-            const tabs = document.querySelectorAll(`#${dashboard}Dashboard .tab`);
+            const dashboardEl = document.getElementById(`${dashboard}Dashboard`);
+            const tabs = dashboardEl.querySelectorAll('.tab');
             tabs.forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
 
-            const contents = document.querySelectorAll(`#${dashboard}Dashboard .tab-content`);
+            const contents = dashboardEl.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
             document.getElementById(`${dashboard}-${tabName}`).classList.add('active');
 
@@ -2101,6 +2352,9 @@
                 loadPqlBlotter();
             } else if (dashboard === 'pnv' && tabName === 'blotter') {
                 loadPnvBlotter();
+            } else if (dashboard === 'pql' && tabName === 'dataEntry') {
+                loadCifTable();
+                loadPurposeTable();
             }
         }
 
@@ -2121,9 +2375,9 @@
                     <div class="user-info-text">ID: ${user.id}</div>
                     <div class="user-info-text">Phòng: ${user.dept}</div>
                     <div class="user-info-text">Vai trò: ${user.role}</div>
-                    ${user.manager ? `<div class="user-info-text">Quản lý bởi: ${user.manager}</div>` : ''}
+                    ${user.manager ? `<div class="user-info-text">Quản lý bởi: ${getManagerName(user.manager)}</div>` : ''}
                     <div class="user-actions">
-                        <button class="btn btn-small btn-primary" onclick="openEditUserModal('${user.id}')">Sửa</button>
+                        <button class="btn btn-small btn-info" onclick="openEditUserModal('${user.id}')">Sửa</button>
                         <button class="btn btn-small btn-warning" onclick="resetPassword('${user.id}')">Reset MK</button>
                         <button class="btn btn-small btn-danger" onclick="deleteUser('${user.id}')">Xóa</button>
                     </div>
@@ -2132,18 +2386,31 @@
             });
         }
 
+        function getManagerName(managerId) {
+            const manager = mockUsers.find(u => u.id === managerId);
+            return manager ? `${manager.name} (${manager.id})` : managerId;
+        }
+
         function openAddUserModal() {
             document.getElementById('addUserModal').classList.add('active');
-            const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
-            const select = document.getElementById('newUserManager');
-            select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
-            bgdUsers.forEach(u => {
-                select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
-            });
+            loadBGDListForSelect('newUserManager');
         }
 
         function closeAddUserModal() {
             document.getElementById('addUserModal').classList.remove('active');
+        }
+
+        function loadBGDListForSelect(selectId, selectedValue = '') {
+            const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            let html = '<option value="">Chọn BGĐ quản lý...</option>';
+            bgdUsers.forEach(u => {
+                const selected = u.id === selectedValue ? 'selected' : '';
+                html += `<option value="${u.id}" ${selected}>${u.name} (${u.id})</option>`;
+            });
+            select.innerHTML = html;
         }
 
         function openEditUserModal(userId) {
@@ -2163,7 +2430,7 @@
                 }
             }
             
-            loadBGDListForEdit(user.manager);
+            loadBGDListForSelect('editUserManager', user.manager);
             updateEditUserRole();
             
             document.getElementById('editUserModal').classList.add('active');
@@ -2174,14 +2441,16 @@
             currentEditingUserId = null;
         }
 
-        function loadBGDListForEdit(selectedManager) {
-            const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
-            const select = document.getElementById('editUserManager');
-            select.innerHTML = '<option value="">Chọn BGĐ quản lý...</option>';
-            bgdUsers.forEach(u => {
-                const selected = u.id === selectedManager ? 'selected' : '';
-                select.innerHTML += `<option value="${u.id}" ${selected}>${u.name} (${u.id})</option>`;
-            });
+        function updateUserRole() {
+            const dept = document.getElementById('newUserDept').value;
+            const managerDiv = document.getElementById('managerSelect');
+            
+            if (dept.startsWith('PNV')) {
+                managerDiv.style.display = 'block';
+            } else {
+                managerDiv.style.display = 'none';
+                document.getElementById('newUserManager').value = '';
+            }
         }
 
         function updateEditUserRole() {
@@ -2194,6 +2463,36 @@
                 managerDiv.style.display = 'none';
                 document.getElementById('editUserManager').value = '';
             }
+        }
+
+        function handleAddUser(e) {
+            e.preventDefault();
+            const id = document.getElementById('newUserId').value.trim();
+            const name = document.getElementById('newUserName').value.trim();
+            const deptValue = document.getElementById('newUserDept').value;
+            const deptText = document.getElementById('newUserDept').options[document.getElementById('newUserDept').selectedIndex].text;
+            const manager = document.getElementById('newUserManager').value;
+
+            if (mockUsers.find(u => u.id === id)) {
+                showNotification('ID đã tồn tại!', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: id,
+                name: name,
+                dept: deptText,
+                role: deptValue.split('-')[0],
+                password: 'Vcb@1234',
+                manager: deptValue.startsWith('PNV') ? (manager || null) : null
+            };
+            
+            mockUsers.push(newUser);
+            saveToLocalStorage();
+            closeAddUserModal();
+            e.target.reset();
+            loadUserList();
+            showNotification('Thêm user thành công!');
         }
 
         function handleEditUser(e) {
@@ -2220,48 +2519,6 @@
             showNotification('Cập nhật user thành công!');
         }
 
-        function handleAddUser(e) {
-            e.preventDefault();
-            const id = document.getElementById('newUserId').value.trim();
-            const name = document.getElementById('newUserName').value.trim();
-            const deptValue = document.getElementById('newUserDept').value;
-            const deptText = document.getElementById('newUserDept').options[document.getElementById('newUserDept').selectedIndex].text;
-            const manager = document.getElementById('newUserManager').value;
-
-            if (mockUsers.find(u => u.id === id)) {
-                showNotification('ID đã tồn tại!', 'error');
-                return;
-            }
-
-            const newUser = {
-                id: id,
-                name: name,
-                dept: deptText,
-                role: deptValue.split('-')[0],
-                password: 'Vcb@1234',
-                manager: manager || null
-            };
-            
-            mockUsers.push(newUser);
-            saveToLocalStorage();
-            closeAddUserModal();
-            e.target.reset();
-            loadUserList();
-            showNotification('Thêm user thành công!');
-        }
-
-        function updateUserRole() {
-            const dept = document.getElementById('newUserDept').value;
-            const managerDiv = document.getElementById('managerSelect');
-            
-            if (dept.startsWith('PNV')) {
-                managerDiv.style.display = 'block';
-            } else {
-                managerDiv.style.display = 'none';
-                document.getElementById('newUserManager').value = '';
-            }
-        }
-
         function resetPassword(userId) {
             const user = mockUsers.find(u => u.id === userId);
             if (user) {
@@ -2284,25 +2541,88 @@
         }
 
         // ==========================================
-        // PNV FUNCTIONS
+        // PNV FUNCTIONS - YẾT GIÁ
         // ==========================================
+        function formatCIF() {
+            const cifInput = document.getElementById('cif');
+            let value = cifInput.value.replace(/\D/g, ''); // Remove non-digits
+            if (value.length > 10) value = value.slice(0, 10);
+            
+            // Pad with leading zeros to make it 10 digits
+            while (value.length < 10) {
+                value = '0' + value;
+            }
+            
+            cifInput.value = value;
+        }
+
+        function formatEditCIF() {
+            const cifInput = document.getElementById('editCif');
+            let value = cifInput.value.replace(/\D/g, '');
+            if (value.length > 10) value = value.slice(0, 10);
+            while (value.length < 10) {
+                value = '0' + value;
+            }
+            cifInput.value = value;
+        }
+
         function lookupCustomerName() {
             const cif = document.getElementById('cif').value.trim();
             const nameInput = document.getElementById('customerName');
             
             if (mockCIF[cif]) {
                 nameInput.value = mockCIF[cif];
-                nameInput.style.color = 'green';
+                nameInput.style.color = 'var(--ocean-blue)';
             } else {
                 nameInput.value = 'Không tìm thấy KH - Vui lòng kiểm tra lại CIF';
-                nameInput.style.color = 'red';
+                nameInput.style.color = 'var(--danger)';
             }
         }
 
         function updatePurposeLabel() {
             const type = document.getElementById('transactionType').value;
-            const label = document.getElementById('purposeLabel');
-            label.textContent = type === 'buy' ? 'Nguồn (1-12)' : 'Mục đích (1-12)';
+            const codeLabel = document.getElementById('purposeCodeLabel');
+            const nameLabel = document.getElementById('purposeNameLabel');
+            
+            if (type === 'buy') {
+                codeLabel.textContent = 'Mã nguồn (01-11)';
+                nameLabel.textContent = 'Tên nguồn';
+            } else {
+                codeLabel.textContent = 'Mã mục đích (01-11)';
+                nameLabel.textContent = 'Tên mục đích';
+            }
+        }
+
+        function lookupPurposeName() {
+            const code = document.getElementById('purposeCode').value.trim();
+            const nameInput = document.getElementById('purposeName');
+            
+            // Format code with leading zero if needed
+            let formattedCode = code;
+            if (code.length === 1) {
+                formattedCode = '0' + code;
+                document.getElementById('purposeCode').value = formattedCode;
+            }
+            
+            if (mockPurpose[formattedCode]) {
+                nameInput.value = mockPurpose[formattedCode];
+                nameInput.style.color = 'var(--ocean-blue)';
+            } else {
+                nameInput.value = 'Mã không tồn tại';
+                nameInput.style.color = 'var(--danger)';
+            }
+        }
+
+        function validateEffectiveDate() {
+            const effDate = document.getElementById('effectiveDate').value;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selectedDate = new Date(effDate);
+            
+            if (selectedDate < today) {
+                showNotification('Ngày hiệu lực không được nhỏ hơn ngày hiện tại!', 'error');
+                document.getElementById('effectiveDate').value = formatDateYYYYMMDD(new Date());
+            }
         }
 
         function submitAskPrice(e) {
@@ -2322,6 +2642,14 @@
                 return;
             }
 
+            const purposeCode = document.getElementById('purposeCode').value.trim();
+            const purposeName = document.getElementById('purposeName').value;
+            
+            if (!mockPurpose[purposeCode] && purposeName.includes('không tồn tại')) {
+                showNotification('Mã mục đích/nguồn không hợp lệ!', 'error');
+                return;
+            }
+
             const quoteRequest = {
                 id: generateId(),
                 pnv: currentUser.id,
@@ -2335,7 +2663,8 @@
                 buyCurr: buyCurr,
                 sellCurr: sellCurr,
                 amount: parseFloat(document.getElementById('amount').value),
-                purpose: document.getElementById('purpose').value,
+                purposeCode: purposeCode,
+                purposeName: purposeName,
                 status: 'pending',
                 interrupted: false,
                 timestamp: new Date().toISOString()
@@ -2344,28 +2673,23 @@
             pendingQuotes.push(quoteRequest);
             saveToLocalStorage();
 
-            localStorage.setItem('pnv_pending_form_' + quoteRequest.id, JSON.stringify({
-                quoteId: quoteRequest.id,
-                cif: cif,
-                customerName: document.getElementById('customerName').value,
-                transactionType: document.getElementById('transactionType').value,
-                effectiveDate: document.getElementById('effectiveDate').value,
-                buyCurrency: buyCurr,
-                sellCurrency: sellCurr,
-                amount: document.getElementById('amount').value,
-                purpose: document.getElementById('purpose').value
-            }));
+            // Store for PNV to retrieve when PQL responds
+            localStorage.setItem('pnv_pending_form_' + quoteRequest.id, JSON.stringify(quoteRequest));
 
             showNotification('Đã gửi yêu cầu hỏi giá đến PQL! Đang chờ phản hồi...', 'info');
             
             document.getElementById('askPriceForm').reset();
             document.getElementById('transactionDate').value = formatDate(new Date());
+            
+            // Reset auto-fill fields styling
+            document.getElementById('customerName').value = '';
+            document.getElementById('purposeName').value = '';
         }
 
         function startQuoteTimer(seconds, quoteId, rate) {
             quoteExpiryTime = Date.now() + (seconds * 1000);
             currentQuoteId = quoteId;
-            const timerDisplay = document.getElementById('quoteTimer');
+            const timerDisplay = document.getElementById('modalQuoteTimer');
             
             if (quoteTimer) clearInterval(quoteTimer);
             
@@ -2375,8 +2699,7 @@
                     const quoteData = JSON.parse(storedQuote);
                     if (quoteData.interrupted) {
                         clearInterval(quoteTimer);
-                        timerDisplay.textContent = '00:00';
-                        document.getElementById('quoteResponse').classList.add('hidden');
+                        closeQuoteModal();
                         showNotification('⛔ Giao dịch đã bị PQL Interrupt! Không thể chấp nhận giá.', 'error');
                         currentQuoteId = null;
                         localStorage.removeItem('pnv_pending_form_' + quoteId);
@@ -2389,7 +2712,7 @@
                 if (remaining <= 0) {
                     clearInterval(quoteTimer);
                     timerDisplay.textContent = '00:00';
-                    document.getElementById('quoteResponse').classList.add('hidden');
+                    closeQuoteModal();
                     showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
                     currentQuoteId = null;
                     localStorage.removeItem('pnv_pending_form_' + quoteId);
@@ -2402,6 +2725,10 @@
             }, 1000);
         }
 
+        function closeQuoteModal() {
+            document.getElementById('quoteResponseModal').classList.remove('active');
+        }
+
         function acceptPrice() {
             if (!currentQuoteId) return;
             
@@ -2411,7 +2738,7 @@
                 if (quoteData.interrupted) {
                     showNotification('⛔ Không thể chấp nhận - Giao dịch đã bị Interrupt!', 'error');
                     clearInterval(quoteTimer);
-                    document.getElementById('quoteResponse').classList.add('hidden');
+                    closeQuoteModal();
                     currentQuoteId = null;
                     return;
                 }
@@ -2422,6 +2749,17 @@
             const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
             const quoteData = storedQuote ? JSON.parse(storedQuote) : {};
             
+            // Calculate balanced rate (opposite rate)
+            const balancedRate = quoteData.rate * (formData.direction === 'VCB MUA' ? 1.002 : 0.998);
+            
+            // Calculate profit
+            const profit = calculateProfit(
+                formData.direction === 'VCB MUA' ? 'MUA' : 'BÁN',
+                formData.amount,
+                quoteData.rate,
+                balancedRate
+            );
+            
             const transaction = {
                 id: generateId(),
                 pnv: currentUser.id,
@@ -2430,41 +2768,45 @@
                 effectiveDate: formData.effectiveDate,
                 cif: formData.cif,
                 customerName: formData.customerName,
-                direction: formData.transactionType === 'buy' ? 'MUA' : 'BÁN',
-                buyCurr: formData.buyCurrency,
-                sellCurr: formData.sellCurrency,
+                direction: formData.direction === 'VCB MUA' ? 'MUA' : 'BÁN',
+                buyCurr: formData.buyCurr,
+                sellCurr: formData.sellCurr,
                 amount: parseFloat(formData.amount),
-                rate: quoteData.rate || 0,
-                equivalent: parseFloat(formData.amount) * (quoteData.rate || 0),
+                rate: quoteData.rate,
+                balancedRate: balancedRate,
+                equivalent: parseFloat(formData.amount) * quoteData.rate,
                 type: calculateTransactionType(formData.effectiveDate, formatDate(new Date())),
                 status: 'Thành công',
-                purpose: formData.purpose,
+                purposeCode: formData.purposeCode,
+                purposeName: formData.purposeName,
                 editedBy: null,
-                editTime: null
+                editTime: null,
+                editNote: null,
+                profit: profit
             };
             
             mockTransactions.push(transaction);
             saveToLocalStorage();
             
-            document.getElementById('quoteResponse').classList.add('hidden');
+            closeQuoteModal();
             document.getElementById('askPriceForm').reset();
             document.getElementById('transactionDate').value = formatDate(new Date());
             currentQuoteId = null;
-            localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
-            localStorage.removeItem('pql_quote_' + formData.quoteId);
+            localStorage.removeItem('pnv_pending_form_' + formData.id);
+            localStorage.removeItem('pql_quote_' + formData.id);
             
-            showNotification('✅ Giao dịch thành công!');
+            showNotification('✅ Giao dịch thành công! Lợi nhuận: ' + profit.toLocaleString('vi-VN') + ' VND');
             loadPnvBlotter();
         }
 
         function rejectPrice() {
             clearInterval(quoteTimer);
-            document.getElementById('quoteResponse').classList.add('hidden');
+            closeQuoteModal();
             
             const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
-            if (formData.quoteId) {
-                localStorage.removeItem('pnv_pending_form_' + formData.quoteId);
-                localStorage.removeItem('pql_quote_' + formData.quoteId);
+            if (formData.id) {
+                localStorage.removeItem('pnv_pending_form_' + formData.id);
+                localStorage.removeItem('pql_quote_' + formData.id);
             }
             
             currentQuoteId = null;
@@ -2491,6 +2833,7 @@
                     <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
                     <td>${t.equivalent.toLocaleString('vi-VN')}</td>
                     <td><span class="badge badge-success">${t.type}</span></td>
+                    <td>${t.purposeCode} - ${t.purposeName}</td>
                     <td class="status-success">${t.status}</td>
                 `;
             });
@@ -2501,9 +2844,6 @@
             showNotification('Đã áp dụng bộ lọc');
         }
 
-        // ==========================================
-        // REAL EXCEL/ PDF EXPORT FOR PNV BLOTTER
-        // ==========================================
         function exportPnvBlotter(format) {
             const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
             
@@ -2512,21 +2852,12 @@
                 return;
             }
 
-            const headers = ['Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều GD', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Thành tiền', 'Loại', 'Trạng thái'];
+            const headers = ['Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều GD', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Thành tiền', 'Loại', 'Mục đích', 'Trạng thái'];
             
             const data = userTrans.map(t => [
-                t.date,
-                t.effectiveDate,
-                t.cif,
-                t.customerName,
-                t.direction,
-                t.buyCurr,
-                t.sellCurr,
-                t.amount,
-                t.rate,
-                t.equivalent,
-                t.type,
-                t.status
+                t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
+                t.buyCurr, t.sellCurr, t.amount, t.rate, t.equivalent, t.type,
+                t.purposeCode + ' - ' + t.purposeName, t.status
             ]);
 
             if (format === 'excel') {
@@ -2536,7 +2867,6 @@
                 XLSX.writeFile(wb, `Blotter_PNV_${currentUser.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
                 showNotification('✅ Đã xuất file Excel thành công!');
             } else {
-                // PDF export using simple HTML to print
                 const printWindow = window.open('', '_blank');
                 let html = `
                     <html>
@@ -2549,22 +2879,15 @@
                             th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 11px; }
                             th { background-color: #4CAF50; color: white; }
                             tr:nth-child(even) { background-color: #f2f2f2; }
-                            .header { margin-bottom: 20px; }
                         </style>
                     </head>
                     <body>
-                        <div class="header">
-                            <h2>BLOTTER PHÒNG NGHIỆP VỤ</h2>
-                            <p><strong>PNV:</strong> ${currentUser.id} - ${currentUser.name}</p>
-                            <p><strong>Ngày xuất:</strong> ${formatDate(new Date())}</p>
-                        </div>
+                        <h2>BLOTTER PHÒNG NGHIỆP VỤ</h2>
+                        <p><strong>PNV:</strong> ${currentUser.id} - ${currentUser.name}</p>
+                        <p><strong>Ngày xuất:</strong> ${formatDate(new Date())}</p>
                         <table>
-                            <thead>
-                                <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-                            </thead>
-                            <tbody>
-                                ${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}
-                            </tbody>
+                            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                            <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
                         </table>
                     </body>
                     </html>
@@ -2588,24 +2911,31 @@
             const container = document.getElementById('pnvChatMessages');
             const div = document.createElement('div');
             div.className = 'chat-message sent';
-            div.innerHTML = `<strong>${currentUser.name}:</strong><br>${message}`;
+            div.innerHTML = `<strong>${currentUser.name}:</strong><br>${message}
+                <div class="chat-message-meta">Gửi đến tất cả PQL - ${new Date().toLocaleTimeString()}</div>`;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
             input.value = '';
             
-            chatMessages.push({
+            const chatData = {
+                id: generateId(),
                 from: currentUser.id,
+                fromName: currentUser.name,
+                fromRole: 'PNV',
                 to: 'PQL',
+                toId: null, // Broadcast to all PQL
                 message: message,
-                time: new Date().toISOString()
-            });
+                time: new Date().toISOString(),
+                read: false
+            };
+            
+            chatMessages.push(chatData);
+            saveToLocalStorage();
         }
 
         // ==========================================
-        // PQL FUNCTIONS - FILE UPLOAD & REAL QUOTE SYSTEM
+        // PQL FUNCTIONS - FILE UPLOAD & MANAGEMENT
         // ==========================================
-        
-        // FILE UPLOAD HANDLING
         function handleCifFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -2619,8 +2949,6 @@
             uploadArea.classList.add('has-file');
             fileNameDiv.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
             uploadBtn.style.display = 'inline-block';
-            
-            showNotification(`Đã chọn file: ${file.name}`, 'success');
         }
 
         function processCifFile() {
@@ -2642,14 +2970,18 @@
                     let successCount = 0;
                     let errorCount = 0;
                     
-                    // Process each row (skip header if exists)
                     for (let i = 0; i < jsonData.length; i++) {
                         const row = jsonData[i];
                         if (row.length >= 2) {
-                            const cif = String(row[0]).trim();
+                            let cif = String(row[0]).trim().replace(/\D/g, '');
                             const name = String(row[1]).trim();
                             
-                            if (cif && name && /^\d{10}$/.test(cif)) {
+                            // Pad CIF to 10 digits
+                            while (cif.length < 10) {
+                                cif = '0' + cif;
+                            }
+                            
+                            if (cif && name && cif.length === 10) {
                                 mockCIF[cif] = name;
                                 successCount++;
                             } else {
@@ -2661,64 +2993,28 @@
                     saveToLocalStorage();
                     loadCifTable();
                     
-                    // Reset file selection
                     selectedCifFile = null;
                     document.getElementById('cifUploadArea').classList.remove('has-file');
                     document.getElementById('cifFileName').textContent = '';
                     document.getElementById('uploadCifBtn').style.display = 'none';
                     document.getElementById('cifFileInput').value = '';
                     
-                    showNotification(`✅ Upload thành công: ${successCount} bản ghi. ${errorCount > 0 ? `Lỗi: ${errorCount}` : ''}`, successCount > 0 ? 'success' : 'warning');
+                    showNotification(`✅ Upload CIF thành công: ${successCount} bản ghi. ${errorCount > 0 ? `Lỗi: ${errorCount}` : ''}`, successCount > 0 ? 'success' : 'warning');
                     
                 } catch (error) {
                     showNotification('❌ Lỗi đọc file Excel: ' + error.message, 'error');
                 }
             };
             
-            reader.onerror = function() {
-                showNotification('❌ Không thể đọc file!', 'error');
-            };
-            
             reader.readAsArrayBuffer(selectedCifFile);
-        }
-
-        function uploadCIFManual(e) {
-            e.preventDefault();
-            const manualData = document.getElementById('cifManualData').value.trim();
-            
-            if (!manualData) {
-                showNotification('Vui lòng nhập dữ liệu!', 'error');
-                return;
-            }
-            
-            const lines = manualData.split('\n');
-            let successCount = 0;
-            
-            lines.forEach(line => {
-                const parts = line.split(',');
-                if (parts.length >= 2) {
-                    const cif = parts[0].trim();
-                    const name = parts[1].trim();
-                    if (cif && name && /^\d{10}$/.test(cif)) {
-                        mockCIF[cif] = name;
-                        successCount++;
-                    }
-                }
-            });
-            
-            saveToLocalStorage();
-            loadCifTable();
-            document.getElementById('cifManualData').value = '';
-            showNotification(`✅ Đã lưu ${successCount} bản ghi CIF!`);
         }
 
         function loadCifTable() {
             const tbody = document.getElementById('cifTableBody');
-            const countSpan = document.getElementById('cifCount');
-            tbody.innerHTML = '';
+            if (!tbody) return;
             
+            tbody.innerHTML = '';
             const entries = Object.entries(mockCIF);
-            countSpan.textContent = entries.length;
             
             entries.forEach(([cif, name]) => {
                 const row = tbody.insertRow();
@@ -2742,7 +3038,7 @@
         }
 
         function clearAllCif() {
-            if (confirm('⚠️ Bạn có chắc muốn XÓA TẤT CẢ CIF? Hành động này không thể hoàn tác!')) {
+            if (confirm('⚠️ Bạn có chắc muốn XÓA TẤT CẢ CIF?')) {
                 mockCIF = {};
                 saveToLocalStorage();
                 loadCifTable();
@@ -2765,7 +3061,155 @@
             showNotification('✅ Đã xuất CIF ra Excel!');
         }
 
-        // QUOTE MANAGEMENT
+        // Purpose File Upload
+        function handlePurposeFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            selectedPurposeFile = file;
+            
+            const uploadArea = document.getElementById('purposeUploadArea');
+            const fileNameDiv = document.getElementById('purposeFileName');
+            const uploadBtn = document.getElementById('uploadPurposeBtn');
+            
+            uploadArea.classList.add('has-file');
+            fileNameDiv.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            uploadBtn.style.display = 'inline-block';
+        }
+
+        function processPurposeFile() {
+            if (!selectedPurposeFile) {
+                showNotification('Vui lòng chọn file trước!', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                
+                try {
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    
+                    let successCount = 0;
+                    
+                    for (let i = 0; i < jsonData.length; i++) {
+                        const row = jsonData[i];
+                        if (row.length >= 2) {
+                            let code = String(row[0]).trim();
+                            const name = String(row[1]).trim();
+                            
+                            // Format code with leading zero
+                            if (code.length === 1) code = '0' + code;
+                            
+                            if (code && name) {
+                                mockPurpose[code] = name;
+                                successCount++;
+                            }
+                        }
+                    }
+                    
+                    saveToLocalStorage();
+                    loadPurposeTable();
+                    
+                    selectedPurposeFile = null;
+                    document.getElementById('purposeUploadArea').classList.remove('has-file');
+                    document.getElementById('purposeFileName').textContent = '';
+                    document.getElementById('uploadPurposeBtn').style.display = 'none';
+                    document.getElementById('purposeFileInput').value = '';
+                    
+                    showNotification(`✅ Upload Purpose thành công: ${successCount} bản ghi!`);
+                    
+                } catch (error) {
+                    showNotification('❌ Lỗi đọc file: ' + error.message, 'error');
+                }
+            };
+            
+            reader.readAsArrayBuffer(selectedPurposeFile);
+        }
+
+        function loadPurposeTable() {
+            const tbody = document.getElementById('purposeTableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            const entries = Object.entries(mockPurpose);
+            
+            entries.forEach(([code, name]) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${code}</td>
+                    <td>${name}</td>
+                    <td>
+                        <button class="btn btn-small btn-danger" onclick="deletePurpose('${code}')">Xóa</button>
+                    </td>
+                `;
+            });
+        }
+
+        function deletePurpose(code) {
+            if (confirm(`Xóa mục đích ${code} - ${mockPurpose[code]}?`)) {
+                delete mockPurpose[code];
+                saveToLocalStorage();
+                loadPurposeTable();
+                showNotification('Đã xóa mục đích');
+            }
+        }
+
+        function clearAllPurpose() {
+            if (confirm('⚠️ Xóa tất cả Purpose?')) {
+                mockPurpose = {};
+                saveToLocalStorage();
+                loadPurposeTable();
+                showNotification('Đã xóa tất cả Purpose', 'warning');
+            }
+        }
+
+        // Room, Rate, Leg file uploads (similar structure)
+        function handleRoomFileSelect(event) {
+            selectedRoomFile = event.target.files[0];
+            if (selectedRoomFile) {
+                document.getElementById('roomUploadArea').classList.add('has-file');
+                document.getElementById('roomFileName').textContent = `📄 ${selectedRoomFile.name}`;
+                document.getElementById('uploadRoomBtn').style.display = 'inline-block';
+            }
+        }
+
+        function processRoomFile() {
+            showNotification('✅ Đã upload file Mã Phòng (demo)', 'success');
+        }
+
+        function handleRateFileSelect(event) {
+            selectedRateFile = event.target.files[0];
+            if (selectedRateFile) {
+                document.getElementById('rateUploadArea').classList.add('has-file');
+                document.getElementById('rateFileName').textContent = `📄 ${selectedRateFile.name}`;
+                document.getElementById('uploadRateBtn').style.display = 'inline-block';
+            }
+        }
+
+        function processRateFile() {
+            showNotification('✅ Đã upload file Tỷ giá thống kê (demo)', 'success');
+        }
+
+        function handleLegFileSelect(event) {
+            selectedLegFile = event.target.files[0];
+            if (selectedLegFile) {
+                document.getElementById('legUploadArea').classList.add('has-file');
+                document.getElementById('legFileName').textContent = `📄 ${selectedLegFile.name}`;
+                document.getElementById('uploadLegBtn').style.display = 'inline-block';
+            }
+        }
+
+        function processLegFile() {
+            showNotification('✅ Đã upload file Chân hàng (demo)', 'success');
+        }
+
+        // ==========================================
+        // PQL QUOTE MANAGEMENT
+        // ==========================================
         function loadPendingQuotes() {
             const container = document.getElementById('pendingQuotes');
             const pending = pendingQuotes.filter(q => q.status === 'pending' && !q.interrupted);
@@ -2788,7 +3232,8 @@
                     <div class="pending-quote-details">
                         CIF: ${quote.cif} | ${quote.customerName}<br>
                         Chiều: ${quote.direction} | ${quote.buyCurr} → ${quote.sellCurr}<br>
-                        Số lượng: ${quote.amount.toLocaleString()} | Ngày hiệu lực: ${quote.effectiveDate}
+                        Số lượng: ${quote.amount.toLocaleString()} | Ngày hiệu lực: ${quote.effectiveDate}<br>
+                        Mục đích: ${quote.purposeCode} - ${quote.purposeName}
                     </div>
                 `;
                 container.appendChild(div);
@@ -2841,9 +3286,9 @@
                 pendingQuotes[quoteIndex].quoteTime = now.toISOString();
                 pendingQuotes[quoteIndex].expiryTime = expiryTime.toISOString();
                 pendingQuotes[quoteIndex].interrupted = false;
+                pendingQuotes[quoteIndex].quotedBy = currentUser.id;
                 saveToLocalStorage();
                 
-                // Store quote for PNV to receive
                 localStorage.setItem('pql_quote_' + quoteId, JSON.stringify({
                     quoteId: quoteId,
                     rate: rate,
@@ -2921,481 +3366,700 @@
             loadPendingQuotes();
         }
 
-        function loadPqlBlotter() {
-            const tbody = document.getElementById('pqlBlotterBody');
-            tbody.innerHTML = '';
-            
-            mockTransactions.forEach(t => {
-                const row = tbody.insertRow();
-                
-                row.innerHTML = `
-                    <td>${t.pnv}<br><small>${t.pnvName}</small></td>
-                    <td>${t.date}</td>
-                    <td>${t.effectiveDate}</td>
-                    <td>${t.cif}</td>
-                    <td>${t.customerName}</td>
-                    <td>${t.direction}</td>
-                    <td>${t.buyCurr}</td>
-                    <td>${t.sellCurr}</td>
-                    <td>${t.amount.toLocaleString('vi-VN')}</td>
-                    <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
-                    <td><span class="badge ${t.type === 'GN' ? 'badge-success' : t.type === 'KH' ? 'badge-warning' : 'badge-info'}">${t.type}</span></td>
-                    <td>${t.editedBy || '-'}</td>
-                    <td>
-                        <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
-                    </td>
-                `;
-            });
+        // PQL BLOTTER & EDIT
+// ==========================================
+function loadPqlBlotter() {
+    const tbody = document.getElementById('pqlBlotterBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    mockTransactions.forEach(t => {
+        const row = tbody.insertRow();
+        const hasEditLog = t.editedBy ? `<div class="edit-log">Sửa bởi: ${t.editedBy} | ${new Date(t.editTime).toLocaleString()}<br>${t.editNote}</div>` : '';
+        
+        row.innerHTML = `
+            <td>${t.pnv}<br><small>${t.pnvName}</small></td>
+            <td>${t.date}</td>
+            <td>${t.effectiveDate}</td>
+            <td>${t.cif}</td>
+            <td>${t.customerName}</td>
+            <td>${t.direction}</td>
+            <td>${t.buyCurr}</td>
+            <td>${t.sellCurr}</td>
+            <td>${t.amount.toLocaleString('vi-VN')}</td>
+            <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+            <td>${t.balancedRate ? t.balancedRate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
+            <td>${t.equivalent.toLocaleString('vi-VN')}</td>
+            <td><span class="badge ${t.type === 'GN' ? 'badge-success' : t.type === 'KH' ? 'badge-warning' : 'badge-info'}">${t.type}</span></td>
+            <td>${t.profit ? t.profit.toLocaleString('vi-VN') : '-'}</td>
+            <td>${t.editedBy || '-'}</td>
+            <td>
+                <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
+            </td>
+        `;
+        
+        if (hasEditLog) {
+            const logRow = tbody.insertRow();
+            logRow.innerHTML = `<td colspan="16">${hasEditLog}</td>`;
+            logRow.style.backgroundColor = '#FFF8E1';
         }
+    });
+}
 
-        function filterPqlBlotter() {
-            loadPqlBlotter();
-            showNotification('Đã áp dụng bộ lọc');
-        }
+function filterPqlBlotter() {
+    loadPqlBlotter();
+    showNotification('Đã áp dụng bộ lọc');
+}
 
-        function exportPqlBlotter(format) {
-            if (format === 'excel') {
-                const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tương đương', 'Loại', 'Người sửa'];
-                const data = mockTransactions.map(t => [
-                    t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
-                    t.buyCurr, t.sellCurr, t.amount, t.rate, t.equivalent, t.type, t.editedBy || ''
-                ]);
-                
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Blotter PQL');
-                XLSX.writeFile(wb, `Blotter_PQL_${new Date().toISOString().split('T')[0]}.xlsx`);
-                showNotification('✅ Đã xuất Excel thành công!');
-            } else {
-                const printWindow = window.open('', '_blank');
-                let html = `
-                    <html>
-                    <head>
-                        <title>Blotter PQL</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; }
-                            h2 { color: #2E7D32; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }
-                            th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-                            th { background-color: #4CAF50; color: white; }
-                            tr:nth-child(even) { background-color: #f2f2f2; }
-                        </style>
-                    </head>
-                    <body>
-                        <h2>BLOTTER PHÒNG QUẢN LÝ</h2>
-                        <p>Ngày xuất: ${formatDate(new Date())}</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
-                                    <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
-                                    <th>Tương đương</th><th>Loại</th><th>Người sửa</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${mockTransactions.map(t => `
-                                    <tr>
-                                        <td>${t.pnv}<br><small>${t.pnvName}</small></td>
-                                        <td>${t.date}</td>
-                                        <td>${t.effectiveDate}</td>
-                                        <td>${t.cif}</td>
-                                        <td>${t.customerName}</td>
-                                        <td>${t.direction}</td>
-                                        <td>${t.buyCurr}</td>
-                                        <td>${t.sellCurr}</td>
-                                        <td>${t.amount.toLocaleString()}</td>
-                                        <td>${t.rate}</td>
-                                        <td>${t.equivalent.toLocaleString()}</td>
-                                        <td>${t.type}</td>
-                                        <td>${t.editedBy || '-'}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </body>
-                    </html>
-                `;
-                printWindow.document.write(html);
-                printWindow.document.close();
-                printWindow.print();
-                showNotification('✅ Đã mở cửa sổ in PDF!');
-            }
-        }
-
-        function openEditTransaction(transId) {
-            const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
-            if (!t) {
-                showNotification('Không tìm thấy giao dịch!', 'error');
-                return;
-            }
-            
-            editingTransactionId = t.id;
-            document.getElementById('editTransId').value = t.id;
-            document.getElementById('editCif').value = t.cif;
-            document.getElementById('editCifName').value = t.customerName;
-            document.getElementById('editEffDate').value = t.effectiveDate;
-            document.getElementById('editBuyCurr').value = t.buyCurr;
-            document.getElementById('editSellCurr').value = t.sellCurr;
-            document.getElementById('editAmount').value = t.amount;
-            document.getElementById('editRate').value = t.rate;
-            document.getElementById('editType').value = t.type;
-            
-            document.getElementById('editTransactionModal').classList.add('active');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editTransactionModal').classList.remove('active');
-            editingTransactionId = null;
-        }
-
-        function saveEditTransaction(e) {
-            e.preventDefault();
-            const t = mockTransactions.find(tr => tr.id === editingTransactionId);
-            if (!t) return;
-            
-            t.cif = document.getElementById('editCif').value;
-            t.customerName = document.getElementById('editCifName').value;
-            t.effectiveDate = document.getElementById('editEffDate').value;
-            t.buyCurr = document.getElementById('editBuyCurr').value;
-            t.sellCurr = document.getElementById('editSellCurr').value;
-            t.amount = parseFloat(document.getElementById('editAmount').value);
-            t.rate = parseFloat(document.getElementById('editRate').value);
-            t.type = document.getElementById('editType').value;
-            t.editedBy = currentUser.id;
-            t.editTime = new Date().toISOString();
-            
-            t.equivalent = t.amount * t.rate;
-            
-            saveToLocalStorage();
-            closeEditModal();
-            loadPqlBlotter();
-            showNotification('Đã cập nhật giao dịch!');
-        }
-
-        function generateReport() {
-            const fromDate = document.getElementById('reportTransFrom').value;
-            const toDate = document.getElementById('reportTransTo').value;
-            const pnv = document.getElementById('reportPnv').value;
-            const type = document.getElementById('reportType').value;
-            
-            let filtered = mockTransactions;
-            if (pnv) filtered = filtered.filter(t => t.pnv.includes(pnv));
-            if (type) filtered = filtered.filter(t => t.type === type);
-            
-            const container = document.getElementById('reportResult');
-            if (filtered.length === 0) {
-                container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
-                return;
-            }
-            
-            let html = `
+function exportPqlBlotter(format) {
+    if (format === 'excel') {
+        const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tỷ giá cân đối', 'Tương đương', 'Loại', 'Lợi nhuận', 'Người sửa', 'Ghi chú sửa'];
+        const data = mockTransactions.map(t => [
+            t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
+            t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.equivalent, 
+            t.type, t.profit || '', t.editedBy || '', t.editNote || ''
+        ]);
+        
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Blotter PQL');
+        XLSX.writeFile(wb, `Blotter_PQL_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showNotification('✅ Đã xuất Excel thành công!');
+    } else {
+        const printWindow = window.open('', '_blank');
+        let html = `
+            <html>
+            <head>
+                <title>Blotter PQL</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h2 { color: #2E7D32; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }
+                    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+                    th { background-color: #4CAF50; color: white; }
+                    tr:nth-child(even) { background-color: #f2f2f2; }
+                    .edit-log { background: #FFF3E0; padding: 5px; margin: 5px 0; font-size: 10px; border-left: 3px solid #FF9800; }
+                </style>
+            </head>
+            <body>
+                <h2>BLOTTER PHÒNG QUẢN LÝ</h2>
+                <p>Ngày xuất: ${formatDate(new Date())}</p>
                 <table>
                     <thead>
                         <tr>
-                            <th>PNV</th>
-                            <th>Ngày GD</th>
-                            <th>CIF</th>
-                            <th>Chiều</th>
-                            <th>Mua</th>
-                            <th>Bán</th>
-                            <th>Số tiền</th>
-                            <th>Tỷ giá</th>
-                            <th>Loại</th>
+                            <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
+                            <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
+                            <th>TG cân đối</th><th>Tương đương</th><th>Loại</th><th>Lợi nhuận</th><th>Người sửa</th>
                         </tr>
                     </thead>
                     <tbody>
-            `;
-            
-            filtered.forEach(t => {
-                html += `
-                    <tr>
-                        <td>${t.pnv}</td>
-                        <td>${t.date}</td>
-                        <td>${t.cif}</td>
-                        <td>${t.direction}</td>
-                        <td>${t.buyCurr}</td>
-                        <td>${t.sellCurr}</td>
-                        <td>${t.amount.toLocaleString()}</td>
-                        <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                        <td>${t.type}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-            showNotification(`Báo cáo có ${filtered.length} giao dịch`);
-        }
+                        ${mockTransactions.map(t => `
+                            <tr>
+                                <td>${t.pnv}<br><small>${t.pnvName}</small></td>
+                                <td>${t.date}</td>
+                                <td>${t.effectiveDate}</td>
+                                <td>${t.cif}</td>
+                                <td>${t.customerName}</td>
+                                <td>${t.direction}</td>
+                                <td>${t.buyCurr}</td>
+                                <td>${t.sellCurr}</td>
+                                <td>${t.amount.toLocaleString()}</td>
+                                <td>${t.rate.toLocaleString()}</td>
+                                <td>${t.balancedRate ? t.balancedRate.toLocaleString() : '-'}</td>
+                                <td>${t.equivalent.toLocaleString()}</td>
+                                <td>${t.type}</td>
+                                <td>${t.profit ? t.profit.toLocaleString() : '-'}</td>
+                                <td>${t.editedBy || '-'}</td>
+                            </tr>
+                            ${t.editedBy ? `
+                            <tr>
+                                <td colspan="15">
+                                    <div class="edit-log">
+                                        <strong>Sửa bởi:</strong> ${t.editedBy} | ${new Date(t.editTime).toLocaleString()}<br>
+                                        <strong>Ghi chú:</strong> ${t.editNote}
+                                    </div>
+                                </td>
+                            </tr>
+                            ` : ''}
+                        `).join('')}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.print();
+        showNotification('✅ Đã mở cửa sổ in PDF!');
+    }
+}
 
-        function exportReport(format) {
-            const fromDate = document.getElementById('reportTransFrom').value;
-            const toDate = document.getElementById('reportTransTo').value;
-            const pnv = document.getElementById('reportPnv').value;
-            const type = document.getElementById('reportType').value;
-            
-            let filtered = mockTransactions;
-            if (pnv) filtered = filtered.filter(t => t.pnv.includes(pnv));
-            if (type) filtered = filtered.filter(t => t.type === type);
-            
-            if (filtered.length === 0) {
-                showNotification('Không có dữ liệu để xuất!', 'error');
-                return;
+function openEditTransaction(transId) {
+    const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
+    if (!t) {
+        showNotification('Không tìm thấy giao dịch!', 'error');
+        return;
+    }
+    
+    editingTransactionId = t.id;
+    document.getElementById('editTransId').value = t.id;
+    document.getElementById('editCif').value = t.cif;
+    document.getElementById('editCifName').value = t.customerName;
+    document.getElementById('editEffDate').value = t.effectiveDate;
+    document.getElementById('editBuyCurr').value = t.buyCurr;
+    document.getElementById('editSellCurr').value = t.sellCurr;
+    document.getElementById('editAmount').value = t.amount;
+    document.getElementById('editRate').value = t.rate;
+    document.getElementById('editBalancedRate').value = t.balancedRate || '';
+    document.getElementById('editType').value = t.type;
+    document.getElementById('editNote').value = '';
+    
+    document.getElementById('editTransactionModal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('editTransactionModal').classList.remove('active');
+    editingTransactionId = null;
+}
+
+function saveEditTransaction(e) {
+    e.preventDefault();
+    const t = mockTransactions.find(tr => tr.id === editingTransactionId);
+    if (!t) return;
+    
+    const editNote = document.getElementById('editNote').value.trim();
+    if (!editNote) {
+        showNotification('Vui lòng nhập ghi chú thay đổi!', 'error');
+        return;
+    }
+    
+    const oldValues = {
+        cif: t.cif,
+        customerName: t.customerName,
+        effectiveDate: t.effectiveDate,
+        buyCurr: t.buyCurr,
+        sellCurr: t.sellCurr,
+        amount: t.amount,
+        rate: t.rate,
+        balancedRate: t.balancedRate,
+        type: t.type
+    };
+    
+    t.cif = document.getElementById('editCif').value;
+    t.customerName = document.getElementById('editCifName').value;
+    t.effectiveDate = document.getElementById('editEffDate').value;
+    t.buyCurr = document.getElementById('editBuyCurr').value;
+    t.sellCurr = document.getElementById('editSellCurr').value;
+    t.amount = parseFloat(document.getElementById('editAmount').value);
+    t.rate = parseFloat(document.getElementById('editRate').value);
+    t.balancedRate = parseFloat(document.getElementById('editBalancedRate').value) || 0;
+    t.type = document.getElementById('editType').value;
+    
+    t.equivalent = t.amount * t.rate;
+    t.profit = calculateProfit(t.direction, t.amount, t.rate, t.balancedRate);
+    t.editedBy = currentUser.id;
+    t.editTime = new Date().toISOString();
+    t.editNote = editNote;
+    t.status = 'Đã sửa';
+    
+    saveToLocalStorage();
+    closeEditModal();
+    loadPqlBlotter();
+    showNotification('✅ Đã cập nhật giao dịch và ghi nhận audit log!');
+}
+
+// ==========================================
+// BÁO CÁO PQL
+// ==========================================
+function generateReport() {
+    const fromDate = document.getElementById('reportTransFrom').value;
+    const toDate = document.getElementById('reportTransTo').value;
+    const pnv = document.getElementById('reportPnv').value;
+    const type = document.getElementById('reportType').value;
+    
+    let filtered = [...mockTransactions];
+    
+    if (fromDate) {
+        filtered = filtered.filter(t => new Date(t.date) >= new Date(fromDate));
+    }
+    if (toDate) {
+        filtered = filtered.filter(t => new Date(t.date) <= new Date(toDate));
+    }
+    if (pnv) {
+        filtered = filtered.filter(t => t.pnv === pnv);
+    }
+    if (type) {
+        filtered = filtered.filter(t => t.type === type);
+    }
+    
+    // Update summary
+    const totalCount = filtered.length;
+    const totalVolume = filtered.reduce((sum, t) => sum + t.amount, 0);
+    const totalProfit = filtered.reduce((sum, t) => sum + (t.profit || 0), 0);
+    const avgBalancedRate = filtered.length > 0 
+        ? filtered.reduce((sum, t) => sum + (t.balancedRate || 0), 0) / filtered.length 
+        : 0;
+    
+    document.getElementById('reportTotalCount').textContent = totalCount;
+    document.getElementById('reportTotalVolume').textContent = totalVolume.toLocaleString('vi-VN');
+    document.getElementById('reportTotalProfit').textContent = totalProfit.toLocaleString('vi-VN') + ' VND';
+    document.getElementById('reportAvgBalancedRate').textContent = avgBalancedRate.toLocaleString('vi-VN', {maximumFractionDigits: 4});
+    
+    const container = document.getElementById('reportResult');
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
+        return;
+    }
+    
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>PNV</th>
+                    <th>Ngày GD</th>
+                    <th>Ngày HL</th>
+                    <th>CIF</th>
+                    <th>Tên KH</th>
+                    <th>Chiều</th>
+                    <th>Mua</th>
+                    <th>Bán</th>
+                    <th>Số tiền</th>
+                    <th>Tỷ giá</th>
+                    <th>TG cân đối</th>
+                    <th>Tương đương</th>
+                    <th>Loại</th>
+                    <th>Lợi nhuận</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    filtered.forEach(t => {
+        html += `
+            <tr>
+                <td>${t.pnv}</td>
+                <td>${t.date}</td>
+                <td>${t.effectiveDate}</td>
+                <td>${t.cif}</td>
+                <td>${t.customerName}</td>
+                <td>${t.direction}</td>
+                <td>${t.buyCurr}</td>
+                <td>${t.sellCurr}</td>
+                <td>${t.amount.toLocaleString()}</td>
+                <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                <td>${t.balancedRate ? t.balancedRate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
+                <td>${t.equivalent.toLocaleString()}</td>
+                <td>${t.type}</td>
+                <td>${t.profit ? t.profit.toLocaleString() : '-'}</td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+    showNotification(`Báo cáo có ${filtered.length} giao dịch`);
+}
+
+function exportReport(format) {
+    const fromDate = document.getElementById('reportTransFrom').value;
+    const toDate = document.getElementById('reportTransTo').value;
+    const pnv = document.getElementById('reportPnv').value;
+    const type = document.getElementById('reportType').value;
+    
+    let filtered = [...mockTransactions];
+    
+    if (fromDate) filtered = filtered.filter(t => new Date(t.date) >= new Date(fromDate));
+    if (toDate) filtered = filtered.filter(t => new Date(t.date) <= new Date(toDate));
+    if (pnv) filtered = filtered.filter(t => t.pnv === pnv);
+    if (type) filtered = filtered.filter(t => t.type === type);
+    
+    if (filtered.length === 0) {
+        showNotification('Không có dữ liệu để xuất!', 'error');
+        return;
+    }
+
+    const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tỷ giá cân đối', 'Tương đương', 'Loại', 'Lợi nhuận', 'Người sửa', 'Ghi chú'];
+    const data = filtered.map(t => [
+        t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
+        t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.equivalent,
+        t.type, t.profit || '', t.editedBy || '', t.editNote || ''
+    ]);
+
+    if (format === 'excel') {
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+        
+        // Add summary section
+        const summary = [
+            ['BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ'],
+            ['Ngày xuất:', formatDate(new Date())],
+            ['Tổng số giao dịch:', filtered.length],
+            ['Tổng khối lượng:', filtered.reduce((sum, t) => sum + t.amount, 0)],
+            ['Tổng lợi nhuận:', filtered.reduce((sum, t) => sum + (t.profit || 0), 0)],
+            []
+        ];
+        
+        const fullData = [...summary, headers, ...data];
+        const ws2 = XLSX.utils.aoa_to_sheet(fullData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws2, 'Báo cáo');
+        XLSX.writeFile(wb, `Bao_Cao_MBNT_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showNotification('✅ Đã xuất báo cáo Excel!');
+    } else {
+        const printWindow = window.open('', '_blank');
+        let html = `
+            <html>
+            <head>
+                <title>Báo cáo Giao dịch</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h2 { color: #2E7D32; }
+                    .summary { background: #E3F2FD; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #4CAF50; color: white; }
+                    tr:nth-child(even) { background-color: #f2f2f2; }
+                </style>
+            </head>
+            <body>
+                <h2>BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ</h2>
+                <div class="summary">
+                    <p><strong>Ngày xuất:</strong> ${formatDate(new Date())}</p>
+                    <p><strong>Tổng số giao dịch:</strong> ${filtered.length}</p>
+                    <p><strong>Tổng khối lượng:</strong> ${filtered.reduce((sum, t) => sum + t.amount, 0).toLocaleString()}</p>
+                    <p><strong>Tổng lợi nhuận:</strong> ${filtered.reduce((sum, t) => sum + (t.profit || 0), 0).toLocaleString()} VND</p>
+                </div>
+                <table>
+                    <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                    <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+                </table>
+            </body>
+            </html>
+        `;
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.print();
+        showNotification('✅ Đã mở cửa sổ in báo cáo PDF!');
+    }
+}
+
+// ==========================================
+// CHAT FUNCTIONS
+// ==========================================
+function loadPnvListForChat() {
+    const select = document.getElementById('pqlChatTarget');
+    if (!select) return;
+    
+    const pnvUsers = mockUsers.filter(u => u.role === 'PNV');
+    let html = '<option value="">-- Gửi đến tất cả PNV --</option>';
+    pnvUsers.forEach(u => {
+        html += `<option value="${u.id}">${u.name} (${u.id}) - ${u.dept}</option>`;
+    });
+    select.innerHTML = html;
+}
+
+function handlePqlChatKeyPress(e) {
+    if (e.key === 'Enter') sendPqlChatMessage();
+}
+
+function sendPqlChatMessage() {
+    const input = document.getElementById('pqlChatInput');
+    const targetSelect = document.getElementById('pqlChatTarget');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    const targetId = targetSelect ? targetSelect.value : '';
+    const targetName = targetId 
+        ? mockUsers.find(u => u.id === targetId)?.name || targetId 
+        : 'Tất cả PNV';
+    
+    const container = document.getElementById('pqlChatMessages');
+    const div = document.createElement('div');
+    div.className = 'chat-message sent';
+    div.innerHTML = `<strong>${currentUser.name} (PQL):</strong><br>${message}
+        <div class="chat-message-meta">Gửi đến: ${targetName} - ${new Date().toLocaleTimeString()}</div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    input.value = '';
+    
+    const chatData = {
+        id: generateId(),
+        from: currentUser.id,
+        fromName: currentUser.name,
+        fromRole: 'PQL',
+        to: targetId || 'ALL_PNV',
+        toId: targetId || null,
+        message: message,
+        time: new Date().toISOString(),
+        read: false
+    };
+    
+    chatMessages.push(chatData);
+    saveToLocalStorage();
+    
+    showNotification(`Đã gửi tin nhắn đến ${targetName}`, 'success');
+}
+
+// ==========================================
+// BGĐ FUNCTIONS
+// ==========================================
+function loadBgdPnvList() {
+    const select = document.getElementById('bgdFilterPnv');
+    const reportSelect = document.getElementById('reportPnv');
+    
+    const managedPnvs = mockUsers.filter(u => u.role === 'PNV' && u.manager === currentUser.id);
+    
+    let html = '<option value="">Tất cả PNV</option>';
+    managedPnvs.forEach(u => {
+        html += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+    });
+    
+    if (select) select.innerHTML = html;
+    if (reportSelect) reportSelect.innerHTML = html;
+}
+
+function loadBgdView() {
+    const tbody = document.getElementById('bgdViewBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    const managedPnvIds = mockUsers
+        .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
+        .map(u => u.id);
+    
+    const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
+    
+    visibleTrans.forEach(t => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${t.pnv}</td>
+            <td>${t.date}</td>
+            <td>${t.effectiveDate}</td>
+            <td>${t.cif}</td>
+            <td>${t.customerName}</td>
+            <td>${t.direction}</td>
+            <td>${t.buyCurr}</td>
+            <td>${t.sellCurr}</td>
+            <td>${t.amount.toLocaleString()}</td>
+            <td>${t.rate.toLocaleString()}</td>
+            <td>${t.balancedRate ? t.balancedRate.toLocaleString() : '-'}</td>
+            <td><span class="badge badge-success">${t.type}</span></td>
+        `;
+    });
+}
+
+function filterBgdView() {
+    loadBgdView();
+    showNotification('Đã cập nhật dữ liệu');
+}
+
+function exportBgdView(format) {
+    const managedPnvIds = mockUsers
+        .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
+        .map(u => u.id);
+    
+    const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
+    
+    if (visibleTrans.length === 0) {
+        showNotification('Không có dữ liệu để xuất!', 'error');
+        return;
+    }
+
+    const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số tiền', 'Tỷ giá', 'Tỷ giá cân đối', 'Loại'];
+    const data = visibleTrans.map(t => [
+        t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
+        t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.type
+    ]);
+
+    if (format === 'excel') {
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'BGD View');
+        XLSX.writeFile(wb, `BGD_View_${currentUser.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showNotification('✅ Đã xuất Excel!');
+    }
+}
+
+// ==========================================
+// POLLING & REALTIME UPDATES
+// ==========================================
+let pnvPollInterval = null;
+let pqlPollInterval = null;
+let chatPollInterval = null;
+
+function startPnvPolling() {
+    // PNV kiểm tra giá chào từ PQL
+    pnvPollInterval = setInterval(() => {
+        if (currentUser?.role !== 'PNV') return;
+        
+        // Kiểm tra quote cho PNV này
+        const myQuotes = pendingQuotes.filter(q => 
+            q.pnv === currentUser.id && 
+            q.status === 'quoted' && 
+            !q.interrupted &&
+            new Date(q.expiryTime) > new Date()
+        );
+        
+        myQuotes.forEach(q => {
+            const stored = localStorage.getItem('pql_quote_' + q.id);
+            if (stored && !document.getElementById('quoteResponseModal').classList.contains('active')) {
+                const data = JSON.parse(stored);
+                const now = new Date();
+                const expiry = new Date(data.expiryTime);
+                
+                if (now < expiry && !data.interrupted) {
+                    // Hiển thị modal chào giá
+                    document.getElementById('quoteResponseModal').classList.add('active');
+                    document.getElementById('modalQuotePrice').textContent = data.rate.toLocaleString('vi-VN', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 4
+                    });
+                    document.getElementById('modalQuotePair').textContent = `${q.buyCurr}/${q.sellCurr}`;
+                    document.getElementById('modalQuotePnv').textContent = `${q.pnvName} (${q.pnv})`;
+                    document.getElementById('modalQuoteAmount').textContent = q.amount.toLocaleString('vi-VN');
+                    
+                    const remainingSeconds = Math.floor((expiry - now) / 1000);
+                    startQuoteTimer(remainingSeconds, q.id, data.rate);
+                    
+                    showNotification('🔔 PQL đã chào giá! Vui lòng phản hồi trong thời gian quy định.', 'warning');
+                }
             }
+        });
+        
+        // Kiểm tra tin nhắn chat mới
+        checkNewChatMessages();
+    }, 2000);
+}
 
-            const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tương đương', 'Loại'];
-            const data = filtered.map(t => [t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction, t.buyCurr, t.sellCurr, t.amount, t.rate, t.equivalent, t.type]);
-
-            if (format === 'excel') {
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Báo cáo');
-                XLSX.writeFile(wb, `Bao_Cao_${new Date().toISOString().split('T')[0]}.xlsx`);
-                showNotification('✅ Đã xuất báo cáo Excel!');
-            } else {
-                const printWindow = window.open('', '_blank');
-                let html = `
-                    <html>
-                    <head>
-                        <title>Báo cáo Giao dịch</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; }
-                            h2 { color: #2E7D32; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
-                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                            th { background-color: #4CAF50; color: white; }
-                            tr:nth-child(even) { background-color: #f2f2f2; }
-                        </style>
-                    </head>
-                    <body>
-                        <h2>BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ</h2>
-                        <p>Ngày xuất: ${formatDate(new Date())}</p>
-                        <table>
-                            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-                            <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
-                        </table>
-                    </body>
-                    </html>
-                `;
-                printWindow.document.write(html);
-                printWindow.document.close();
-                printWindow.print();
-                showNotification('✅ Đã mở cửa sổ in báo cáo PDF!');
-            }
+function startPqlPolling() {
+    // PQL kiểm tra yêu cầu hỏi giá mới
+    pqlPollInterval = setInterval(() => {
+        if (currentUser?.role !== 'PQL') return;
+        
+        const currentTab = document.querySelector('#pql-quotes.tab-content');
+        if (currentTab && currentTab.classList.contains('active')) {
+            loadPendingQuotes();
         }
+    }, 3000);
+    
+    // PQL kiểm tra tin nhắn từ PNV
+    chatPollInterval = setInterval(() => {
+        if (currentUser?.role !== 'PQL') return;
+        checkNewChatMessages();
+    }, 2000);
+}
 
-        function handlePqlChatKeyPress(e) {
-            if (e.key === 'Enter') sendPqlChatMessage();
-        }
-
-        function sendPqlChatMessage() {
-            const input = document.getElementById('pqlChatInput');
-            const message = input.value.trim();
-            if (!message) return;
+function checkNewChatMessages() {
+    const unreadMessages = chatMessages.filter(m => 
+        !m.read && 
+        ((currentUser.role === 'PQL' && m.fromRole === 'PNV') ||
+         (currentUser.role === 'PNV' && m.fromRole === 'PQL' && (m.to === currentUser.id || m.to === 'ALL_PNV')))
+    );
+    
+    unreadMessages.forEach(m => {
+        m.read = true;
+        
+        const container = currentUser.role === 'PNV' 
+            ? document.getElementById('pnvChatMessages')
+            : document.getElementById('pqlChatMessages');
             
-            const container = document.getElementById('pqlChatMessages');
+        if (container) {
             const div = document.createElement('div');
-            div.className = 'chat-message sent';
-            div.innerHTML = `<strong>${currentUser.name} (PQL):</strong><br>${message}`;
+            div.className = m.to === 'ALL_PNV' || m.to === 'PQL' ? 'chat-message broadcast' : 'chat-message received';
+            div.innerHTML = `<strong>${m.fromName} (${m.fromRole}):</strong><br>${m.message}
+                <div class="chat-message-meta">${new Date(m.time).toLocaleTimeString()}</div>`;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
-            input.value = '';
-            
-            chatMessages.push({
-                from: currentUser.id,
-                to: 'PNV',
-                message: message,
-                time: new Date().toISOString()
+        }
+    });
+    
+    if (unreadMessages.length > 0) {
+        saveToLocalStorage();
+    }
+}
+
+function stopAllPolling() {
+    if (pnvPollInterval) clearInterval(pnvPollInterval);
+    if (pqlPollInterval) clearInterval(pqlPollInterval);
+    if (chatPollInterval) clearInterval(chatPollInterval);
+    if (quoteTimer) clearInterval(quoteTimer);
+}
+
+// ==========================================
+// INITIALIZATION
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+    loadFromLocalStorage();
+    
+    const today = new Date();
+    const dateInputs = [
+        'pnvFilterFromDate', 'pnvFilterToDate', 'pqlFilterFrom', 'pqlFilterTo',
+        'reportTransFrom', 'reportTransTo', 'reportEffFrom', 'reportEffTo',
+        'bgdFromDate', 'bgdToDate', 'effectiveDate', 'editEffDate'
+    ];
+    
+    dateInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.value) {
+            el.value = formatDateYYYYMMDD(today);
+        }
+    });
+
+    // File upload drag & drop handlers
+    const uploadAreas = [
+        { area: 'cifUploadArea', input: 'cifFileInput' },
+        { area: 'purposeUploadArea', input: 'purposeFileInput' },
+        { area: 'roomUploadArea', input: 'roomFileInput' },
+        { area: 'rateUploadArea', input: 'rateFileInput' },
+        { area: 'legUploadArea', input: 'legFileInput' }
+    ];
+    
+    uploadAreas.forEach(({ area, input }) => {
+        const uploadArea = document.getElementById(area);
+        const fileInput = document.getElementById(input);
+        
+        if (uploadArea && fileInput) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#4CAF50';
+                uploadArea.style.backgroundColor = '#f0f8f0';
             });
-        }
-
-        // ==========================================
-        // BGĐ FUNCTIONS
-        // ==========================================
-        function loadBgdPnvList() {
-            const select = document.getElementById('bgdFilterPnv');
-            const managedPnvs = mockUsers.filter(u => u.role === 'PNV' && u.manager === currentUser.id);
             
-            select.innerHTML = '<option value="">Tất cả PNV</option>';
-            managedPnvs.forEach(u => {
-                select.innerHTML += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#C8E6C9';
+                uploadArea.style.backgroundColor = '#E8F5E9';
             });
-        }
-
-        function loadBgdView() {
-            const tbody = document.getElementById('bgdViewBody');
-            tbody.innerHTML = '';
             
-            const managedPnvIds = mockUsers
-                .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
-                .map(u => u.id);
-            
-            const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
-            
-            visibleTrans.forEach(t => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${t.pnv}</td>
-                    <td>${t.date}</td>
-                    <td>${t.effectiveDate}</td>
-                    <td>${t.cif}</td>
-                    <td>${t.customerName}</td>
-                    <td>${t.direction}</td>
-                    <td>${t.buyCurr}</td>
-                    <td>${t.sellCurr}</td>
-                    <td>${t.amount.toLocaleString()}</td>
-                    <td>${t.rate.toLocaleString()}</td>
-                    <td><span class="badge badge-success">${t.type}</span></td>
-                `;
-            });
-        }
-
-        function filterBgdView() {
-            loadBgdView();
-            showNotification('Đã cập nhật dữ liệu');
-        }
-
-        function exportBgdView(format) {
-            const managedPnvIds = mockUsers
-                .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
-                .map(u => u.id);
-            
-            const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
-            
-            if (visibleTrans.length === 0) {
-                showNotification('Không có dữ liệu để xuất!', 'error');
-                return;
-            }
-
-            const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số tiền', 'Tỷ giá', 'Loại'];
-            const data = visibleTrans.map(t => [t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction, t.buyCurr, t.sellCurr, t.amount, t.rate, t.type]);
-
-            if (format === 'excel') {
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'BGD View');
-                XLSX.writeFile(wb, `BGD_View_${currentUser.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
-                showNotification('✅ Đã xuất Excel!');
-            }
-        }
-
-        // ==========================================
-        // POLLING & REALTIME UPDATES
-        // ==========================================
-        let pnvPollInterval = null;
-        let pqlPollInterval = null;
-
-        function startPnvPolling() {
-            // PNV kiểm tra xem có giá chào nào từ PQL không
-            pnvPollInterval = setInterval(() => {
-                if (currentUser?.role !== 'PNV') return;
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#C8E6C9';
+                uploadArea.style.backgroundColor = '#E8F5E9';
                 
-                // Tìm quote cho PNV này
-                const myQuotes = pendingQuotes.filter(q => 
-                    q.pnv === currentUser.id && 
-                    q.status === 'quoted' && 
-                    !q.interrupted &&
-                    new Date(q.expiryTime) > new Date()
-                );
-                
-                myQuotes.forEach(q => {
-                    const stored = localStorage.getItem('pql_quote_' + q.id);
-                    if (stored) {
-                        const data = JSON.parse(stored);
-                        // Nếu chưa hiển thị thì hiển thị
-                        if (!document.getElementById('quoteResponse').classList.contains('hidden')) return;
-                        
-                        const now = new Date();
-                        const expiry = new Date(data.expiryTime);
-                        if (now < expiry && !data.interrupted) {
-                            // Hiển thị giá chào
-                            const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + q.id) || '{}');
-                            document.getElementById('quoteResponse').classList.remove('hidden');
-                            document.getElementById('quotePrice').textContent = data.rate.toLocaleString('vi-VN', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 4
-                            });
-                            document.getElementById('quotePair').textContent = `${formData.buyCurrency}/${formData.sellCurrency}`;
-                            
-                            const remainingSeconds = Math.floor((expiry - now) / 1000);
-                            startQuoteTimer(remainingSeconds, q.id, data.rate);
-                            showNotification('🔔 PQL đã chào giá! Vui lòng chấp nhận trong thời gian quy định.', 'warning');
-                        }
-                    }
-                });
-            }, 2000);
-        }
-
-        function startPqlPolling() {
-            // PQL kiểm tra có yêu cầu hỏi giá mới không
-            pqlPollInterval = setInterval(() => {
-                if (currentUser?.role !== 'PQL') return;
-                
-                const currentTab = document.querySelector('#pql-quotes.tab-content');
-                if (currentTab && currentTab.classList.contains('active')) {
-                    loadPendingQuotes();
-                }
-            }, 3000);
-        }
-
-        function stopAllPolling() {
-            if (pnvPollInterval) clearInterval(pnvPollInterval);
-            if (pqlPollInterval) clearInterval(pqlPollInterval);
-        }
-
-        // ==========================================
-        // INITIALIZATION
-        // ==========================================
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFromLocalStorage();
-            
-            const today = new Date();
-            document.getElementById('pnvFilterFromDate').value = formatDateYYYYMMDD(today);
-            document.getElementById('pnvFilterToDate').value = formatDateYYYYMMDD(today);
-            document.getElementById('pqlFilterFrom').value = formatDateYYYYMMDD(today);
-            document.getElementById('pqlFilterTo').value = formatDateYYYYMMDD(today);
-            document.getElementById('reportTransFrom').value = formatDateYYYYMMDD(today);
-            document.getElementById('reportTransTo').value = formatDateYYYYMMDD(today);
-            document.getElementById('bgdFromDate').value = formatDateYYYYMMDD(today);
-            document.getElementById('bgdToDate').value = formatDateYYYYMMDD(today);
-
-            // File upload drag & drop
-            const uploadArea = document.getElementById('cifUploadArea');
-            if (uploadArea) {
-                uploadArea.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.borderColor = '#4CAF50';
-                });
-                
-                uploadArea.addEventListener('dragleave', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.borderColor = '#C8E6C9';
-                });
-                
-                uploadArea.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.borderColor = '#C8E6C9';
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    const validExts = ['.xlsx', '.xls', '.csv'];
+                    const isValid = validExts.some(ext => file.name.toLowerCase().endsWith(ext));
                     
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0) {
-                        const file = files[0];
-                        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
-                            selectedCifFile = file;
-                            uploadArea.classList.add('has-file');
-                            document.getElementById('cifFileName').textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-                            document.getElementById('uploadCifBtn').style.display = 'inline-block';
-                            showNotification(`Đã chọn file: ${file.name}`, 'success');
-                        } else {
-                            showNotification('Chỉ chấp nhận file .xlsx, .xls, .csv!', 'error');
-                        }
+                    if (isValid) {
+                        fileInput.files = files;
+                        // Trigger change event
+                        const event = new Event('change');
+                        fileInput.dispatchEvent(event);
+                    } else {
+                        showNotification('Chỉ chấp nhận file .xlsx, .xls, .csv!', 'error');
                     }
-                });
-            }
-        });
+                }
+            });
+        }
+    });
+});
 
-        window.addEventListener('beforeunload', function() {
-            stopAllPolling();
-        });
-    </script>
+window.addEventListener('beforeunload', function() {
+    stopAllPolling();
+});
+</script>
 </body>
 </html>
