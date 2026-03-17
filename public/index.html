@@ -931,6 +931,156 @@
             }
         }
     </style>
+
+
+        <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // Global socket variable
+        let socket = null;
+        let currentQuoteData = null;
+        
+        // Kết nối server (thay YOUR_RENDER_URL bằng URL thật)
+        const SERVER_URL = window.location.origin; // Hoặc 'https://your-app.onrender.com'
+        
+        function initSocket() {
+            socket = io(SERVER_URL);
+            
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                if (currentUser) {
+                    socket.emit('register', currentUser.id);
+                }
+            });
+            
+            // PNV nhận giá chào từ PQL
+            socket.on('price_quote', (data) => {
+                console.log('Received price quote:', data);
+                showQuoteModal(data);
+            });
+            
+            // Quote bị interrupt
+            socket.on('quote_interrupted', (data) => {
+                closeQuoteModal();
+                showNotification('⛔ Giao dịch đã bị PQL Interrupt!', 'error');
+            });
+            
+            // Nhận message chat
+            socket.on('new_message', (data) => {
+                displayChatMessage(data);
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+            });
+        }
+        
+        function showQuoteModal(data) {
+            currentQuoteData = data;
+            const modal = document.getElementById('quoteResponseModal');
+            
+            document.getElementById('modalQuotePrice').textContent = parseFloat(data.rate).toLocaleString('vi-VN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 4
+            });
+            
+            // Start countdown
+            const expiry = new Date(data.expiryTime);
+            startQuoteTimer(expiry, data.quoteId);
+            
+            modal.classList.add('active');
+            showNotification('🔔 PQL đã chào giá! Vui lòng phản hồi.', 'warning');
+        }
+        
+        function startQuoteTimer(expiryTime, quoteId) {
+            const timerDisplay = document.getElementById('modalQuoteTimer');
+            
+            if (window.quoteTimerInterval) {
+                clearInterval(window.quoteTimerInterval);
+            }
+            
+            window.quoteTimerInterval = setInterval(() => {
+                const now = new Date();
+                const remaining = Math.ceil((expiryTime - now) / 1000);
+                
+                if (remaining <= 0) {
+                    clearInterval(window.quoteTimerInterval);
+                    timerDisplay.textContent = '00:00';
+                    closeQuoteModal();
+                    showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
+                    
+                    // Tự động từ chối
+                    socket.emit('respond_quote', {
+                        quoteId: quoteId,
+                        accepted: false,
+                        pnvId: currentUser.id
+                    });
+                    return;
+                }
+                
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function acceptPrice() {
+            if (!currentQuoteData) return;
+            
+            clearInterval(window.quoteTimerInterval);
+            
+            socket.emit('respond_quote', {
+                quoteId: currentQuoteData.quoteId,
+                accepted: true,
+                pnvId: currentUser.id
+            });
+            
+            closeQuoteModal();
+            showNotification('✅ Đã chấp nhận giá! Giao dịch thành công.');
+            
+            // Reload blotter
+            setTimeout(() => loadPnvBlotter(), 500);
+        }
+        
+        function rejectPrice() {
+            if (!currentQuoteData) return;
+            
+            clearInterval(window.quoteTimerInterval);
+            
+            socket.emit('respond_quote', {
+                quoteId: currentQuoteData.quoteId,
+                accepted: false,
+                pnvId: currentUser.id
+            });
+            
+            closeQuoteModal();
+            showNotification('Đã từ chối giá', 'warning');
+        }
+        
+        function closeQuoteModal() {
+            document.getElementById('quoteResponseModal').classList.remove('active');
+            currentQuoteData = null;
+        }
+        
+        // API Helper functions
+        async function apiGet(endpoint) {
+            const response = await fetch(`${SERVER_URL}/api${endpoint}`);
+            return response.json();
+        }
+        
+        async function apiPost(endpoint, data) {
+            const response = await fetch(`${SERVER_URL}/api${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return response.json();
+        }
+    </script>
+
+
+
+    
 </head>
 <body>
     <!-- Header -->
@@ -2040,6 +2190,139 @@
     <div class="notification" id="notification"></div>
 
     <script>
+
+
+
+        function handleLogin(e) {
+    e.preventDefault();
+    const userId = document.getElementById('userId').value.trim();
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('loginError');
+
+    // ... (giữ nguyên phần check user) ...
+    
+    currentUser = user;
+    
+    // Init socket connection
+    initSocket();
+    socket.emit('register', currentUser.id);
+    
+    // ... (phần còn lại giữ nguyên) ...
+}
+
+        function submitAskPrice(e) {
+    e.preventDefault();
+    
+    // ... (validation giữ nguyên) ...
+    
+    const quoteData = {
+        pnvId: currentUser.id,
+        pnvName: currentUser.name,
+        cif: document.getElementById('cif').value.trim(),
+        customerName: document.getElementById('customerName').value,
+        direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
+        buyCurr: document.getElementById('buyCurrency').value,
+        sellCurr: document.getElementById('sellCurrency').value,
+        amount: parseFloat(document.getElementById('amount').value),
+        purposeCode: cleanCode,
+        purposeName: document.getElementById('purposeName').value,
+        effectiveDate: document.getElementById('effectiveDate').value
+    };
+    
+    // Gửi qua socket realtime
+    socket.emit('ask_price', quoteData);
+    
+    showNotification('Đã gửi yêu cầu hỏi giá đến PQL! Đang chờ phản hồi...', 'info');
+    
+    document.getElementById('askPriceForm').reset();
+    document.getElementById('transactionDate').value = formatDate(new Date());
+}
+
+        // Load pending quotes từ API
+async function loadPendingQuotes() {
+    try {
+        const quotes = await apiGet('/quotes/pending');
+        const container = document.getElementById('pendingQuotes');
+        
+        if (quotes.length === 0) {
+            container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        quotes.forEach(quote => {
+            const div = document.createElement('div');
+            div.className = 'pending-quote';
+            div.onclick = () => selectQuote(quote);
+            div.innerHTML = `
+                <div class="pending-quote-header">
+                    <span class="pending-quote-title">${quote.pnv_name} (${quote.pnv_id})</span>
+                    <span class="pending-quote-time">${new Date(quote.created_at).toLocaleTimeString()}</span>
+                </div>
+                <div class="pending-quote-details">
+                    CIF: ${quote.cif} | ${quote.customer_name}<br>
+                    Chiều: ${quote.direction} | ${quote.buy_curr} → ${quote.sell_curr}<br>
+                    Số lượng: ${parseFloat(quote.amount).toLocaleString()} | Ngày hiệu lực: ${quote.effective_date}<br>
+                    Mục đích: ${quote.purpose_code} - ${quote.purpose_name}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    } catch (err) {
+        console.error('Error loading quotes:', err);
+    }
+}
+
+// Gửi chào giá
+function submitQuote(e) {
+    e.preventDefault();
+    const quoteId = document.getElementById('quoteRequestId').value;
+    const rate = parseFloat(document.getElementById('quoteRate').value);
+    const duration = parseInt(document.getElementById('quoteDuration').value);
+    
+    if (!rate || rate <= 0) {
+        showNotification('Vui lòng nhập tỷ giá hợp lệ!', 'error');
+        return;
+    }
+    
+    socket.emit('submit_quote', {
+        quoteId: quoteId,
+        rate: rate,
+        duration: duration,
+        pqlId: currentUser.id
+    });
+    
+    showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
+    
+    document.getElementById('quoteFormCard').classList.add('hidden');
+    loadPendingQuotes();
+}
+
+// Interrupt
+function interruptCurrent() {
+    socket.emit('interrupt_quote', { all: false });
+    showNotification('⛔ Đã Interrupt giao dịch!', 'error');
+}
+
+function interruptAll() {
+    socket.emit('interrupt_quote', { all: true });
+    showNotification('⛔⛔⛔ Đã Interrupt TẤT CẢ giao dịch!', 'error');
+}
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         // ==========================================
         // GLOBAL STATE & CONFIGURATION
         // ==========================================
