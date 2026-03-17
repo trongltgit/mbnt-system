@@ -1047,8 +1047,7 @@
                                 <label>CIF (10 ký tự)</label>
                                 <input type="text" id="cif" maxlength="10" required 
                                        onblur="formatCIF(); lookupCustomerName();"
-                                       oninput="formatCIF()"
-                                       placeholder="Nhập CIF">
+                                       placeholder="Nhập CIF (VD: 98099)">
                             </div>
                             <div class="form-group">
                                 <label>Tên khách hàng</label>
@@ -1144,7 +1143,7 @@
                                 <label id="purposeCodeLabel">Mã mục đích/Nguồn</label>
                                 <input type="text" id="purposeCode" maxlength="2" required
                                        oninput="lookupPurposeName()"
-                                       placeholder="Nhập mã (VD: 01, 02...)">
+                                       placeholder="Nhập mã 1-12">
                             </div>
                             <div class="form-group">
                                 <label id="purposeNameLabel">Tên mục đích/Nguồn</label>
@@ -1844,7 +1843,7 @@
                         <option value="PNV-K3">KHDN3 (K3)</option>
                         <option value="PNV-FDI">FDI (FDI)</option>
                         <option value="PNV-L1">KHBL1 (L1)</option>
-                        <option value="PNV-L2">KHBL2 (L2)</option>
+                                            <option value="PNV-L2">KHBL2 (L2)</option>
                         <option value="PNV-L3">KHBL3 (L3)</option>
                         <option value="PNV-TĐT">PGD TĐT (TĐT)</option>
                         <option value="PNV-ML">PGD ML (ML)</option>
@@ -2079,31 +2078,30 @@
         };
 
         let mockPurpose = {
-            '01': 'Thanh toán nhập khẩu hàng hóa (bao gồm phí dịch vụ, vận tải và bảo hiểm đi kèm với hàng hóa)',
-            '02': 'Thanh toán nhập khẩu dịch vụ (vận tải, bưu chính viễn thông, du lịch, dịch vụ tài chính…)',
-            '03': 'Chuyển tiền một chiều',
-            '04': 'Chuyển thu nhập từ hoạt động đầu tư trực tiếp ra nước ngoài',
-            '05': 'Chuyển tiền khi được phép giảm vốn đầu tư trực tiếp vào Việt NamChuyển lợi nhuận',
-            '06': 'Chuyển tiền đầu tư trực tiếp của Việt Nam ra nước ngoài',
-            '07': 'Chuyển thu nhập từ hoạt động đầu tư gián tiếp ra nước ngoài',
-            '08': 'Thanh toán tiền lãi và trả nợ gốc các khoản vay nước ngoài',
-            '09': 'Thanh toán tiền lãi và trả nợ gốc các khoản vay ngoại tệ trong nước',
+            '1': 'Thanh toán nhập khẩu hàng hóa (bao gồm phí dịch vụ, vận tải và bảo hiểm đi kèm với hàng hóa)',
+            '2': 'Thanh toán nhập khẩu dịch vụ (vận tải, bưu chính viễn thông, du lịch, dịch vụ tài chính…)',
+            '3': 'Chuyển tiền một chiều',
+            '4': 'Chuyển thu nhập từ hoạt động đầu tư trực tiếp ra nước ngoài',
+            '5': 'Chuyển tiền khi được phép giảm vốn đầu tư trực tiếp vào Việt NamChuyển lợi nhuận',
+            '6': 'Chuyển tiền đầu tư trực tiếp của Việt Nam ra nước ngoài',
+            '7': 'Chuyển thu nhập từ hoạt động đầu tư gián tiếp ra nước ngoài',
+            '8': 'Thanh toán tiền lãi và trả nợ gốc các khoản vay nước ngoài',
+            '9': 'Thanh toán tiền lãi và trả nợ gốc các khoản vay ngoại tệ trong nước',
             '10': 'Thanh toán thẻ quốc tế',
             '11': 'Bán ngoại tệ cho Kho bạc Nhà nước',
             '12': 'Mục đích khác'
         };
 
-
         let mockSource = {
-            '01': 'Nguồn thu từ xuất khẩu hàng hóa (bao gồm dịch vụ gắn liền với hàng hóa)',
-            '02': 'Nguồn thu từ xuất khẩu dịch vụ (vận tải, bưu chính viễn thông, du lịch, dịch vụ tài chính…)',
-            '03': 'Chuyển tiền một chiều',
-            '04': 'Giải ngân vốn đầu tư trực tiếp nước ngoài (FDI)',
-            '05': 'Để thanh toán thương vụ M&A, thoái vốn',
-            '06': 'Giải ngân vốn đầu tư gián tiếp (mua cổ phần, cổ phiếu, trái phiếu, và các loại chứng khoán khác)',
-            '07': 'Giải ngân vốn vay nước ngoài',
-            '08': 'Giải ngân vốn vay trong nước bằng ngoại tệ',
-            '09': 'TNguồn thu từ thanh toán quốc tế',
+            '1': 'Nguồn thu từ xuất khẩu hàng hóa (bao gồm dịch vụ gắn liền với hàng hóa)',
+            '2': 'Nguồn thu từ xuất khẩu dịch vụ (vận tải, bưu chính viễn thông, du lịch, dịch vụ tài chính…)',
+            '3': 'Chuyển tiền một chiều',
+            '4': 'Giải ngân vốn đầu tư trực tiếp nước ngoài (FDI)',
+            '5': 'Để thanh toán thương vụ M&A, thoái vốn',
+            '6': 'Giải ngân vốn đầu tư gián tiếp (mua cổ phần, cổ phiếu, trái phiếu, và các loại chứng khoán khác)',
+            '7': 'Giải ngân vốn vay nước ngoài',
+            '8': 'Giải ngân vốn vay trong nước bằng ngoại tệ',
+            '9': 'TNguồn thu từ thanh toán quốc tế',
             '10': 'Mua ngoại tệ từ Kho bạc Nhà nước',
             '11': 'Nguồn khác'
         };
@@ -2130,7 +2128,7 @@
                 equivalent: 2535000000,
                 type: 'GN',
                 status: 'Thành công',
-                purposeCode: '01',
+                purposeCode: '1',
                 purposeName: 'Thanh toán hàng nhập khẩu',
                 editedBy: null,
                 editTime: null,
@@ -2154,7 +2152,7 @@
                 equivalent: 1375000000,
                 type: 'GN',
                 status: 'Thành công',
-                purposeCode: '02',
+                purposeCode: '2',
                 purposeName: 'Thanh toán dịch vụ',
                 editedBy: null,
                 editTime: null,
@@ -2559,27 +2557,32 @@
         // ==========================================
         // PNV FUNCTIONS - YẾT GIÁ
         // ==========================================
+        // CIF: Chỉ format khi blur (ra khỏi ô), không format khi đang nhập
         function formatCIF() {
             const cifInput = document.getElementById('cif');
             let value = cifInput.value.replace(/\D/g, ''); // Remove non-digits
             if (value.length > 10) value = value.slice(0, 10);
             
-            // Pad with leading zeros to make it 10 digits
-            while (value.length < 10) {
-                value = '0' + value;
+            // Chỉ format khi có giá trị
+            if (value.length > 0) {
+                // Pad with leading zeros to make it 10 digits
+                while (value.length < 10) {
+                    value = '0' + value;
+                }
+                cifInput.value = value;
             }
-            
-            cifInput.value = value;
         }
 
         function formatEditCIF() {
             const cifInput = document.getElementById('editCif');
             let value = cifInput.value.replace(/\D/g, '');
             if (value.length > 10) value = value.slice(0, 10);
-            while (value.length < 10) {
-                value = '0' + value;
+            if (value.length > 0) {
+                while (value.length < 10) {
+                    value = '0' + value;
+                }
+                cifInput.value = value;
             }
-            cifInput.value = value;
         }
 
         function lookupCustomerName() {
@@ -2601,27 +2604,38 @@
             const nameLabel = document.getElementById('purposeNameLabel');
             
             if (type === 'buy') {
-                codeLabel.textContent = 'Mã nguồn (01-11)';
+                codeLabel.textContent = 'Mã nguồn (1-11)';
                 nameLabel.textContent = 'Tên nguồn';
             } else {
-                codeLabel.textContent = 'Mã mục đích (01-11)';
+                codeLabel.textContent = 'Mã mục đích (1-12)';
                 nameLabel.textContent = 'Tên mục đích';
             }
         }
 
+        // Mã mục đích/nguồn: nhập tự do 1-12, không format số 0
         function lookupPurposeName() {
             const code = document.getElementById('purposeCode').value.trim();
             const nameInput = document.getElementById('purposeName');
+            const type = document.getElementById('transactionType').value;
             
-            // Format code with leading zero if needed
-            let formattedCode = code;
-            if (code.length === 1) {
-                formattedCode = '0' + code;
-                document.getElementById('purposeCode').value = formattedCode;
+            // Không format code, giữ nguyên như người dùng nhập (1, 2, 01, 02 đều được)
+            // Chỉ cần loại bỏ ký tự không phải số
+            let cleanCode = code.replace(/\D/g, '');
+            
+            // Giới hạn 1-12
+            const numCode = parseInt(cleanCode);
+            if (numCode < 1 || numCode > 12) {
+                nameInput.value = 'Mã phải từ 1 đến 12';
+                nameInput.style.color = 'var(--danger)';
+                return;
             }
             
-            if (mockPurpose[formattedCode]) {
-                nameInput.value = mockPurpose[formattedCode];
+            // Tìm trong mockPurpose hoặc mockSource dựa vào loại giao dịch
+            const dataSource = type === 'buy' ? mockSource : mockPurpose;
+            const displayCode = cleanCode.replace(/^0+/, '') || '0'; // Bỏ số 0 đầu nếu có
+            
+            if (dataSource[displayCode]) {
+                nameInput.value = dataSource[displayCode];
                 nameInput.style.color = 'var(--ocean-blue)';
             } else {
                 nameInput.value = 'Mã không tồn tại';
@@ -2660,11 +2674,17 @@
 
             const purposeCode = document.getElementById('purposeCode').value.trim();
             const purposeName = document.getElementById('purposeName').value;
+            const type = document.getElementById('transactionType').value;
             
-            if (!mockPurpose[purposeCode] && purposeName.includes('không tồn tại')) {
-                showNotification('Mã mục đích/nguồn không hợp lệ!', 'error');
+            // Validate mã mục đích/nguồn
+            const numCode = parseInt(purposeCode.replace(/\D/g, ''));
+            if (numCode < 1 || numCode > 12 || purposeName.includes('không tồn tại') || purposeName.includes('phải từ')) {
+                showNotification('Mã mục đích/nguồn không hợp lệ! (phải từ 1-12)', 'error');
                 return;
             }
+
+            // Lưu mã gốc như người dùng nhập (không format)
+            const cleanCode = purposeCode.replace(/^0+/, '') || '0';
 
             const quoteRequest = {
                 id: generateId(),
@@ -2672,14 +2692,14 @@
                 pnvName: currentUser.name,
                 cif: cif,
                 customerName: document.getElementById('customerName').value,
-                direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
+                direction: type === 'buy' ? 'VCB MUA' : 'VCB BÁN',
                 date: formatDate(new Date()),
                 effectiveDate: document.getElementById('effectiveDate').value,
                 currency: document.getElementById('currencyCode').value,
                 buyCurr: buyCurr,
                 sellCurr: sellCurr,
                 amount: parseFloat(document.getElementById('amount').value),
-                purposeCode: purposeCode,
+                purposeCode: cleanCode, // Lưu mã gốc không format
                 purposeName: purposeName,
                 status: 'pending',
                 interrupted: false,
@@ -2793,7 +2813,7 @@
                 equivalent: parseFloat(formData.amount) * quoteData.rate,
                 type: calculateTransactionType(formData.effectiveDate, formatDate(new Date())),
                 status: 'Thành công',
-                purposeCode: formData.purposeCode,
+                purposeCode: formData.purposeCode, // Giữ nguyên mã gốc
                 purposeName: formData.purposeName,
                 editedBy: null,
                 editTime: null,
@@ -3077,7 +3097,7 @@
             showNotification('✅ Đã xuất CIF ra Excel!');
         }
 
-        // Purpose File Upload
+        // Purpose File Upload - Mã mục đích nhập tự do 1-12
         function handlePurposeFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -3117,11 +3137,13 @@
                             let code = String(row[0]).trim();
                             const name = String(row[1]).trim();
                             
-                            // Format code with leading zero
-                            if (code.length === 1) code = '0' + code;
-                            
-                            if (code && name) {
-                                mockPurpose[code] = name;
+                            // Không format code, giữ nguyên như người dùng nhập
+                            // Chỉ kiểm tra là số từ 1-12
+                            const numCode = parseInt(code);
+                            if (!isNaN(numCode) && numCode >= 1 && numCode <= 12) {
+                                // Lưu dưới dạng số không có số 0 đầu
+                                const cleanCode = String(numCode);
+                                mockPurpose[cleanCode] = name;
                                 successCount++;
                             }
                         }
@@ -3373,7 +3395,7 @@
             
             saveToLocalStorage();
             
-            if (interruptedCount > 0) {
+                        if (interruptedCount > 0) {
                 showNotification(`⛔⛔⛔ Đã Interrupt ALL ${interruptedCount} giao dịch đang chào giá!`, 'error');
             } else {
                 showNotification('Không có giao dịch nào đang chào giá.', 'warning');
@@ -3383,699 +3405,699 @@
         }
 
         // PQL BLOTTER & EDIT
-// ==========================================
-function loadPqlBlotter() {
-    const tbody = document.getElementById('pqlBlotterBody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    
-    mockTransactions.forEach(t => {
-        const row = tbody.insertRow();
-        const hasEditLog = t.editedBy ? `<div class="edit-log">Sửa bởi: ${t.editedBy} | ${new Date(t.editTime).toLocaleString()}<br>${t.editNote}</div>` : '';
-        
-        row.innerHTML = `
-            <td>${t.pnv}<br><small>${t.pnvName}</small></td>
-            <td>${t.date}</td>
-            <td>${t.effectiveDate}</td>
-            <td>${t.cif}</td>
-            <td>${t.customerName}</td>
-            <td>${t.direction}</td>
-            <td>${t.buyCurr}</td>
-            <td>${t.sellCurr}</td>
-            <td>${t.amount.toLocaleString('vi-VN')}</td>
-            <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-            <td>${t.balancedRate ? t.balancedRate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
-            <td>${t.equivalent.toLocaleString('vi-VN')}</td>
-            <td><span class="badge ${t.type === 'GN' ? 'badge-success' : t.type === 'KH' ? 'badge-warning' : 'badge-info'}">${t.type}</span></td>
-            <td>${t.profit ? t.profit.toLocaleString('vi-VN') : '-'}</td>
-            <td>${t.editedBy || '-'}</td>
-            <td>
-                <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
-            </td>
-        `;
-        
-        if (hasEditLog) {
-            const logRow = tbody.insertRow();
-            logRow.innerHTML = `<td colspan="16">${hasEditLog}</td>`;
-            logRow.style.backgroundColor = '#FFF8E1';
+        // ==========================================
+        function loadPqlBlotter() {
+            const tbody = document.getElementById('pqlBlotterBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            mockTransactions.forEach(t => {
+                const row = tbody.insertRow();
+                const hasEditLog = t.editedBy ? `<div class="edit-log">Sửa bởi: ${t.editedBy} | ${new Date(t.editTime).toLocaleString()}<br>${t.editNote}</div>` : '';
+                
+                row.innerHTML = `
+                    <td>${t.pnv}<br><small>${t.pnvName}</small></td>
+                    <td>${t.date}</td>
+                    <td>${t.effectiveDate}</td>
+                    <td>${t.cif}</td>
+                    <td>${t.customerName}</td>
+                    <td>${t.direction}</td>
+                    <td>${t.buyCurr}</td>
+                    <td>${t.sellCurr}</td>
+                    <td>${t.amount.toLocaleString('vi-VN')}</td>
+                    <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                    <td>${t.balancedRate ? t.balancedRate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
+                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
+                    <td><span class="badge ${t.type === 'GN' ? 'badge-success' : t.type === 'KH' ? 'badge-warning' : 'badge-info'}">${t.type}</span></td>
+                    <td>${t.profit ? t.profit.toLocaleString('vi-VN') : '-'}</td>
+                    <td>${t.editedBy || '-'}</td>
+                    <td>
+                        <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
+                    </td>
+                `;
+                
+                if (hasEditLog) {
+                    const logRow = tbody.insertRow();
+                    logRow.innerHTML = `<td colspan="16">${hasEditLog}</td>`;
+                    logRow.style.backgroundColor = '#FFF8E1';
+                }
+            });
         }
-    });
-}
 
-function filterPqlBlotter() {
-    loadPqlBlotter();
-    showNotification('Đã áp dụng bộ lọc');
-}
+        function filterPqlBlotter() {
+            loadPqlBlotter();
+            showNotification('Đã áp dụng bộ lọc');
+        }
 
-function exportPqlBlotter(format) {
-    if (format === 'excel') {
-        const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tỷ giá cân đối', 'Tương đương', 'Loại', 'Lợi nhuận', 'Người sửa', 'Ghi chú sửa'];
-        const data = mockTransactions.map(t => [
-            t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
-            t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.equivalent, 
-            t.type, t.profit || '', t.editedBy || '', t.editNote || ''
-        ]);
-        
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Blotter PQL');
-        XLSX.writeFile(wb, `Blotter_PQL_${new Date().toISOString().split('T')[0]}.xlsx`);
-        showNotification('✅ Đã xuất Excel thành công!');
-    } else {
-        const printWindow = window.open('', '_blank');
-        let html = `
-            <html>
-            <head>
-                <title>Blotter PQL</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    h2 { color: #2E7D32; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }
-                    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-                    th { background-color: #4CAF50; color: white; }
-                    tr:nth-child(even) { background-color: #f2f2f2; }
-                    .edit-log { background: #FFF3E0; padding: 5px; margin: 5px 0; font-size: 10px; border-left: 3px solid #FF9800; }
-                </style>
-            </head>
-            <body>
-                <h2>BLOTTER PHÒNG QUẢN LÝ</h2>
-                <p>Ngày xuất: ${formatDate(new Date())}</p>
+        function exportPqlBlotter(format) {
+            if (format === 'excel') {
+                const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tỷ giá cân đối', 'Tương đương', 'Loại', 'Lợi nhuận', 'Người sửa', 'Ghi chú sửa'];
+                const data = mockTransactions.map(t => [
+                    t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
+                    t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.equivalent, 
+                    t.type, t.profit || '', t.editedBy || '', t.editNote || ''
+                ]);
+                
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Blotter PQL');
+                XLSX.writeFile(wb, `Blotter_PQL_${new Date().toISOString().split('T')[0]}.xlsx`);
+                showNotification('✅ Đã xuất Excel thành công!');
+            } else {
+                const printWindow = window.open('', '_blank');
+                let html = `
+                    <html>
+                    <head>
+                        <title>Blotter PQL</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            h2 { color: #2E7D32; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }
+                            th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+                            th { background-color: #4CAF50; color: white; }
+                            tr:nth-child(even) { background-color: #f2f2f2; }
+                            .edit-log { background: #FFF3E0; padding: 5px; margin: 5px 0; font-size: 10px; border-left: 3px solid #FF9800; }
+                        </style>
+                    </head>
+                    <body>
+                        <h2>BLOTTER PHÒNG QUẢN LÝ</h2>
+                        <p>Ngày xuất: ${formatDate(new Date())}</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
+                                    <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
+                                    <th>TG cân đối</th><th>Tương đương</th><th>Loại</th><th>Lợi nhuận</th><th>Người sửa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${mockTransactions.map(t => `
+                                    <tr>
+                                        <td>${t.pnv}<br><small>${t.pnvName}</small></td>
+                                        <td>${t.date}</td>
+                                        <td>${t.effectiveDate}</td>
+                                        <td>${t.cif}</td>
+                                        <td>${t.customerName}</td>
+                                        <td>${t.direction}</td>
+                                        <td>${t.buyCurr}</td>
+                                        <td>${t.sellCurr}</td>
+                                        <td>${t.amount.toLocaleString()}</td>
+                                        <td>${t.rate.toLocaleString()}</td>
+                                        <td>${t.balancedRate ? t.balancedRate.toLocaleString() : '-'}</td>
+                                        <td>${t.equivalent.toLocaleString()}</td>
+                                        <td>${t.type}</td>
+                                        <td>${t.profit ? t.profit.toLocaleString() : '-'}</td>
+                                        <td>${t.editedBy || '-'}</td>
+                                    </tr>
+                                    ${t.editedBy ? `
+                                    <tr>
+                                        <td colspan="15">
+                                            <div class="edit-log">
+                                                <strong>Sửa bởi:</strong> ${t.editedBy} | ${new Date(t.editTime).toLocaleString()}<br>
+                                                <strong>Ghi chú:</strong> ${t.editNote}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    ` : ''}
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </body>
+                    </html>
+                `;
+                printWindow.document.write(html);
+                printWindow.document.close();
+                printWindow.print();
+                showNotification('✅ Đã mở cửa sổ in PDF!');
+            }
+        }
+
+        function openEditTransaction(transId) {
+            const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
+            if (!t) {
+                showNotification('Không tìm thấy giao dịch!', 'error');
+                return;
+            }
+            
+            editingTransactionId = t.id;
+            document.getElementById('editTransId').value = t.id;
+            document.getElementById('editCif').value = t.cif;
+            document.getElementById('editCifName').value = t.customerName;
+            document.getElementById('editEffDate').value = t.effectiveDate;
+            document.getElementById('editBuyCurr').value = t.buyCurr;
+            document.getElementById('editSellCurr').value = t.sellCurr;
+            document.getElementById('editAmount').value = t.amount;
+            document.getElementById('editRate').value = t.rate;
+            document.getElementById('editBalancedRate').value = t.balancedRate || '';
+            document.getElementById('editType').value = t.type;
+            document.getElementById('editNote').value = '';
+            
+            document.getElementById('editTransactionModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editTransactionModal').classList.remove('active');
+            editingTransactionId = null;
+        }
+
+        function saveEditTransaction(e) {
+            e.preventDefault();
+            const t = mockTransactions.find(tr => tr.id === editingTransactionId);
+            if (!t) return;
+            
+            const editNote = document.getElementById('editNote').value.trim();
+            if (!editNote) {
+                showNotification('Vui lòng nhập ghi chú thay đổi!', 'error');
+                return;
+            }
+            
+            const oldValues = {
+                cif: t.cif,
+                customerName: t.customerName,
+                effectiveDate: t.effectiveDate,
+                buyCurr: t.buyCurr,
+                sellCurr: t.sellCurr,
+                amount: t.amount,
+                rate: t.rate,
+                balancedRate: t.balancedRate,
+                type: t.type
+            };
+            
+            t.cif = document.getElementById('editCif').value;
+            t.customerName = document.getElementById('editCifName').value;
+            t.effectiveDate = document.getElementById('editEffDate').value;
+            t.buyCurr = document.getElementById('editBuyCurr').value;
+            t.sellCurr = document.getElementById('editSellCurr').value;
+            t.amount = parseFloat(document.getElementById('editAmount').value);
+            t.rate = parseFloat(document.getElementById('editRate').value);
+            t.balancedRate = parseFloat(document.getElementById('editBalancedRate').value) || 0;
+            t.type = document.getElementById('editType').value;
+            
+            t.equivalent = t.amount * t.rate;
+            t.profit = calculateProfit(t.direction, t.amount, t.rate, t.balancedRate);
+            t.editedBy = currentUser.id;
+            t.editTime = new Date().toISOString();
+            t.editNote = editNote;
+            t.status = 'Đã sửa';
+            
+            saveToLocalStorage();
+            closeEditModal();
+            loadPqlBlotter();
+            showNotification('✅ Đã cập nhật giao dịch và ghi nhận audit log!');
+        }
+
+        // ==========================================
+        // BÁO CÁO PQL
+        // ==========================================
+        function generateReport() {
+            const fromDate = document.getElementById('reportTransFrom').value;
+            const toDate = document.getElementById('reportTransTo').value;
+            const pnv = document.getElementById('reportPnv').value;
+            const type = document.getElementById('reportType').value;
+            
+            let filtered = [...mockTransactions];
+            
+            if (fromDate) {
+                filtered = filtered.filter(t => new Date(t.date) >= new Date(fromDate));
+            }
+            if (toDate) {
+                filtered = filtered.filter(t => new Date(t.date) <= new Date(toDate));
+            }
+            if (pnv) {
+                filtered = filtered.filter(t => t.pnv === pnv);
+            }
+            if (type) {
+                filtered = filtered.filter(t => t.type === type);
+            }
+            
+            // Update summary
+            const totalCount = filtered.length;
+            const totalVolume = filtered.reduce((sum, t) => sum + t.amount, 0);
+            const totalProfit = filtered.reduce((sum, t) => sum + (t.profit || 0), 0);
+            const avgBalancedRate = filtered.length > 0 
+                ? filtered.reduce((sum, t) => sum + (t.balancedRate || 0), 0) / filtered.length 
+                : 0;
+            
+            document.getElementById('reportTotalCount').textContent = totalCount;
+            document.getElementById('reportTotalVolume').textContent = totalVolume.toLocaleString('vi-VN');
+            document.getElementById('reportTotalProfit').textContent = totalProfit.toLocaleString('vi-VN') + ' VND';
+            document.getElementById('reportAvgBalancedRate').textContent = avgBalancedRate.toLocaleString('vi-VN', {maximumFractionDigits: 4});
+            
+            const container = document.getElementById('reportResult');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
+                return;
+            }
+            
+            let html = `
                 <table>
                     <thead>
                         <tr>
-                            <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
-                            <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
-                            <th>TG cân đối</th><th>Tương đương</th><th>Loại</th><th>Lợi nhuận</th><th>Người sửa</th>
+                            <th>PNV</th>
+                            <th>Ngày GD</th>
+                            <th>Ngày HL</th>
+                            <th>CIF</th>
+                            <th>Tên KH</th>
+                            <th>Chiều</th>
+                            <th>Mua</th>
+                            <th>Bán</th>
+                            <th>Số tiền</th>
+                            <th>Tỷ giá</th>
+                            <th>TG cân đối</th>
+                            <th>Tương đương</th>
+                            <th>Loại</th>
+                            <th>Lợi nhuận</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${mockTransactions.map(t => `
-                            <tr>
-                                <td>${t.pnv}<br><small>${t.pnvName}</small></td>
-                                <td>${t.date}</td>
-                                <td>${t.effectiveDate}</td>
-                                <td>${t.cif}</td>
-                                <td>${t.customerName}</td>
-                                <td>${t.direction}</td>
-                                <td>${t.buyCurr}</td>
-                                <td>${t.sellCurr}</td>
-                                <td>${t.amount.toLocaleString()}</td>
-                                <td>${t.rate.toLocaleString()}</td>
-                                <td>${t.balancedRate ? t.balancedRate.toLocaleString() : '-'}</td>
-                                <td>${t.equivalent.toLocaleString()}</td>
-                                <td>${t.type}</td>
-                                <td>${t.profit ? t.profit.toLocaleString() : '-'}</td>
-                                <td>${t.editedBy || '-'}</td>
-                            </tr>
-                            ${t.editedBy ? `
-                            <tr>
-                                <td colspan="15">
-                                    <div class="edit-log">
-                                        <strong>Sửa bởi:</strong> ${t.editedBy} | ${new Date(t.editTime).toLocaleString()}<br>
-                                        <strong>Ghi chú:</strong> ${t.editNote}
-                                    </div>
-                                </td>
-                            </tr>
-                            ` : ''}
-                        `).join('')}
-                    </tbody>
-                </table>
-            </body>
-            </html>
-        `;
-        printWindow.document.write(html);
-        printWindow.document.close();
-        printWindow.print();
-        showNotification('✅ Đã mở cửa sổ in PDF!');
-    }
-}
-
-function openEditTransaction(transId) {
-    const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
-    if (!t) {
-        showNotification('Không tìm thấy giao dịch!', 'error');
-        return;
-    }
-    
-    editingTransactionId = t.id;
-    document.getElementById('editTransId').value = t.id;
-    document.getElementById('editCif').value = t.cif;
-    document.getElementById('editCifName').value = t.customerName;
-    document.getElementById('editEffDate').value = t.effectiveDate;
-    document.getElementById('editBuyCurr').value = t.buyCurr;
-    document.getElementById('editSellCurr').value = t.sellCurr;
-    document.getElementById('editAmount').value = t.amount;
-    document.getElementById('editRate').value = t.rate;
-    document.getElementById('editBalancedRate').value = t.balancedRate || '';
-    document.getElementById('editType').value = t.type;
-    document.getElementById('editNote').value = '';
-    
-    document.getElementById('editTransactionModal').classList.add('active');
-}
-
-function closeEditModal() {
-    document.getElementById('editTransactionModal').classList.remove('active');
-    editingTransactionId = null;
-}
-
-function saveEditTransaction(e) {
-    e.preventDefault();
-    const t = mockTransactions.find(tr => tr.id === editingTransactionId);
-    if (!t) return;
-    
-    const editNote = document.getElementById('editNote').value.trim();
-    if (!editNote) {
-        showNotification('Vui lòng nhập ghi chú thay đổi!', 'error');
-        return;
-    }
-    
-    const oldValues = {
-        cif: t.cif,
-        customerName: t.customerName,
-        effectiveDate: t.effectiveDate,
-        buyCurr: t.buyCurr,
-        sellCurr: t.sellCurr,
-        amount: t.amount,
-        rate: t.rate,
-        balancedRate: t.balancedRate,
-        type: t.type
-    };
-    
-    t.cif = document.getElementById('editCif').value;
-    t.customerName = document.getElementById('editCifName').value;
-    t.effectiveDate = document.getElementById('editEffDate').value;
-    t.buyCurr = document.getElementById('editBuyCurr').value;
-    t.sellCurr = document.getElementById('editSellCurr').value;
-    t.amount = parseFloat(document.getElementById('editAmount').value);
-    t.rate = parseFloat(document.getElementById('editRate').value);
-    t.balancedRate = parseFloat(document.getElementById('editBalancedRate').value) || 0;
-    t.type = document.getElementById('editType').value;
-    
-    t.equivalent = t.amount * t.rate;
-    t.profit = calculateProfit(t.direction, t.amount, t.rate, t.balancedRate);
-    t.editedBy = currentUser.id;
-    t.editTime = new Date().toISOString();
-    t.editNote = editNote;
-    t.status = 'Đã sửa';
-    
-    saveToLocalStorage();
-    closeEditModal();
-    loadPqlBlotter();
-    showNotification('✅ Đã cập nhật giao dịch và ghi nhận audit log!');
-}
-
-// ==========================================
-// BÁO CÁO PQL
-// ==========================================
-function generateReport() {
-    const fromDate = document.getElementById('reportTransFrom').value;
-    const toDate = document.getElementById('reportTransTo').value;
-    const pnv = document.getElementById('reportPnv').value;
-    const type = document.getElementById('reportType').value;
-    
-    let filtered = [...mockTransactions];
-    
-    if (fromDate) {
-        filtered = filtered.filter(t => new Date(t.date) >= new Date(fromDate));
-    }
-    if (toDate) {
-        filtered = filtered.filter(t => new Date(t.date) <= new Date(toDate));
-    }
-    if (pnv) {
-        filtered = filtered.filter(t => t.pnv === pnv);
-    }
-    if (type) {
-        filtered = filtered.filter(t => t.type === type);
-    }
-    
-    // Update summary
-    const totalCount = filtered.length;
-    const totalVolume = filtered.reduce((sum, t) => sum + t.amount, 0);
-    const totalProfit = filtered.reduce((sum, t) => sum + (t.profit || 0), 0);
-    const avgBalancedRate = filtered.length > 0 
-        ? filtered.reduce((sum, t) => sum + (t.balancedRate || 0), 0) / filtered.length 
-        : 0;
-    
-    document.getElementById('reportTotalCount').textContent = totalCount;
-    document.getElementById('reportTotalVolume').textContent = totalVolume.toLocaleString('vi-VN');
-    document.getElementById('reportTotalProfit').textContent = totalProfit.toLocaleString('vi-VN') + ' VND';
-    document.getElementById('reportAvgBalancedRate').textContent = avgBalancedRate.toLocaleString('vi-VN', {maximumFractionDigits: 4});
-    
-    const container = document.getElementById('reportResult');
-    if (filtered.length === 0) {
-        container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
-        return;
-    }
-    
-    let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>PNV</th>
-                    <th>Ngày GD</th>
-                    <th>Ngày HL</th>
-                    <th>CIF</th>
-                    <th>Tên KH</th>
-                    <th>Chiều</th>
-                    <th>Mua</th>
-                    <th>Bán</th>
-                    <th>Số tiền</th>
-                    <th>Tỷ giá</th>
-                    <th>TG cân đối</th>
-                    <th>Tương đương</th>
-                    <th>Loại</th>
-                    <th>Lợi nhuận</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    
-    filtered.forEach(t => {
-        html += `
-            <tr>
-                <td>${t.pnv}</td>
-                <td>${t.date}</td>
-                <td>${t.effectiveDate}</td>
-                <td>${t.cif}</td>
-                <td>${t.customerName}</td>
-                <td>${t.direction}</td>
-                <td>${t.buyCurr}</td>
-                <td>${t.sellCurr}</td>
-                <td>${t.amount.toLocaleString()}</td>
-                <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                <td>${t.balancedRate ? t.balancedRate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
-                <td>${t.equivalent.toLocaleString()}</td>
-                <td>${t.type}</td>
-                <td>${t.profit ? t.profit.toLocaleString() : '-'}</td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
-    showNotification(`Báo cáo có ${filtered.length} giao dịch`);
-}
-
-function exportReport(format) {
-    const fromDate = document.getElementById('reportTransFrom').value;
-    const toDate = document.getElementById('reportTransTo').value;
-    const pnv = document.getElementById('reportPnv').value;
-    const type = document.getElementById('reportType').value;
-    
-    let filtered = [...mockTransactions];
-    
-    if (fromDate) filtered = filtered.filter(t => new Date(t.date) >= new Date(fromDate));
-    if (toDate) filtered = filtered.filter(t => new Date(t.date) <= new Date(toDate));
-    if (pnv) filtered = filtered.filter(t => t.pnv === pnv);
-    if (type) filtered = filtered.filter(t => t.type === type);
-    
-    if (filtered.length === 0) {
-        showNotification('Không có dữ liệu để xuất!', 'error');
-        return;
-    }
-
-    const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tỷ giá cân đối', 'Tương đương', 'Loại', 'Lợi nhuận', 'Người sửa', 'Ghi chú'];
-    const data = filtered.map(t => [
-        t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
-        t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.equivalent,
-        t.type, t.profit || '', t.editedBy || '', t.editNote || ''
-    ]);
-
-    if (format === 'excel') {
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-        
-        // Add summary section
-        const summary = [
-            ['BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ'],
-            ['Ngày xuất:', formatDate(new Date())],
-            ['Tổng số giao dịch:', filtered.length],
-            ['Tổng khối lượng:', filtered.reduce((sum, t) => sum + t.amount, 0)],
-            ['Tổng lợi nhuận:', filtered.reduce((sum, t) => sum + (t.profit || 0), 0)],
-            []
-        ];
-        
-        const fullData = [...summary, headers, ...data];
-        const ws2 = XLSX.utils.aoa_to_sheet(fullData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws2, 'Báo cáo');
-        XLSX.writeFile(wb, `Bao_Cao_MBNT_${new Date().toISOString().split('T')[0]}.xlsx`);
-        showNotification('✅ Đã xuất báo cáo Excel!');
-    } else {
-        const printWindow = window.open('', '_blank');
-        let html = `
-            <html>
-            <head>
-                <title>Báo cáo Giao dịch</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    h2 { color: #2E7D32; }
-                    .summary { background: #E3F2FD; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #4CAF50; color: white; }
-                    tr:nth-child(even) { background-color: #f2f2f2; }
-                </style>
-            </head>
-            <body>
-                <h2>BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ</h2>
-                <div class="summary">
-                    <p><strong>Ngày xuất:</strong> ${formatDate(new Date())}</p>
-                    <p><strong>Tổng số giao dịch:</strong> ${filtered.length}</p>
-                    <p><strong>Tổng khối lượng:</strong> ${filtered.reduce((sum, t) => sum + t.amount, 0).toLocaleString()}</p>
-                    <p><strong>Tổng lợi nhuận:</strong> ${filtered.reduce((sum, t) => sum + (t.profit || 0), 0).toLocaleString()} VND</p>
-                </div>
-                <table>
-                    <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-                    <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
-                </table>
-            </body>
-            </html>
-        `;
-        printWindow.document.write(html);
-        printWindow.document.close();
-        printWindow.print();
-        showNotification('✅ Đã mở cửa sổ in báo cáo PDF!');
-    }
-}
-
-// ==========================================
-// CHAT FUNCTIONS
-// ==========================================
-function loadPnvListForChat() {
-    const select = document.getElementById('pqlChatTarget');
-    if (!select) return;
-    
-    const pnvUsers = mockUsers.filter(u => u.role === 'PNV');
-    let html = '<option value="">-- Gửi đến tất cả PNV --</option>';
-    pnvUsers.forEach(u => {
-        html += `<option value="${u.id}">${u.name} (${u.id}) - ${u.dept}</option>`;
-    });
-    select.innerHTML = html;
-}
-
-function handlePqlChatKeyPress(e) {
-    if (e.key === 'Enter') sendPqlChatMessage();
-}
-
-function sendPqlChatMessage() {
-    const input = document.getElementById('pqlChatInput');
-    const targetSelect = document.getElementById('pqlChatTarget');
-    const message = input.value.trim();
-    if (!message) return;
-    
-    const targetId = targetSelect ? targetSelect.value : '';
-    const targetName = targetId 
-        ? mockUsers.find(u => u.id === targetId)?.name || targetId 
-        : 'Tất cả PNV';
-    
-    const container = document.getElementById('pqlChatMessages');
-    const div = document.createElement('div');
-    div.className = 'chat-message sent';
-    div.innerHTML = `<strong>${currentUser.name} (PQL):</strong><br>${message}
-        <div class="chat-message-meta">Gửi đến: ${targetName} - ${new Date().toLocaleTimeString()}</div>`;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-    input.value = '';
-    
-    const chatData = {
-        id: generateId(),
-        from: currentUser.id,
-        fromName: currentUser.name,
-        fromRole: 'PQL',
-        to: targetId || 'ALL_PNV',
-        toId: targetId || null,
-        message: message,
-        time: new Date().toISOString(),
-        read: false
-    };
-    
-    chatMessages.push(chatData);
-    saveToLocalStorage();
-    
-    showNotification(`Đã gửi tin nhắn đến ${targetName}`, 'success');
-}
-
-// ==========================================
-// BGĐ FUNCTIONS
-// ==========================================
-function loadBgdPnvList() {
-    const select = document.getElementById('bgdFilterPnv');
-    const reportSelect = document.getElementById('reportPnv');
-    
-    const managedPnvs = mockUsers.filter(u => u.role === 'PNV' && u.manager === currentUser.id);
-    
-    let html = '<option value="">Tất cả PNV</option>';
-    managedPnvs.forEach(u => {
-        html += `<option value="${u.id}">${u.name} (${u.id})</option>`;
-    });
-    
-    if (select) select.innerHTML = html;
-    if (reportSelect) reportSelect.innerHTML = html;
-}
-
-function loadBgdView() {
-    const tbody = document.getElementById('bgdViewBody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    
-    const managedPnvIds = mockUsers
-        .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
-        .map(u => u.id);
-    
-    const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
-    
-    visibleTrans.forEach(t => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-            <td>${t.pnv}</td>
-            <td>${t.date}</td>
-            <td>${t.effectiveDate}</td>
-            <td>${t.cif}</td>
-            <td>${t.customerName}</td>
-            <td>${t.direction}</td>
-            <td>${t.buyCurr}</td>
-            <td>${t.sellCurr}</td>
-            <td>${t.amount.toLocaleString()}</td>
-            <td>${t.rate.toLocaleString()}</td>
-            <td>${t.balancedRate ? t.balancedRate.toLocaleString() : '-'}</td>
-            <td><span class="badge badge-success">${t.type}</span></td>
-        `;
-    });
-}
-
-function filterBgdView() {
-    loadBgdView();
-    showNotification('Đã cập nhật dữ liệu');
-}
-
-function exportBgdView(format) {
-    const managedPnvIds = mockUsers
-        .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
-        .map(u => u.id);
-    
-    const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
-    
-    if (visibleTrans.length === 0) {
-        showNotification('Không có dữ liệu để xuất!', 'error');
-        return;
-    }
-
-    const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số tiền', 'Tỷ giá', 'Tỷ giá cân đối', 'Loại'];
-    const data = visibleTrans.map(t => [
-        t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
-        t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.type
-    ]);
-
-    if (format === 'excel') {
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'BGD View');
-        XLSX.writeFile(wb, `BGD_View_${currentUser.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
-        showNotification('✅ Đã xuất Excel!');
-    }
-}
-
-// ==========================================
-// POLLING & REALTIME UPDATES
-// ==========================================
-let pnvPollInterval = null;
-let pqlPollInterval = null;
-let chatPollInterval = null;
-
-function startPnvPolling() {
-    // PNV kiểm tra giá chào từ PQL
-    pnvPollInterval = setInterval(() => {
-        if (currentUser?.role !== 'PNV') return;
-        
-        // Kiểm tra quote cho PNV này
-        const myQuotes = pendingQuotes.filter(q => 
-            q.pnv === currentUser.id && 
-            q.status === 'quoted' && 
-            !q.interrupted &&
-            new Date(q.expiryTime) > new Date()
-        );
-        
-        myQuotes.forEach(q => {
-            const stored = localStorage.getItem('pql_quote_' + q.id);
-            if (stored && !document.getElementById('quoteResponseModal').classList.contains('active')) {
-                const data = JSON.parse(stored);
-                const now = new Date();
-                const expiry = new Date(data.expiryTime);
-                
-                if (now < expiry && !data.interrupted) {
-                    // Hiển thị modal chào giá
-                    document.getElementById('quoteResponseModal').classList.add('active');
-                    document.getElementById('modalQuotePrice').textContent = data.rate.toLocaleString('vi-VN', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 4
-                    });
-                    document.getElementById('modalQuotePair').textContent = `${q.buyCurr}/${q.sellCurr}`;
-                    document.getElementById('modalQuotePnv').textContent = `${q.pnvName} (${q.pnv})`;
-                    document.getElementById('modalQuoteAmount').textContent = q.amount.toLocaleString('vi-VN');
-                    
-                    const remainingSeconds = Math.floor((expiry - now) / 1000);
-                    startQuoteTimer(remainingSeconds, q.id, data.rate);
-                    
-                    showNotification('🔔 PQL đã chào giá! Vui lòng phản hồi trong thời gian quy định.', 'warning');
-                }
-            }
-        });
-        
-        // Kiểm tra tin nhắn chat mới
-        checkNewChatMessages();
-    }, 2000);
-}
-
-function startPqlPolling() {
-    // PQL kiểm tra yêu cầu hỏi giá mới
-    pqlPollInterval = setInterval(() => {
-        if (currentUser?.role !== 'PQL') return;
-        
-        const currentTab = document.querySelector('#pql-quotes.tab-content');
-        if (currentTab && currentTab.classList.contains('active')) {
-            loadPendingQuotes();
-        }
-    }, 3000);
-    
-    // PQL kiểm tra tin nhắn từ PNV
-    chatPollInterval = setInterval(() => {
-        if (currentUser?.role !== 'PQL') return;
-        checkNewChatMessages();
-    }, 2000);
-}
-
-function checkNewChatMessages() {
-    const unreadMessages = chatMessages.filter(m => 
-        !m.read && 
-        ((currentUser.role === 'PQL' && m.fromRole === 'PNV') ||
-         (currentUser.role === 'PNV' && m.fromRole === 'PQL' && (m.to === currentUser.id || m.to === 'ALL_PNV')))
-    );
-    
-    unreadMessages.forEach(m => {
-        m.read = true;
-        
-        const container = currentUser.role === 'PNV' 
-            ? document.getElementById('pnvChatMessages')
-            : document.getElementById('pqlChatMessages');
+            `;
             
-        if (container) {
+            filtered.forEach(t => {
+                html += `
+                    <tr>
+                        <td>${t.pnv}</td>
+                        <td>${t.date}</td>
+                        <td>${t.effectiveDate}</td>
+                        <td>${t.cif}</td>
+                        <td>${t.customerName}</td>
+                        <td>${t.direction}</td>
+                        <td>${t.buyCurr}</td>
+                        <td>${t.sellCurr}</td>
+                        <td>${t.amount.toLocaleString()}</td>
+                        <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                        <td>${t.balancedRate ? t.balancedRate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
+                        <td>${t.equivalent.toLocaleString()}</td>
+                        <td>${t.type}</td>
+                        <td>${t.profit ? t.profit.toLocaleString() : '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            showNotification(`Báo cáo có ${filtered.length} giao dịch`);
+        }
+
+        function exportReport(format) {
+            const fromDate = document.getElementById('reportTransFrom').value;
+            const toDate = document.getElementById('reportTransTo').value;
+            const pnv = document.getElementById('reportPnv').value;
+            const type = document.getElementById('reportType').value;
+            
+            let filtered = [...mockTransactions];
+            
+            if (fromDate) filtered = filtered.filter(t => new Date(t.date) >= new Date(fromDate));
+            if (toDate) filtered = filtered.filter(t => new Date(t.date) <= new Date(toDate));
+            if (pnv) filtered = filtered.filter(t => t.pnv === pnv);
+            if (type) filtered = filtered.filter(t => t.type === type);
+            
+            if (filtered.length === 0) {
+                showNotification('Không có dữ liệu để xuất!', 'error');
+                return;
+            }
+
+            const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tỷ giá cân đối', 'Tương đương', 'Loại', 'Lợi nhuận', 'Người sửa', 'Ghi chú'];
+            const data = filtered.map(t => [
+                t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
+                t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.equivalent,
+                t.type, t.profit || '', t.editedBy || '', t.editNote || ''
+            ]);
+
+            if (format === 'excel') {
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+                
+                // Add summary section
+                const summary = [
+                    ['BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ'],
+                    ['Ngày xuất:', formatDate(new Date())],
+                    ['Tổng số giao dịch:', filtered.length],
+                    ['Tổng khối lượng:', filtered.reduce((sum, t) => sum + t.amount, 0)],
+                    ['Tổng lợi nhuận:', filtered.reduce((sum, t) => sum + (t.profit || 0), 0)],
+                    []
+                ];
+                
+                const fullData = [...summary, headers, ...data];
+                const ws2 = XLSX.utils.aoa_to_sheet(fullData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws2, 'Báo cáo');
+                XLSX.writeFile(wb, `Bao_Cao_MBNT_${new Date().toISOString().split('T')[0]}.xlsx`);
+                showNotification('✅ Đã xuất báo cáo Excel!');
+            } else {
+                const printWindow = window.open('', '_blank');
+                let html = `
+                    <html>
+                    <head>
+                        <title>Báo cáo Giao dịch</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            h2 { color: #2E7D32; }
+                            .summary { background: #E3F2FD; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                            th { background-color: #4CAF50; color: white; }
+                            tr:nth-child(even) { background-color: #f2f2f2; }
+                        </style>
+                    </head>
+                    <body>
+                        <h2>BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ</h2>
+                        <div class="summary">
+                            <p><strong>Ngày xuất:</strong> ${formatDate(new Date())}</p>
+                            <p><strong>Tổng số giao dịch:</strong> ${filtered.length}</p>
+                            <p><strong>Tổng khối lượng:</strong> ${filtered.reduce((sum, t) => sum + t.amount, 0).toLocaleString()}</p>
+                            <p><strong>Tổng lợi nhuận:</strong> ${filtered.reduce((sum, t) => sum + (t.profit || 0), 0).toLocaleString()} VND</p>
+                        </div>
+                        <table>
+                            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                            <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+                        </table>
+                    </body>
+                    </html>
+                `;
+                printWindow.document.write(html);
+                printWindow.document.close();
+                printWindow.print();
+                showNotification('✅ Đã mở cửa sổ in báo cáo PDF!');
+            }
+        }
+
+        // ==========================================
+        // CHAT FUNCTIONS
+        // ==========================================
+        function loadPnvListForChat() {
+            const select = document.getElementById('pqlChatTarget');
+            if (!select) return;
+            
+            const pnvUsers = mockUsers.filter(u => u.role === 'PNV');
+            let html = '<option value="">-- Gửi đến tất cả PNV --</option>';
+            pnvUsers.forEach(u => {
+                html += `<option value="${u.id}">${u.name} (${u.id}) - ${u.dept}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        function handlePqlChatKeyPress(e) {
+            if (e.key === 'Enter') sendPqlChatMessage();
+        }
+
+        function sendPqlChatMessage() {
+            const input = document.getElementById('pqlChatInput');
+            const targetSelect = document.getElementById('pqlChatTarget');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const targetId = targetSelect ? targetSelect.value : '';
+            const targetName = targetId 
+                ? mockUsers.find(u => u.id === targetId)?.name || targetId 
+                : 'Tất cả PNV';
+            
+            const container = document.getElementById('pqlChatMessages');
             const div = document.createElement('div');
-            div.className = m.to === 'ALL_PNV' || m.to === 'PQL' ? 'chat-message broadcast' : 'chat-message received';
-            div.innerHTML = `<strong>${m.fromName} (${m.fromRole}):</strong><br>${m.message}
-                <div class="chat-message-meta">${new Date(m.time).toLocaleTimeString()}</div>`;
+            div.className = 'chat-message sent';
+            div.innerHTML = `<strong>${currentUser.name} (PQL):</strong><br>${message}
+                <div class="chat-message-meta">Gửi đến: ${targetName} - ${new Date().toLocaleTimeString()}</div>`;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
+            input.value = '';
+            
+            const chatData = {
+                id: generateId(),
+                from: currentUser.id,
+                fromName: currentUser.name,
+                fromRole: 'PQL',
+                to: targetId || 'ALL_PNV',
+                toId: targetId || null,
+                message: message,
+                time: new Date().toISOString(),
+                read: false
+            };
+            
+            chatMessages.push(chatData);
+            saveToLocalStorage();
+            
+            showNotification(`Đã gửi tin nhắn đến ${targetName}`, 'success');
         }
-    });
-    
-    if (unreadMessages.length > 0) {
-        saveToLocalStorage();
-    }
-}
 
-function stopAllPolling() {
-    if (pnvPollInterval) clearInterval(pnvPollInterval);
-    if (pqlPollInterval) clearInterval(pqlPollInterval);
-    if (chatPollInterval) clearInterval(chatPollInterval);
-    if (quoteTimer) clearInterval(quoteTimer);
-}
-
-// ==========================================
-// INITIALIZATION
-// ==========================================
-document.addEventListener('DOMContentLoaded', function() {
-    loadFromLocalStorage();
-    
-    const today = new Date();
-    const dateInputs = [
-        'pnvFilterFromDate', 'pnvFilterToDate', 'pqlFilterFrom', 'pqlFilterTo',
-        'reportTransFrom', 'reportTransTo', 'reportEffFrom', 'reportEffTo',
-        'bgdFromDate', 'bgdToDate', 'effectiveDate', 'editEffDate'
-    ];
-    
-    dateInputs.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && !el.value) {
-            el.value = formatDateYYYYMMDD(today);
-        }
-    });
-
-    // File upload drag & drop handlers
-    const uploadAreas = [
-        { area: 'cifUploadArea', input: 'cifFileInput' },
-        { area: 'purposeUploadArea', input: 'purposeFileInput' },
-        { area: 'roomUploadArea', input: 'roomFileInput' },
-        { area: 'rateUploadArea', input: 'rateFileInput' },
-        { area: 'legUploadArea', input: 'legFileInput' }
-    ];
-    
-    uploadAreas.forEach(({ area, input }) => {
-        const uploadArea = document.getElementById(area);
-        const fileInput = document.getElementById(input);
-        
-        if (uploadArea && fileInput) {
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#4CAF50';
-                uploadArea.style.backgroundColor = '#f0f8f0';
+        // ==========================================
+        // BGĐ FUNCTIONS
+        // ==========================================
+        function loadBgdPnvList() {
+            const select = document.getElementById('bgdFilterPnv');
+            const reportSelect = document.getElementById('reportPnv');
+            
+            const managedPnvs = mockUsers.filter(u => u.role === 'PNV' && u.manager === currentUser.id);
+            
+            let html = '<option value="">Tất cả PNV</option>';
+            managedPnvs.forEach(u => {
+                html += `<option value="${u.id}">${u.name} (${u.id})</option>`;
             });
             
-            uploadArea.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#C8E6C9';
-                uploadArea.style.backgroundColor = '#E8F5E9';
-            });
+            if (select) select.innerHTML = html;
+            if (reportSelect) reportSelect.innerHTML = html;
+        }
+
+        function loadBgdView() {
+            const tbody = document.getElementById('bgdViewBody');
+            if (!tbody) return;
             
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#C8E6C9';
-                uploadArea.style.backgroundColor = '#E8F5E9';
+            tbody.innerHTML = '';
+            
+            const managedPnvIds = mockUsers
+                .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
+                .map(u => u.id);
+            
+            const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
+            
+            visibleTrans.forEach(t => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${t.pnv}</td>
+                    <td>${t.date}</td>
+                    <td>${t.effectiveDate}</td>
+                    <td>${t.cif}</td>
+                    <td>${t.customerName}</td>
+                    <td>${t.direction}</td>
+                    <td>${t.buyCurr}</td>
+                    <td>${t.sellCurr}</td>
+                    <td>${t.amount.toLocaleString()}</td>
+                    <td>${t.rate.toLocaleString()}</td>
+                    <td>${t.balancedRate ? t.balancedRate.toLocaleString() : '-'}</td>
+                    <td><span class="badge badge-success">${t.type}</span></td>
+                `;
+            });
+        }
+
+        function filterBgdView() {
+            loadBgdView();
+            showNotification('Đã cập nhật dữ liệu');
+        }
+
+        function exportBgdView(format) {
+            const managedPnvIds = mockUsers
+                .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
+                .map(u => u.id);
+            
+            const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
+            
+            if (visibleTrans.length === 0) {
+                showNotification('Không có dữ liệu để xuất!', 'error');
+                return;
+            }
+
+            const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số tiền', 'Tỷ giá', 'Tỷ giá cân đối', 'Loại'];
+            const data = visibleTrans.map(t => [
+                t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
+                t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.type
+            ]);
+
+            if (format === 'excel') {
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'BGD View');
+                XLSX.writeFile(wb, `BGD_View_${currentUser.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
+                showNotification('✅ Đã xuất Excel!');
+            }
+        }
+
+        // ==========================================
+        // POLLING & REALTIME UPDATES
+        // ==========================================
+        let pnvPollInterval = null;
+        let pqlPollInterval = null;
+        let chatPollInterval = null;
+
+        function startPnvPolling() {
+            // PNV kiểm tra giá chào từ PQL
+            pnvPollInterval = setInterval(() => {
+                if (currentUser?.role !== 'PNV') return;
                 
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    const file = files[0];
-                    const validExts = ['.xlsx', '.xls', '.csv'];
-                    const isValid = validExts.some(ext => file.name.toLowerCase().endsWith(ext));
-                    
-                    if (isValid) {
-                        fileInput.files = files;
-                        // Trigger change event
-                        const event = new Event('change');
-                        fileInput.dispatchEvent(event);
-                    } else {
-                        showNotification('Chỉ chấp nhận file .xlsx, .xls, .csv!', 'error');
+                // Kiểm tra quote cho PNV này
+                const myQuotes = pendingQuotes.filter(q => 
+                    q.pnv === currentUser.id && 
+                    q.status === 'quoted' && 
+                    !q.interrupted &&
+                    new Date(q.expiryTime) > new Date()
+                );
+                
+                myQuotes.forEach(q => {
+                    const stored = localStorage.getItem('pql_quote_' + q.id);
+                    if (stored && !document.getElementById('quoteResponseModal').classList.contains('active')) {
+                        const data = JSON.parse(stored);
+                        const now = new Date();
+                        const expiry = new Date(data.expiryTime);
+                        
+                        if (now < expiry && !data.interrupted) {
+                            // Hiển thị modal chào giá
+                            document.getElementById('quoteResponseModal').classList.add('active');
+                            document.getElementById('modalQuotePrice').textContent = data.rate.toLocaleString('vi-VN', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 4
+                            });
+                            document.getElementById('modalQuotePair').textContent = `${q.buyCurr}/${q.sellCurr}`;
+                            document.getElementById('modalQuotePnv').textContent = `${q.pnvName} (${q.pnv})`;
+                            document.getElementById('modalQuoteAmount').textContent = q.amount.toLocaleString('vi-VN');
+                            
+                            const remainingSeconds = Math.floor((expiry - now) / 1000);
+                            startQuoteTimer(remainingSeconds, q.id, data.rate);
+                            
+                            showNotification('🔔 PQL đã chào giá! Vui lòng phản hồi trong thời gian quy định.', 'warning');
+                        }
                     }
+                });
+                
+                // Kiểm tra tin nhắn chat mới
+                checkNewChatMessages();
+            }, 2000);
+        }
+
+        function startPqlPolling() {
+            // PQL kiểm tra yêu cầu hỏi giá mới
+            pqlPollInterval = setInterval(() => {
+                if (currentUser?.role !== 'PQL') return;
+                
+                const currentTab = document.querySelector('#pql-quotes.tab-content');
+                if (currentTab && currentTab.classList.contains('active')) {
+                    loadPendingQuotes();
+                }
+            }, 3000);
+            
+            // PQL kiểm tra tin nhắn từ PNV
+            chatPollInterval = setInterval(() => {
+                if (currentUser?.role !== 'PQL') return;
+                checkNewChatMessages();
+            }, 2000);
+        }
+
+        function checkNewChatMessages() {
+            const unreadMessages = chatMessages.filter(m => 
+                !m.read && 
+                ((currentUser.role === 'PQL' && m.fromRole === 'PNV') ||
+                 (currentUser.role === 'PNV' && m.fromRole === 'PQL' && (m.to === currentUser.id || m.to === 'ALL_PNV')))
+            );
+            
+            unreadMessages.forEach(m => {
+                m.read = true;
+                
+                const container = currentUser.role === 'PNV' 
+                    ? document.getElementById('pnvChatMessages')
+                    : document.getElementById('pqlChatMessages');
+                    
+                if (container) {
+                    const div = document.createElement('div');
+                    div.className = m.to === 'ALL_PNV' || m.to === 'PQL' ? 'chat-message broadcast' : 'chat-message received';
+                    div.innerHTML = `<strong>${m.fromName} (${m.fromRole}):</strong><br>${m.message}
+                        <div class="chat-message-meta">${new Date(m.time).toLocaleTimeString()}</div>`;
+                    container.appendChild(div);
+                    container.scrollTop = container.scrollHeight;
                 }
             });
+            
+            if (unreadMessages.length > 0) {
+                saveToLocalStorage();
+            }
         }
-    });
-});
 
-window.addEventListener('beforeunload', function() {
-    stopAllPolling();
-});
-</script>
+        function stopAllPolling() {
+            if (pnvPollInterval) clearInterval(pnvPollInterval);
+            if (pqlPollInterval) clearInterval(pqlPollInterval);
+            if (chatPollInterval) clearInterval(chatPollInterval);
+            if (quoteTimer) clearInterval(quoteTimer);
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            
+            const today = new Date();
+            const dateInputs = [
+                'pnvFilterFromDate', 'pnvFilterToDate', 'pqlFilterFrom', 'pqlFilterTo',
+                'reportTransFrom', 'reportTransTo', 'reportEffFrom', 'reportEffTo',
+                'bgdFromDate', 'bgdToDate', 'effectiveDate', 'editEffDate'
+            ];
+            
+            dateInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && !el.value) {
+                    el.value = formatDateYYYYMMDD(today);
+                }
+            });
+
+            // File upload drag & drop handlers
+            const uploadAreas = [
+                { area: 'cifUploadArea', input: 'cifFileInput' },
+                { area: 'purposeUploadArea', input: 'purposeFileInput' },
+                { area: 'roomUploadArea', input: 'roomFileInput' },
+                { area: 'rateUploadArea', input: 'rateFileInput' },
+                { area: 'legUploadArea', input: 'legFileInput' }
+            ];
+            
+            uploadAreas.forEach(({ area, input }) => {
+                const uploadArea = document.getElementById(area);
+                const fileInput = document.getElementById(input);
+                
+                if (uploadArea && fileInput) {
+                    uploadArea.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        uploadArea.style.borderColor = '#4CAF50';
+                        uploadArea.style.backgroundColor = '#f0f8f0';
+                    });
+                    
+                    uploadArea.addEventListener('dragleave', (e) => {
+                        e.preventDefault();
+                        uploadArea.style.borderColor = '#C8E6C9';
+                        uploadArea.style.backgroundColor = '#E8F5E9';
+                    });
+                    
+                    uploadArea.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        uploadArea.style.borderColor = '#C8E6C9';
+                        uploadArea.style.backgroundColor = '#E8F5E9';
+                        
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                            const file = files[0];
+                            const validExts = ['.xlsx', '.xls', '.csv'];
+                            const isValid = validExts.some(ext => file.name.toLowerCase().endsWith(ext));
+                            
+                            if (isValid) {
+                                fileInput.files = files;
+                                // Trigger change event
+                                const event = new Event('change');
+                                fileInput.dispatchEvent(event);
+                            } else {
+                                showNotification('Chỉ chấp nhận file .xlsx, .xls, .csv!', 'error');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        window.addEventListener('beforeunload', function() {
+            stopAllPolling();
+        });
+    </script>
 </body>
 </html>
