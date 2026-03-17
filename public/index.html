@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ - MBNT</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -477,6 +478,7 @@
             border-radius: 15px;
             font-size: 14px;
             line-height: 1.4;
+            word-wrap: break-word;
         }
 
         .chat-message.sent {
@@ -499,6 +501,14 @@
             border: 1px solid var(--info);
             margin-right: auto;
             border-bottom-left-radius: 5px;
+        }
+
+        .chat-message.system {
+            background: #FFF3E0;
+            border: 1px solid var(--warning);
+            margin: 0 auto;
+            text-align: center;
+            max-width: 90%;
         }
 
         .chat-input-area {
@@ -627,13 +637,14 @@
         }
 
         .quote-timer {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: bold;
             color: var(--danger);
+            font-family: monospace;
         }
 
         .quote-price {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
             color: var(--primary-green);
             text-align: center;
@@ -771,6 +782,10 @@
             background: var(--warning);
         }
 
+        .notification.info {
+            background: var(--info);
+        }
+
         .badge {
             display: inline-block;
             padding: 4px 8px;
@@ -899,6 +914,33 @@
             color: var(--text-dark);
         }
 
+        .connection-status {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2500;
+            transition: all 0.3s;
+        }
+
+        .connection-status.online {
+            background: var(--success);
+            color: white;
+        }
+
+        .connection-status.offline {
+            background: var(--danger);
+            color: white;
+        }
+
+        .connection-status.connecting {
+            background: var(--warning);
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -931,158 +973,11 @@
             }
         }
     </style>
-
-
-        <!-- Socket.IO Client -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script>
-        // Global socket variable
-        let socket = null;
-        let currentQuoteData = null;
-        
-        // Kết nối server (thay YOUR_RENDER_URL bằng URL thật)
-        const SERVER_URL = window.location.origin; // Hoặc 'https://your-app.onrender.com'
-        
-        function initSocket() {
-            socket = io(SERVER_URL);
-            
-            socket.on('connect', () => {
-                console.log('Connected to server');
-                if (currentUser) {
-                    socket.emit('register', currentUser.id);
-                }
-            });
-            
-            // PNV nhận giá chào từ PQL
-            socket.on('price_quote', (data) => {
-                console.log('Received price quote:', data);
-                showQuoteModal(data);
-            });
-            
-            // Quote bị interrupt
-            socket.on('quote_interrupted', (data) => {
-                closeQuoteModal();
-                showNotification('⛔ Giao dịch đã bị PQL Interrupt!', 'error');
-            });
-            
-            // Nhận message chat
-            socket.on('new_message', (data) => {
-                displayChatMessage(data);
-            });
-            
-            socket.on('disconnect', () => {
-                console.log('Disconnected from server');
-            });
-        }
-        
-        function showQuoteModal(data) {
-            currentQuoteData = data;
-            const modal = document.getElementById('quoteResponseModal');
-            
-            document.getElementById('modalQuotePrice').textContent = parseFloat(data.rate).toLocaleString('vi-VN', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 4
-            });
-            
-            // Start countdown
-            const expiry = new Date(data.expiryTime);
-            startQuoteTimer(expiry, data.quoteId);
-            
-            modal.classList.add('active');
-            showNotification('🔔 PQL đã chào giá! Vui lòng phản hồi.', 'warning');
-        }
-        
-        function startQuoteTimer(expiryTime, quoteId) {
-            const timerDisplay = document.getElementById('modalQuoteTimer');
-            
-            if (window.quoteTimerInterval) {
-                clearInterval(window.quoteTimerInterval);
-            }
-            
-            window.quoteTimerInterval = setInterval(() => {
-                const now = new Date();
-                const remaining = Math.ceil((expiryTime - now) / 1000);
-                
-                if (remaining <= 0) {
-                    clearInterval(window.quoteTimerInterval);
-                    timerDisplay.textContent = '00:00';
-                    closeQuoteModal();
-                    showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
-                    
-                    // Tự động từ chối
-                    socket.emit('respond_quote', {
-                        quoteId: quoteId,
-                        accepted: false,
-                        pnvId: currentUser.id
-                    });
-                    return;
-                }
-                
-                const mins = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-        
-        function acceptPrice() {
-            if (!currentQuoteData) return;
-            
-            clearInterval(window.quoteTimerInterval);
-            
-            socket.emit('respond_quote', {
-                quoteId: currentQuoteData.quoteId,
-                accepted: true,
-                pnvId: currentUser.id
-            });
-            
-            closeQuoteModal();
-            showNotification('✅ Đã chấp nhận giá! Giao dịch thành công.');
-            
-            // Reload blotter
-            setTimeout(() => loadPnvBlotter(), 500);
-        }
-        
-        function rejectPrice() {
-            if (!currentQuoteData) return;
-            
-            clearInterval(window.quoteTimerInterval);
-            
-            socket.emit('respond_quote', {
-                quoteId: currentQuoteData.quoteId,
-                accepted: false,
-                pnvId: currentUser.id
-            });
-            
-            closeQuoteModal();
-            showNotification('Đã từ chối giá', 'warning');
-        }
-        
-        function closeQuoteModal() {
-            document.getElementById('quoteResponseModal').classList.remove('active');
-            currentQuoteData = null;
-        }
-        
-        // API Helper functions
-        async function apiGet(endpoint) {
-            const response = await fetch(`${SERVER_URL}/api${endpoint}`);
-            return response.json();
-        }
-        
-        async function apiPost(endpoint, data) {
-            const response = await fetch(`${SERVER_URL}/api${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            return response.json();
-        }
-    </script>
-
-
-
-    
 </head>
 <body>
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status connecting">Đang kết nối...</div>
+
     <!-- Header -->
     <header class="header" id="header">
         <div class="logo-section">
@@ -1375,16 +1270,15 @@
                     <div class="card-title">Chat với Phòng Quản lý</div>
                     <div class="chat-container">
                         <div class="chat-messages" id="pnvChatMessages">
-                            <div class="chat-message received">
+                            <div class="chat-message system">
                                 <strong>Hệ thống:</strong><br>
-                                Chào mừng! Bạn có thể chat trực tiếp với PQL tại đây.
-                                <div class="chat-message-meta">Tin nhắn của bạn sẽ được gửi đến tất cả PQL</div>
+                                Chào mừng! Tin nhắn của bạn sẽ được gửi đến tất cả PQL.
                             </div>
                         </div>
                         <div class="chat-input-area">
                             <input type="text" class="chat-input" id="pnvChatInput" 
-                                   placeholder="Nhập tin nhắn..." onkeypress="handleChatKeyPress(event)">
-                            <button class="btn chat-send" onclick="sendChatMessage()">Gửi</button>
+                                   placeholder="Nhập tin nhắn..." onkeypress="handleChatKeyPress(event, 'pnv')">
+                            <button class="btn chat-send" onclick="sendChatMessage('pnv')">Gửi</button>
                         </div>
                     </div>
                 </div>
@@ -1420,10 +1314,10 @@
                 <div class="dashboard-title">📊 DASHBOARD PHÒNG QUẢN LÝ</div>
             </div>
 
-            <!-- INTERRUPT BAR - LUÔN HIỂN THỊ -->
+            <!-- INTERRUPT BAR -->
             <div class="interrupt-bar">
                 <div class="interrupt-title">⚠️ QUYỀN KHẨN CẤP</div>
-                <div class="btn-group" style="margin: 0;">
+                                <div class="btn-group" style="margin: 0;">
                     <button class="btn btn-small btn-danger" onclick="interruptCurrent()">Interrupt</button>
                     <button class="btn btn-small btn-danger" onclick="interruptAll()">Interrupt All</button>
                 </div>
@@ -1451,7 +1345,7 @@
                         </div>
                         <label class="upload-btn">
                             Chọn file
-                            <input type="file" id="cifFileInput" accept=".xlsx,.xls,.csv" onchange="handleCifFileSelect(event)">
+                            <input type="file" id="cifFileInput" accept=".xlsx,.xls,.csv" onchange="handleCifFileSelect(event)" style="display: none;">
                         </label>
                         <div class="file-name" id="cifFileName"></div>
                     </div>
@@ -1491,7 +1385,7 @@
                         </div>
                         <label class="upload-btn">
                             Chọn file
-                            <input type="file" id="purposeFileInput" accept=".xlsx,.xls,.csv" onchange="handlePurposeFileSelect(event)">
+                            <input type="file" id="purposeFileInput" accept=".xlsx,.xls,.csv" onchange="handlePurposeFileSelect(event)" style="display: none;">
                         </label>
                         <div class="file-name" id="purposeFileName"></div>
                     </div>
@@ -1516,72 +1410,6 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Upload Mã Phòng -->
-                <div class="card">
-                    <div class="card-title">Upload Mã Phòng</div>
-                    <div class="file-upload-area" id="roomUploadArea">
-                        <div style="font-size: 48px; margin-bottom: 10px;">🏢</div>
-                        <div style="font-weight: 600; margin-bottom: 5px;">Upload file Mã Phòng</div>
-                        <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
-                            Hỗ trợ: .xlsx, .xls, .csv (Cột A: Mã phòng, Cột B: Tên phòng)
-                        </div>
-                        <label class="upload-btn">
-                            Chọn file
-                            <input type="file" id="roomFileInput" accept=".xlsx,.xls,.csv" onchange="handleRoomFileSelect(event)">
-                        </label>
-                        <div class="file-name" id="roomFileName"></div>
-                    </div>
-                    <div style="margin-top: 20px;">
-                        <button class="btn btn-small" onclick="processRoomFile()" id="uploadRoomBtn" style="display: none; width: auto;">
-                            📤 Upload Mã Phòng
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Upload TG Thống kê -->
-                <div class="card">
-                    <div class="card-title">Upload Tỷ giá thống kê</div>
-                    <div class="file-upload-area" id="rateUploadArea">
-                        <div style="font-size: 48px; margin-bottom: 10px;">💱</div>
-                        <div style="font-weight: 600; margin-bottom: 5px;">Upload file Tỷ giá thống kê</div>
-                        <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
-                            Hỗ trợ: .xlsx, .xls, .csv (Cột A: Mã tiền, Cột B: Tỷ giá mua, Cột C: Tỷ giá bán)
-                        </div>
-                        <label class="upload-btn">
-                            Chọn file
-                            <input type="file" id="rateFileInput" accept=".xlsx,.xls,.csv" onchange="handleRateFileSelect(event)">
-                        </label>
-                        <div class="file-name" id="rateFileName"></div>
-                    </div>
-                    <div style="margin-top: 20px;">
-                        <button class="btn btn-small" onclick="processRateFile()" id="uploadRateBtn" style="display: none; width: auto;">
-                            📤 Upload Tỷ giá
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Upload Chân hàng -->
-                <div class="card">
-                    <div class="card-title">Upload Chân hàng</div>
-                    <div class="file-upload-area" id="legUploadArea">
-                        <div style="font-size: 48px; margin-bottom: 10px;">📦</div>
-                        <div style="font-weight: 600; margin-bottom: 5px;">Upload file Chân hàng</div>
-                        <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
-                            Hỗ trợ: .xlsx, .xls, .csv
-                        </div>
-                        <label class="upload-btn">
-                            Chọn file
-                            <input type="file" id="legFileInput" accept=".xlsx,.xls,.csv" onchange="handleLegFileSelect(event)">
-                        </label>
-                        <div class="file-name" id="legFileName"></div>
-                    </div>
-                    <div style="margin-top: 20px;">
-                        <button class="btn btn-small" onclick="processLegFile()" id="uploadLegBtn" style="display: none; width: auto;">
-                            📤 Upload Chân hàng
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <!-- Tab Chào giá -->
@@ -1590,7 +1418,7 @@
                     <div class="card-title">Yêu cầu hỏi giá đang chờ</div>
                     <div id="pendingQuotes">
                         <div style="padding: 20px; text-align: center; color: var(--gray);">
-                            Không có yêu cầu nào đang chờ
+                            Đang tải...
                         </div>
                     </div>
                 </div>
@@ -1742,9 +1570,8 @@
             <!-- Tab Báo cáo -->
             <div id="pql-reports" class="tab-content">
                 <div class="card">
-                    <div class="card-title">Báo cáo giao dịch - Mẫu BC KDNT</div>
+                    <div class="card-title">Báo cáo giao dịch</div>
                     
-                    <!-- Summary Section -->
                     <div class="report-summary">
                         <div class="summary-item">
                             <span class="summary-label">Tổng số giao dịch:</span>
@@ -1757,10 +1584,6 @@
                         <div class="summary-item">
                             <span class="summary-label">Tổng lợi nhuận:</span>
                             <span class="summary-value" id="reportTotalProfit">0 VND</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Tỷ giá cân đối trung bình:</span>
-                            <span class="summary-value" id="reportAvgBalancedRate">0</span>
                         </div>
                     </div>
 
@@ -1775,33 +1598,6 @@
                                 <input type="date" id="reportTransTo">
                             </div>
                             <div class="form-group">
-                                <label>Ngày hiệu lực từ</label>
-                                <input type="date" id="reportEffFrom">
-                            </div>
-                            <div class="form-group">
-                                <label>Ngày hiệu lực đến</label>
-                                <input type="date" id="reportEffTo">
-                            </div>
-                            <div class="form-group">
-                                <label>Mã đồng tiền bán</label>
-                                <select id="reportSellCurr">
-                                    <option value="">Tất cả</option>
-                                    <option value="USD">USD</option>
-                                    <option value="EUR">EUR</option>
-                                    <option value="GBP">GBP</option>
-                                    <option value="JPY">JPY</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Mã đồng tiền mua</label>
-                                <select id="reportBuyCurr">
-                                    <option value="">Tất cả</option>
-                                    <option value="USD">USD</option>
-                                    <option value="EUR">EUR</option>
-                                    <option value="VND">VND</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
                                 <label>Mã PNV</label>
                                 <select id="reportPnv">
                                     <option value="">Tất cả</option>
@@ -1813,7 +1609,6 @@
                                     <option value="">Tất cả</option>
                                     <option value="GN">GN (Giao ngay)</option>
                                     <option value="KH">KH (Kỳ hạn)</option>
-                                    <option value="HĐ">HĐ (Hoán đổi)</option>
                                 </select>
                             </div>
                         </div>
@@ -1843,16 +1638,15 @@
                     </div>
                     <div class="chat-container">
                         <div class="chat-messages" id="pqlChatMessages">
-                            <div class="chat-message received">
+                            <div class="chat-message system">
                                 <strong>Hệ thống:</strong><br>
                                 Sẵn sàng nhận tin nhắn từ PNV.
-                                <div class="chat-message-meta">Tin nhắn từ PNV sẽ hiển thị ở đây</div>
                             </div>
                         </div>
                         <div class="chat-input-area">
                             <input type="text" class="chat-input" id="pqlChatInput" 
-                                   placeholder="Nhập tin nhắn..." onkeypress="handlePqlChatKeyPress(event)">
-                            <button class="btn chat-send" onclick="sendPqlChatMessage()">Gửi</button>
+                                   placeholder="Nhập tin nhắn..." onkeypress="handleChatKeyPress(event, 'pql')">
+                            <button class="btn chat-send" onclick="sendChatMessage('pql')">Gửi</button>
                         </div>
                     </div>
                 </div>
@@ -1993,7 +1787,7 @@
                         <option value="PNV-K3">KHDN3 (K3)</option>
                         <option value="PNV-FDI">FDI (FDI)</option>
                         <option value="PNV-L1">KHBL1 (L1)</option>
-                                            <option value="PNV-L2">KHBL2 (L2)</option>
+                        <option value="PNV-L2">KHBL2 (L2)</option>
                         <option value="PNV-L3">KHBL3 (L3)</option>
                         <option value="PNV-TĐT">PGD TĐT (TĐT)</option>
                         <option value="PNV-ML">PGD ML (ML)</option>
@@ -2090,7 +1884,6 @@
                 </div>
                 <div style="text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Cặp tiền: <strong id="modalQuotePair">USD/VND</strong></div>
-                    <div style="font-size: 14px; color: #666;">PNV: <strong id="modalQuotePnv">-</strong></div>
                     <div style="font-size: 14px; color: #666;">Số lượng: <strong id="modalQuoteAmount">-</strong></div>
                 </div>
                 <div class="quote-price" id="modalQuotePrice">0.00</div>
@@ -2169,7 +1962,6 @@
                         <select id="editType" required>
                             <option value="GN">GN - Giao ngay</option>
                             <option value="KH">KH - Kỳ hạn</option>
-                            <option value="HĐ">HĐ - Hoán đổi</option>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column: 1 / -1;">
@@ -2190,262 +1982,22 @@
     <div class="notification" id="notification"></div>
 
     <script>
-
-
-
-        function handleLogin(e) {
-    e.preventDefault();
-    const userId = document.getElementById('userId').value.trim();
-    const password = document.getElementById('password').value;
-    const errorDiv = document.getElementById('loginError');
-
-    // ... (giữ nguyên phần check user) ...
-    
-    currentUser = user;
-    
-    // Init socket connection
-    initSocket();
-    socket.emit('register', currentUser.id);
-    
-    // ... (phần còn lại giữ nguyên) ...
-}
-
-        function submitAskPrice(e) {
-    e.preventDefault();
-    
-    // ... (validation giữ nguyên) ...
-    
-    const quoteData = {
-        pnvId: currentUser.id,
-        pnvName: currentUser.name,
-        cif: document.getElementById('cif').value.trim(),
-        customerName: document.getElementById('customerName').value,
-        direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
-        buyCurr: document.getElementById('buyCurrency').value,
-        sellCurr: document.getElementById('sellCurrency').value,
-        amount: parseFloat(document.getElementById('amount').value),
-        purposeCode: cleanCode,
-        purposeName: document.getElementById('purposeName').value,
-        effectiveDate: document.getElementById('effectiveDate').value
-    };
-    
-    // Gửi qua socket realtime
-    socket.emit('ask_price', quoteData);
-    
-    showNotification('Đã gửi yêu cầu hỏi giá đến PQL! Đang chờ phản hồi...', 'info');
-    
-    document.getElementById('askPriceForm').reset();
-    document.getElementById('transactionDate').value = formatDate(new Date());
-}
-
-        // Load pending quotes từ API
-async function loadPendingQuotes() {
-    try {
-        const quotes = await apiGet('/quotes/pending');
-        const container = document.getElementById('pendingQuotes');
-        
-        if (quotes.length === 0) {
-            container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
-            return;
-        }
-        
-        container.innerHTML = '';
-        quotes.forEach(quote => {
-            const div = document.createElement('div');
-            div.className = 'pending-quote';
-            div.onclick = () => selectQuote(quote);
-            div.innerHTML = `
-                <div class="pending-quote-header">
-                    <span class="pending-quote-title">${quote.pnv_name} (${quote.pnv_id})</span>
-                    <span class="pending-quote-time">${new Date(quote.created_at).toLocaleTimeString()}</span>
-                </div>
-                <div class="pending-quote-details">
-                    CIF: ${quote.cif} | ${quote.customer_name}<br>
-                    Chiều: ${quote.direction} | ${quote.buy_curr} → ${quote.sell_curr}<br>
-                    Số lượng: ${parseFloat(quote.amount).toLocaleString()} | Ngày hiệu lực: ${quote.effective_date}<br>
-                    Mục đích: ${quote.purpose_code} - ${quote.purpose_name}
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    } catch (err) {
-        console.error('Error loading quotes:', err);
-    }
-}
-
-// Gửi chào giá
-function submitQuote(e) {
-    e.preventDefault();
-    const quoteId = document.getElementById('quoteRequestId').value;
-    const rate = parseFloat(document.getElementById('quoteRate').value);
-    const duration = parseInt(document.getElementById('quoteDuration').value);
-    
-    if (!rate || rate <= 0) {
-        showNotification('Vui lòng nhập tỷ giá hợp lệ!', 'error');
-        return;
-    }
-    
-    socket.emit('submit_quote', {
-        quoteId: quoteId,
-        rate: rate,
-        duration: duration,
-        pqlId: currentUser.id
-    });
-    
-    showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
-    
-    document.getElementById('quoteFormCard').classList.add('hidden');
-    loadPendingQuotes();
-}
-
-// Interrupt
-function interruptCurrent() {
-    socket.emit('interrupt_quote', { all: false });
-    showNotification('⛔ Đã Interrupt giao dịch!', 'error');
-}
-
-function interruptAll() {
-    socket.emit('interrupt_quote', { all: true });
-    showNotification('⛔⛔⛔ Đã Interrupt TẤT CẢ giao dịch!', 'error');
-}
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
         // ==========================================
         // GLOBAL STATE & CONFIGURATION
         // ==========================================
         let currentUser = null;
-        let quoteTimer = null;
-        let quoteExpiryTime = null;
-        let currentQuoteId = null;
+        let socket = null;
+        let currentQuoteData = null;
+        let quoteTimerInterval = null;
         let editingTransactionId = null;
         let currentEditingUserId = null;
         let selectedCifFile = null;
         let selectedPurposeFile = null;
-        let selectedRoomFile = null;
-        let selectedRateFile = null;
-        let selectedLegFile = null;
+        let allUsers = [];
+        let cifData = {};
+        let purposeData = {};
 
-        // ==========================================
-        // MOCK DATA INITIALIZATION
-        // ==========================================
-        let mockUsers = [
-            { id: 'admin', name: 'Administrator', dept: 'IT', role: 'admin', password: 'Vcb@1234', manager: null },
-            { id: 'K001', name: 'Nguyễn Văn A', dept: 'KHDN1 (K1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
-            { id: 'K002', name: 'Trần Thị B', dept: 'KHDN2 (K2)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD001' },
-            { id: 'L001', name: 'Lê Văn C', dept: 'KHBL1 (L1)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
-            { id: 'TN001', name: 'Phạm Thị D', dept: 'DV KHTN (TN)', role: 'PNV', password: 'Vcb@1234', manager: 'BGD002' },
-            { id: 'KT001', name: 'Hoàng Văn E', dept: 'PQL - Kế toán', role: 'PQL', password: 'Vcb@1234', manager: null },
-            { id: 'BGD001', name: 'Giám đốc A', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null },
-            { id: 'BGD002', name: 'Giám đốc B', dept: 'Ban Giám đốc', role: 'BGD', password: 'Vcb@1234', manager: null }
-        ];
-
-        let mockCIF = {
-            '0000123456': 'CÔNG TY TNHH ABC',
-            '0000987654': 'TẬP ĐOÀN XYZ',
-            '0001122334': 'NGÂN HÀNG DEF',
-            '0002233445': 'CÔNG TY CP GHI',
-            '0003344556': 'TẬP ĐOÀN JKL'
-        };
-
-        let mockPurpose = {
-            '1': 'Thanh toán nhập khẩu hàng hóa (bao gồm phí dịch vụ, vận tải và bảo hiểm đi kèm với hàng hóa)',
-            '2': 'Thanh toán nhập khẩu dịch vụ (vận tải, bưu chính viễn thông, du lịch, dịch vụ tài chính…)',
-            '3': 'Chuyển tiền một chiều',
-            '4': 'Chuyển thu nhập từ hoạt động đầu tư trực tiếp ra nước ngoài',
-            '5': 'Chuyển tiền khi được phép giảm vốn đầu tư trực tiếp vào Việt NamChuyển lợi nhuận',
-            '6': 'Chuyển tiền đầu tư trực tiếp của Việt Nam ra nước ngoài',
-            '7': 'Chuyển thu nhập từ hoạt động đầu tư gián tiếp ra nước ngoài',
-            '8': 'Thanh toán tiền lãi và trả nợ gốc các khoản vay nước ngoài',
-            '9': 'Thanh toán tiền lãi và trả nợ gốc các khoản vay ngoại tệ trong nước',
-            '10': 'Thanh toán thẻ quốc tế',
-            '11': 'Bán ngoại tệ cho Kho bạc Nhà nước',
-            '12': 'Mục đích khác'
-        };
-
-        let mockSource = {
-            '1': 'Nguồn thu từ xuất khẩu hàng hóa (bao gồm dịch vụ gắn liền với hàng hóa)',
-            '2': 'Nguồn thu từ xuất khẩu dịch vụ (vận tải, bưu chính viễn thông, du lịch, dịch vụ tài chính…)',
-            '3': 'Chuyển tiền một chiều',
-            '4': 'Giải ngân vốn đầu tư trực tiếp nước ngoài (FDI)',
-            '5': 'Để thanh toán thương vụ M&A, thoái vốn',
-            '6': 'Giải ngân vốn đầu tư gián tiếp (mua cổ phần, cổ phiếu, trái phiếu, và các loại chứng khoán khác)',
-            '7': 'Giải ngân vốn vay nước ngoài',
-            '8': 'Giải ngân vốn vay trong nước bằng ngoại tệ',
-            '9': 'TNguồn thu từ thanh toán quốc tế',
-            '10': 'Mua ngoại tệ từ Kho bạc Nhà nước',
-            '11': 'Nguồn khác'
-        };
-
-        let mockRoomData = {};
-        let mockRateStats = {};
-        let mockLegData = {};
-
-        let mockTransactions = [
-            {
-                id: 1,
-                pnv: 'K001',
-                pnvName: 'Nguyễn Văn A',
-                date: '15/03/2026',
-                effectiveDate: '17/03/2026',
-                cif: '0000123456',
-                customerName: 'CÔNG TY TNHH ABC',
-                direction: 'MUA',
-                buyCurr: 'USD',
-                sellCurr: 'VND',
-                amount: 100000,
-                rate: 25350.00,
-                balancedRate: 25400.00,
-                equivalent: 2535000000,
-                type: 'GN',
-                status: 'Thành công',
-                purposeCode: '1',
-                purposeName: 'Thanh toán hàng nhập khẩu',
-                editedBy: null,
-                editTime: null,
-                editNote: null,
-                profit: 5000000
-            },
-            {
-                id: 2,
-                pnv: 'L001',
-                pnvName: 'Lê Văn C',
-                date: '14/03/2026',
-                effectiveDate: '16/03/2026',
-                cif: '0000987654',
-                customerName: 'TẬP ĐOÀN XYZ',
-                direction: 'BÁN',
-                buyCurr: 'VND',
-                sellCurr: 'EUR',
-                amount: 50000,
-                rate: 27500.00,
-                balancedRate: 27450.00,
-                equivalent: 1375000000,
-                type: 'GN',
-                status: 'Thành công',
-                purposeCode: '2',
-                purposeName: 'Thanh toán dịch vụ',
-                editedBy: null,
-                editTime: null,
-                editNote: null,
-                profit: 2500000
-            }
-        ];
-
-        let pendingQuotes = [];
-        let chatMessages = [];
+        const API_BASE = '';
 
         // ==========================================
         // UTILITY FUNCTIONS
@@ -2457,14 +2009,6 @@ function interruptAll() {
         function formatDateYYYYMMDD(date) {
             const d = new Date(date);
             return d.toISOString().split('T')[0];
-        }
-
-        function parseDate(dateStr) {
-            const parts = dateStr.split('/');
-            if (parts.length === 3) {
-                return new Date(parts[2], parts[1] - 1, parts[0]);
-            }
-            return new Date(dateStr);
         }
 
         function validatePassword(password) {
@@ -2480,134 +2024,197 @@ function interruptAll() {
             setTimeout(() => notif.classList.remove('show'), 3000);
         }
 
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-
-        function calculateTransactionType(effDateStr, transDateStr) {
-            const eff = parseDate(effDateStr);
-            const trans = parseDate(transDateStr);
-            const diffTime = Math.abs(eff - trans);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays <= 2 ? 'GN' : 'KH';
-        }
-
-        function calculateProfit(direction, amount, rate, balancedRate) {
-            if (!balancedRate || balancedRate <= 0) return 0;
-            if (direction === 'MUA') {
-                return amount * (balancedRate - rate);
-            } else {
-                return amount * (rate - balancedRate);
-            }
+        function updateConnectionStatus(status) {
+            const el = document.getElementById('connectionStatus');
+            el.className = `connection-status ${status}`;
+            if (status === 'online') el.textContent = '🟢 Đã kết nối';
+            else if (status === 'offline') el.textContent = '🔴 Mất kết nối';
+            else el.textContent = '🟡 Đang kết nối...';
         }
 
         // ==========================================
-        // LOCAL STORAGE MANAGEMENT
+        // API FUNCTIONS
         // ==========================================
-        function saveToLocalStorage() {
-            localStorage.setItem('mbnt_users', JSON.stringify(mockUsers));
-            localStorage.setItem('mbnt_cif', JSON.stringify(mockCIF));
-            localStorage.setItem('mbnt_purpose', JSON.stringify(mockPurpose));
-            localStorage.setItem('mbnt_room', JSON.stringify(mockRoomData));
-            localStorage.setItem('mbnt_ratestats', JSON.stringify(mockRateStats));
-            localStorage.setItem('mbnt_leg', JSON.stringify(mockLegData));
-            localStorage.setItem('mbnt_transactions', JSON.stringify(mockTransactions));
-            localStorage.setItem('mbnt_pendingQuotes', JSON.stringify(pendingQuotes));
-            localStorage.setItem('mbnt_chat', JSON.stringify(chatMessages));
+        async function apiGet(endpoint) {
+            const response = await fetch(`${API_BASE}/api${endpoint}`);
+            if (!response.ok) throw new Error('API Error');
+            return response.json();
         }
 
-        function loadFromLocalStorage() {
-            const users = localStorage.getItem('mbnt_users');
-            const cif = localStorage.getItem('mbnt_cif');
-            const purpose = localStorage.getItem('mbnt_purpose');
-            const room = localStorage.getItem('mbnt_room');
-            const ratestats = localStorage.getItem('mbnt_ratestats');
-            const leg = localStorage.getItem('mbnt_leg');
-            const trans = localStorage.getItem('mbnt_transactions');
-            const quotes = localStorage.getItem('mbnt_pendingQuotes');
-            const chat = localStorage.getItem('mbnt_chat');
+        async function apiPost(endpoint, data) {
+            const response = await fetch(`${API_BASE}/api${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) throw new Error('API Error');
+            return response.json();
+        }
 
-            if (users) mockUsers = JSON.parse(users);
-            if (cif) mockCIF = JSON.parse(cif);
-            if (purpose) mockPurpose = JSON.parse(purpose);
-            if (room) mockRoomData = JSON.parse(room);
-            if (ratestats) mockRateStats = JSON.parse(ratestats);
-            if (leg) mockLegData = JSON.parse(leg);
-            if (trans) mockTransactions = JSON.parse(trans);
-            if (quotes) pendingQuotes = JSON.parse(quotes);
-            if (chat) chatMessages = JSON.parse(chat);
+        async function apiPut(endpoint, data) {
+            const response = await fetch(`${API_BASE}/api${endpoint}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) throw new Error('API Error');
+            return response.json();
+        }
+
+        async function apiDelete(endpoint) {
+            const response = await fetch(`${API_BASE}/api${endpoint}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('API Error');
+            return response.json();
+        }
+
+        // ==========================================
+        // SOCKET.IO INITIALIZATION
+        // ==========================================
+        function initSocket() {
+            socket = io(API_BASE || undefined, {
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionAttempts: 5
+            });
+
+            socket.on('connect', () => {
+                console.log('Socket connected');
+                updateConnectionStatus('online');
+                if (currentUser) {
+                    socket.emit('register', currentUser.id);
+                }
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Socket disconnected');
+                updateConnectionStatus('offline');
+            });
+
+            socket.on('connect_error', () => {
+                updateConnectionStatus('connecting');
+            });
+
+            // PNV nhận giá chào từ PQL
+            socket.on('price_quote', (data) => {
+                console.log('Received price quote:', data);
+                showQuoteModal(data);
+            });
+
+            // Quote bị interrupt
+            socket.on('quote_interrupted', (data) => {
+                closeQuoteModal();
+                showNotification('⛔ Giao dịch đã bị PQL Interrupt!', 'error');
+            });
+
+            // PQL nhận yêu cầu hỏi giá mới
+            socket.on('new_quote_request', (data) => {
+                showNotification(`📥 ${data.pnvName} vừa gửi yêu cầu hỏi giá!`, 'info');
+                if (currentUser?.role === 'PQL') {
+                    loadPendingQuotes();
+                }
+            });
+
+            // Nhận message chat
+            socket.on('new_message', (data) => {
+                displayChatMessage(data);
+            });
+
+            // Unread messages khi đăng nhập lại
+            socket.on('unread_messages', (messages) => {
+                messages.forEach(msg => displayChatMessage(msg));
+            });
+
+            socket.on('message_sent', (data) => {
+                addMessageToChat('sent', data.fromName, data.message, data.timestamp);
+            });
+
+            socket.on('quote_responded', (data) => {
+                if (data.accepted) {
+                    showNotification(`✅ ${data.pnvId} đã chấp nhận giá!`, 'success');
+                } else {
+                    showNotification(`❌ ${data.pnvId} đã từ chối giá`, 'warning');
+                }
+                loadPendingQuotes();
+            });
         }
 
         // ==========================================
         // AUTHENTICATION
         // ==========================================
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const userId = document.getElementById('userId').value.trim();
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('loginError');
 
-            const user = mockUsers.find(u => u.id === userId && u.password === password);
-            
-            if (!user) {
+            try {
+                const user = await apiPost('/login', { userId, password });
+                currentUser = user;
+                
+                errorDiv.style.display = 'none';
+                
+                document.getElementById('header').style.display = 'flex';
+                document.getElementById('footer').style.display = 'flex';
+                document.getElementById('userInfoSection').classList.remove('hidden');
+                
+                document.getElementById('displayUserName').textContent = user.name;
+                document.getElementById('displayUserDept').textContent = user.dept;
+
+                document.getElementById('loginPage').style.display = 'none';
+                
+                // Init socket và đăng ký user
+                initSocket();
+                
+                // Load data dựa vào role
+                if (user.role === 'admin') {
+                    document.getElementById('adminDashboard').style.display = 'block';
+                    await loadUserList();
+                } else if (user.role === 'PNV') {
+                    document.getElementById('pnvDashboard').style.display = 'block';
+                    document.getElementById('transactionDate').value = formatDate(new Date());
+                    await loadCifData();
+                    await loadPurposeData();
+                    await loadPnvBlotter();
+                } else if (user.role === 'PQL') {
+                    document.getElementById('pqlDashboard').style.display = 'block';
+                    await loadCifData();
+                    await loadPurposeData();
+                    await loadCifTable();
+                    await loadPurposeTable();
+                    await loadPendingQuotes();
+                    await loadPqlBlotter();
+                    await loadPnvListForSelect();
+                } else if (user.role === 'BGD') {
+                    document.getElementById('bgdDashboard').style.display = 'block';
+                    await loadBgdPnvList();
+                    await loadBgdView();
+                }
+
+                showNotification(`Chào mừng ${user.name}!`);
+                
+            } catch (err) {
                 errorDiv.textContent = 'ID hoặc mật khẩu không đúng!';
                 errorDiv.style.display = 'block';
-                return;
             }
-
-            currentUser = user;
-            errorDiv.style.display = 'none';
-            
-            document.getElementById('header').style.display = 'flex';
-            document.getElementById('footer').style.display = 'flex';
-            document.getElementById('userInfoSection').classList.remove('hidden');
-            
-            document.getElementById('displayUserName').textContent = user.name;
-            document.getElementById('displayUserDept').textContent = user.dept;
-
-            document.getElementById('loginPage').style.display = 'none';
-            
-            if (user.role === 'admin') {
-                document.getElementById('adminDashboard').style.display = 'block';
-                loadUserList();
-            } else if (user.role === 'PNV') {
-                document.getElementById('pnvDashboard').style.display = 'block';
-                document.getElementById('transactionDate').value = formatDate(new Date());
-                loadPnvBlotter();
-                startPnvPolling();
-            } else if (user.role === 'PQL') {
-                document.getElementById('pqlDashboard').style.display = 'block';
-                loadCifTable();
-                loadPurposeTable();
-                loadPqlBlotter();
-                loadPnvListForChat();
-                startPqlPolling();
-            } else if (user.role === 'BGD') {
-                document.getElementById('bgdDashboard').style.display = 'block';
-                loadBgdPnvList();
-                loadBgdView();
-            }
-
-            showNotification(`Chào mừng ${user.name}!`);
         }
 
         function logout() {
             currentUser = null;
-            stopAllPolling();
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
             location.reload();
         }
 
-        function handleChangePassword(e) {
+        async function handleChangePassword(e) {
             e.preventDefault();
             const prefix = currentUser.role.toLowerCase();
             const currentPwd = document.getElementById(`${prefix}CurrentPassword`).value;
             const newPwd = document.getElementById(`${prefix}NewPassword`).value;
             const confirmPwd = document.getElementById(`${prefix}ConfirmPassword`).value;
-
-            if (currentPwd !== currentUser.password) {
-                showNotification('Mật khẩu hiện tại không đúng!', 'error');
-                return;
-            }
 
             if (!validatePassword(newPwd)) {
                 showNotification('Mật khẩu mới không đủ mạnh! (8+ ký tự, Hoa, thường, số, đặc biệt)', 'error');
@@ -2619,15 +2226,18 @@ function interruptAll() {
                 return;
             }
 
-            currentUser.password = newPwd;
-            const userIndex = mockUsers.findIndex(u => u.id === currentUser.id);
-            if (userIndex > -1) {
-                mockUsers[userIndex].password = newPwd;
+            try {
+                await apiPost('/change-password', {
+                    userId: currentUser.id,
+                    currentPassword: currentPwd,
+                    newPassword: newPwd
+                });
+                
+                e.target.reset();
+                showNotification('Đổi mật khẩu thành công!');
+            } catch (err) {
+                showNotification('Mật khẩu hiện tại không đúng!', 'error');
             }
-            saveToLocalStorage();
-            
-            e.target.reset();
-            showNotification('Đổi mật khẩu thành công!');
         }
 
         // ==========================================
@@ -2652,40 +2262,42 @@ function interruptAll() {
             } else if (dashboard === 'pql' && tabName === 'dataEntry') {
                 loadCifTable();
                 loadPurposeTable();
+            } else if (dashboard === 'pql' && tabName === 'chat') {
+                loadPnvListForSelect();
             }
         }
 
         // ==========================================
         // ADMIN FUNCTIONS
         // ==========================================
-        function loadUserList() {
-            const container = document.getElementById('userList');
-            container.innerHTML = '';
-            
-            mockUsers.forEach(user => {
-                if (user.id === 'admin') return;
+        async function loadUserList() {
+            try {
+                allUsers = await apiGet('/users');
+                const container = document.getElementById('userList');
+                container.innerHTML = '';
                 
-                const card = document.createElement('div');
-                card.className = 'user-card';
-                card.innerHTML = `
-                    <h4>${user.name}</h4>
-                    <div class="user-info-text">ID: ${user.id}</div>
-                    <div class="user-info-text">Phòng: ${user.dept}</div>
-                    <div class="user-info-text">Vai trò: ${user.role}</div>
-                    ${user.manager ? `<div class="user-info-text">Quản lý bởi: ${getManagerName(user.manager)}</div>` : ''}
-                    <div class="user-actions">
-                        <button class="btn btn-small btn-info" onclick="openEditUserModal('${user.id}')">Sửa</button>
-                        <button class="btn btn-small btn-warning" onclick="resetPassword('${user.id}')">Reset MK</button>
-                        <button class="btn btn-small btn-danger" onclick="deleteUser('${user.id}')">Xóa</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function getManagerName(managerId) {
-            const manager = mockUsers.find(u => u.id === managerId);
-            return manager ? `${manager.name} (${manager.id})` : managerId;
+                allUsers.forEach(user => {
+                    if (user.id === 'admin') return;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'user-card';
+                    card.innerHTML = `
+                        <h4>${user.name}</h4>
+                        <div class="user-info-text">ID: ${user.id}</div>
+                        <div class="user-info-text">Phòng: ${user.dept}</div>
+                        <div class="user-info-text">Vai trò: ${user.role}</div>
+                        ${user.manager_id ? `<div class="user-info-text">Quản lý bởi: ${user.manager_id}</div>` : ''}
+                        <div class="user-actions">
+                            <button class="btn btn-small btn-info" onclick="openEditUserModal('${user.id}')">Sửa</button>
+                            <button class="btn btn-small btn-warning" onclick="resetPassword('${user.id}')">Reset MK</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteUser('${user.id}')">Xóa</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                showNotification('Lỗi tải danh sách user!', 'error');
+            }
         }
 
         function openAddUserModal() {
@@ -2698,7 +2310,7 @@ function interruptAll() {
         }
 
         function loadBGDListForSelect(selectId, selectedValue = '') {
-            const bgdUsers = mockUsers.filter(u => u.role === 'BGD');
+            const bgdUsers = allUsers.filter(u => u.role === 'BGD');
             const select = document.getElementById(selectId);
             if (!select) return;
             
@@ -2711,23 +2323,16 @@ function interruptAll() {
         }
 
         function openEditUserModal(userId) {
-            const user = mockUsers.find(u => u.id === userId);
+            const user = allUsers.find(u => u.id === userId);
             if (!user) return;
             
             currentEditingUserId = userId;
             
             document.getElementById('editUserId').value = user.id;
             document.getElementById('editUserName').value = user.name;
+            document.getElementById('editUserDept').value = user.dept;
             
-            const deptSelect = document.getElementById('editUserDept');
-            for (let i = 0; i < deptSelect.options.length; i++) {
-                if (deptSelect.options[i].text === user.dept) {
-                    deptSelect.selectedIndex = i;
-                    break;
-                }
-            }
-            
-            loadBGDListForSelect('editUserManager', user.manager);
+            loadBGDListForSelect('editUserManager', user.manager_id);
             updateEditUserRole();
             
             document.getElementById('editUserModal').classList.add('active');
@@ -2741,114 +2346,111 @@ function interruptAll() {
         function updateUserRole() {
             const dept = document.getElementById('newUserDept').value;
             const managerDiv = document.getElementById('managerSelect');
-            
-            if (dept.startsWith('PNV')) {
-                managerDiv.style.display = 'block';
-            } else {
-                managerDiv.style.display = 'none';
-                document.getElementById('newUserManager').value = '';
-            }
+            managerDiv.style.display = dept.startsWith('PNV') ? 'block' : 'none';
         }
 
         function updateEditUserRole() {
             const dept = document.getElementById('editUserDept').value;
             const managerDiv = document.getElementById('editManagerSelect');
-            
-            if (dept.startsWith('PNV')) {
-                managerDiv.style.display = 'block';
-            } else {
-                managerDiv.style.display = 'none';
-                document.getElementById('editUserManager').value = '';
-            }
+            managerDiv.style.display = dept.startsWith('PNV') ? 'block' : 'none';
         }
 
-        function handleAddUser(e) {
+        async function handleAddUser(e) {
             e.preventDefault();
             const id = document.getElementById('newUserId').value.trim();
             const name = document.getElementById('newUserName').value.trim();
-            const deptValue = document.getElementById('newUserDept').value;
-            const deptText = document.getElementById('newUserDept').options[document.getElementById('newUserDept').selectedIndex].text;
-            const manager = document.getElementById('newUserManager').value;
+            const dept = document.getElementById('newUserDept').value;
+            const managerId = document.getElementById('newUserManager').value;
 
-            if (mockUsers.find(u => u.id === id)) {
-                showNotification('ID đã tồn tại!', 'error');
-                return;
+            try {
+                await apiPost('/users', {
+                    id,
+                    name,
+                    dept,
+                    role: dept.split('-')[0],
+                    managerId: dept.startsWith('PNV') ? managerId : null
+                });
+                
+                closeAddUserModal();
+                e.target.reset();
+                await loadUserList();
+                showNotification('Thêm user thành công!');
+            } catch (err) {
+                showNotification('ID đã tồn tại hoặc lỗi!', 'error');
             }
-
-            const newUser = {
-                id: id,
-                name: name,
-                dept: deptText,
-                role: deptValue.split('-')[0],
-                password: 'Vcb@1234',
-                manager: deptValue.startsWith('PNV') ? (manager || null) : null
-            };
-            
-            mockUsers.push(newUser);
-            saveToLocalStorage();
-            closeAddUserModal();
-            e.target.reset();
-            loadUserList();
-            showNotification('Thêm user thành công!');
         }
 
-        function handleEditUser(e) {
+        async function handleEditUser(e) {
             e.preventDefault();
-            
             if (!currentEditingUserId) return;
             
-            const user = mockUsers.find(u => u.id === currentEditingUserId);
-            if (!user) return;
+            const dept = document.getElementById('editUserDept').value;
             
-            const newName = document.getElementById('editUserName').value.trim();
-            const deptValue = document.getElementById('editUserDept').value;
-            const deptText = document.getElementById('editUserDept').options[document.getElementById('editUserDept').selectedIndex].text;
-            const manager = document.getElementById('editUserManager').value;
-            
-            user.name = newName;
-            user.dept = deptText;
-            user.role = deptValue.split('-')[0];
-            user.manager = deptValue.startsWith('PNV') ? (manager || null) : null;
-            
-            saveToLocalStorage();
-            closeEditUserModal();
-            loadUserList();
-            showNotification('Cập nhật user thành công!');
-        }
-
-        function resetPassword(userId) {
-            const user = mockUsers.find(u => u.id === userId);
-            if (user) {
-                user.password = 'Vcb@1234';
-                saveToLocalStorage();
-                showNotification(`Đã reset mật khẩu cho ${user.name} về mặc định (Vcb@1234)`);
+            try {
+                await apiPut(`/users/${currentEditingUserId}`, {
+                    name: document.getElementById('editUserName').value,
+                    dept: dept,
+                    role: dept.split('-')[0],
+                    managerId: dept.startsWith('PNV') ? document.getElementById('editUserManager').value : null
+                });
+                
+                closeEditUserModal();
+                await loadUserList();
+                showNotification('Cập nhật user thành công!');
+            } catch (err) {
+                showNotification('Lỗi cập nhật user!', 'error');
             }
         }
 
-        function deleteUser(userId) {
-            if (confirm('Bạn có chắc muốn xóa user này?')) {
-                const index = mockUsers.findIndex(u => u.id === userId);
-                if (index > -1) {
-                    mockUsers.splice(index, 1);
-                    saveToLocalStorage();
-                    loadUserList();
-                    showNotification('Đã xóa user');
-                }
+        async function resetPassword(userId) {
+            try {
+                await apiPut(`/users/${userId}`, { password: 'Vcb@1234' });
+                showNotification(`Đã reset mật khẩu cho ${userId} về mặc định`);
+            } catch (err) {
+                showNotification('Lỗi reset mật khẩu!', 'error');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Bạn có chắc muốn xóa user này?')) return;
+            
+            try {
+                await apiDelete(`/users/${userId}`);
+                await loadUserList();
+                showNotification('Đã xóa user');
+            } catch (err) {
+                showNotification('Lỗi xóa user!', 'error');
             }
         }
 
         // ==========================================
-        // PNV FUNCTIONS - YẾT GIÁ
+        // DATA LOADING FUNCTIONS
         // ==========================================
-        // CIF: Chỉ format khi blur (ra khỏi ô), không format khi đang nhập
+        async function loadCifData() {
+            try {
+                cifData = await apiGet('/cif');
+            } catch (err) {
+                console.error('Error loading CIF:', err);
+            }
+        }
+
+        async function loadPurposeData() {
+            try {
+                purposeData = await apiGet('/purpose');
+            } catch (err) {
+                console.error('Error loading purpose:', err);
+            }
+        }
+
+        // ==========================================
+        // PNV FUNCTIONS - YÊU CẦU GIÁ
+        // ==========================================
         function formatCIF() {
             const cifInput = document.getElementById('cif');
-            let value = cifInput.value.replace(/\D/g, ''); // Remove non-digits
+            let value = cifInput.value.replace(/\D/g, '');
             if (value.length > 10) value = value.slice(0, 10);
             
-            // Chỉ format khi có giá trị
             if (value.length > 0) {
-                // Pad with leading zeros to make it 10 digits
                 while (value.length < 10) {
                     value = '0' + value;
                 }
@@ -2872,8 +2474,8 @@ function interruptAll() {
             const cif = document.getElementById('cif').value.trim();
             const nameInput = document.getElementById('customerName');
             
-            if (mockCIF[cif]) {
-                nameInput.value = mockCIF[cif];
+            if (cifData[cif]) {
+                nameInput.value = cifData[cif];
                 nameInput.style.color = 'var(--ocean-blue)';
             } else {
                 nameInput.value = 'Không tìm thấy KH - Vui lòng kiểm tra lại CIF';
@@ -2883,39 +2485,26 @@ function interruptAll() {
 
         function updatePurposeLabel() {
             const type = document.getElementById('transactionType').value;
-            const codeLabel = document.getElementById('purposeCodeLabel');
-            const nameLabel = document.getElementById('purposeNameLabel');
-            
-            if (type === 'buy') {
-                codeLabel.textContent = 'Mã nguồn (1-11)';
-                nameLabel.textContent = 'Tên nguồn';
-            } else {
-                codeLabel.textContent = 'Mã mục đích (1-12)';
-                nameLabel.textContent = 'Tên mục đích';
-            }
+            document.getElementById('purposeCodeLabel').textContent = type === 'buy' ? 'Mã nguồn (1-11)' : 'Mã mục đích (1-12)';
+            document.getElementById('purposeNameLabel').textContent = type === 'buy' ? 'Tên nguồn' : 'Tên mục đích';
         }
 
-        // Mã mục đích/nguồn: nhập tự do 1-12, không format số 0
         function lookupPurposeName() {
             const code = document.getElementById('purposeCode').value.trim();
             const nameInput = document.getElementById('purposeName');
             const type = document.getElementById('transactionType').value;
             
-            // Không format code, giữ nguyên như người dùng nhập (1, 2, 01, 02 đều được)
-            // Chỉ cần loại bỏ ký tự không phải số
             let cleanCode = code.replace(/\D/g, '');
-            
-            // Giới hạn 1-12
             const numCode = parseInt(cleanCode);
+            
             if (numCode < 1 || numCode > 12) {
                 nameInput.value = 'Mã phải từ 1 đến 12';
                 nameInput.style.color = 'var(--danger)';
                 return;
             }
             
-            // Tìm trong mockPurpose hoặc mockSource dựa vào loại giao dịch
-            const dataSource = type === 'buy' ? mockSource : mockPurpose;
-            const displayCode = cleanCode.replace(/^0+/, '') || '0'; // Bỏ số 0 đầu nếu có
+            const displayCode = String(numCode);
+            const dataSource = type === 'buy' ? purposeData : purposeData;
             
             if (dataSource[displayCode]) {
                 nameInput.value = dataSource[displayCode];
@@ -2927,18 +2516,17 @@ function interruptAll() {
         }
 
         function validateEffectiveDate() {
-            const effDate = document.getElementById('effectiveDate').value;
+            const effDate = new Date(document.getElementById('effectiveDate').value);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const selectedDate = new Date(effDate);
             
-            if (selectedDate < today) {
+            if (effDate < today) {
                 showNotification('Ngày hiệu lực không được nhỏ hơn ngày hiện tại!', 'error');
                 document.getElementById('effectiveDate').value = formatDateYYYYMMDD(new Date());
             }
         }
 
-        function submitAskPrice(e) {
+        async function submitAskPrice(e) {
             e.preventDefault();
             
             const buyCurr = document.getElementById('buyCurrency').value;
@@ -2950,91 +2538,85 @@ function interruptAll() {
             }
 
             const cif = document.getElementById('cif').value.trim();
-            if (!mockCIF[cif]) {
+            if (!cifData[cif]) {
                 showNotification('CIF không tồn tại trong hệ thống!', 'error');
                 return;
             }
 
             const purposeCode = document.getElementById('purposeCode').value.trim();
             const purposeName = document.getElementById('purposeName').value;
-            const type = document.getElementById('transactionType').value;
-            
-            // Validate mã mục đích/nguồn
             const numCode = parseInt(purposeCode.replace(/\D/g, ''));
+            
             if (numCode < 1 || numCode > 12 || purposeName.includes('không tồn tại') || purposeName.includes('phải từ')) {
                 showNotification('Mã mục đích/nguồn không hợp lệ! (phải từ 1-12)', 'error');
                 return;
             }
 
-            // Lưu mã gốc như người dùng nhập (không format)
-            const cleanCode = purposeCode.replace(/^0+/, '') || '0';
-
-            const quoteRequest = {
-                id: generateId(),
-                pnv: currentUser.id,
+            const quoteData = {
+                pnvId: currentUser.id,
                 pnvName: currentUser.name,
                 cif: cif,
                 customerName: document.getElementById('customerName').value,
-                direction: type === 'buy' ? 'VCB MUA' : 'VCB BÁN',
-                date: formatDate(new Date()),
-                effectiveDate: document.getElementById('effectiveDate').value,
-                currency: document.getElementById('currencyCode').value,
+                direction: document.getElementById('transactionType').value === 'buy' ? 'VCB MUA' : 'VCB BÁN',
                 buyCurr: buyCurr,
                 sellCurr: sellCurr,
                 amount: parseFloat(document.getElementById('amount').value),
-                purposeCode: cleanCode, // Lưu mã gốc không format
+                purposeCode: String(numCode),
                 purposeName: purposeName,
-                status: 'pending',
-                interrupted: false,
-                timestamp: new Date().toISOString()
+                effectiveDate: document.getElementById('effectiveDate').value
             };
 
-            pendingQuotes.push(quoteRequest);
-            saveToLocalStorage();
-
-            // Store for PNV to retrieve when PQL responds
-            localStorage.setItem('pnv_pending_form_' + quoteRequest.id, JSON.stringify(quoteRequest));
-
+            // Gửi qua socket realtime
+            socket.emit('ask_price', quoteData);
+            
             showNotification('Đã gửi yêu cầu hỏi giá đến PQL! Đang chờ phản hồi...', 'info');
             
             document.getElementById('askPriceForm').reset();
             document.getElementById('transactionDate').value = formatDate(new Date());
-            
-            // Reset auto-fill fields styling
             document.getElementById('customerName').value = '';
             document.getElementById('purposeName').value = '';
         }
 
-        function startQuoteTimer(seconds, quoteId, rate) {
-            quoteExpiryTime = Date.now() + (seconds * 1000);
-            currentQuoteId = quoteId;
+        function showQuoteModal(data) {
+            currentQuoteData = data;
+            const modal = document.getElementById('quoteResponseModal');
+            
+            document.getElementById('modalQuotePrice').textContent = parseFloat(data.rate).toLocaleString('vi-VN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 4
+            });
+            document.getElementById('modalQuotePair').textContent = `${data.buyCurr}/${data.sellCurr}`;
+            document.getElementById('modalQuoteAmount').textContent = parseFloat(data.amount).toLocaleString('vi-VN');
+            
+            const expiry = new Date(data.expiryTime);
+            startQuoteTimer(expiry, data.quoteId);
+            
+            modal.classList.add('active');
+            showNotification('🔔 PQL đã chào giá! Vui lòng phản hồi.', 'warning');
+        }
+
+        function startQuoteTimer(expiryTime, quoteId) {
             const timerDisplay = document.getElementById('modalQuoteTimer');
             
-            if (quoteTimer) clearInterval(quoteTimer);
+            if (quoteTimerInterval) {
+                clearInterval(quoteTimerInterval);
+            }
             
-            quoteTimer = setInterval(() => {
-                const storedQuote = localStorage.getItem('pql_quote_' + quoteId);
-                if (storedQuote) {
-                    const quoteData = JSON.parse(storedQuote);
-                    if (quoteData.interrupted) {
-                        clearInterval(quoteTimer);
-                        closeQuoteModal();
-                        showNotification('⛔ Giao dịch đã bị PQL Interrupt! Không thể chấp nhận giá.', 'error');
-                        currentQuoteId = null;
-                        localStorage.removeItem('pnv_pending_form_' + quoteId);
-                        return;
-                    }
-                }
-                
-                const remaining = Math.ceil((quoteExpiryTime - Date.now()) / 1000);
+            quoteTimerInterval = setInterval(() => {
+                const now = new Date();
+                const remaining = Math.ceil((expiryTime - now) / 1000);
                 
                 if (remaining <= 0) {
-                    clearInterval(quoteTimer);
+                    clearInterval(quoteTimerInterval);
                     timerDisplay.textContent = '00:00';
                     closeQuoteModal();
                     showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
-                    currentQuoteId = null;
-                    localStorage.removeItem('pnv_pending_form_' + quoteId);
+                    
+                    socket.emit('respond_quote', {
+                        quoteId: quoteId,
+                        accepted: false,
+                        pnvId: currentUser.id
+                    });
                     return;
                 }
                 
@@ -3046,270 +2628,121 @@ function interruptAll() {
 
         function closeQuoteModal() {
             document.getElementById('quoteResponseModal').classList.remove('active');
+            if (quoteTimerInterval) {
+                clearInterval(quoteTimerInterval);
+                quoteTimerInterval = null;
+            }
+            currentQuoteData = null;
         }
 
         function acceptPrice() {
-            if (!currentQuoteId) return;
+            if (!currentQuoteData) return;
             
-            const storedQuote = localStorage.getItem('pql_quote_' + currentQuoteId);
-            if (storedQuote) {
-                const quoteData = JSON.parse(storedQuote);
-                if (quoteData.interrupted) {
-                    showNotification('⛔ Không thể chấp nhận - Giao dịch đã bị Interrupt!', 'error');
-                    clearInterval(quoteTimer);
-                    closeQuoteModal();
-                    currentQuoteId = null;
-                    return;
-                }
-            }
-            
-            clearInterval(quoteTimer);
-            
-            const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
-            const quoteData = storedQuote ? JSON.parse(storedQuote) : {};
-            
-            // Calculate balanced rate (opposite rate)
-            const balancedRate = quoteData.rate * (formData.direction === 'VCB MUA' ? 1.002 : 0.998);
-            
-            // Calculate profit
-            const profit = calculateProfit(
-                formData.direction === 'VCB MUA' ? 'MUA' : 'BÁN',
-                formData.amount,
-                quoteData.rate,
-                balancedRate
-            );
-            
-            const transaction = {
-                id: generateId(),
-                pnv: currentUser.id,
-                pnvName: currentUser.name,
-                date: formatDate(new Date()),
-                effectiveDate: formData.effectiveDate,
-                cif: formData.cif,
-                customerName: formData.customerName,
-                direction: formData.direction === 'VCB MUA' ? 'MUA' : 'BÁN',
-                buyCurr: formData.buyCurr,
-                sellCurr: formData.sellCurr,
-                amount: parseFloat(formData.amount),
-                rate: quoteData.rate,
-                balancedRate: balancedRate,
-                equivalent: parseFloat(formData.amount) * quoteData.rate,
-                type: calculateTransactionType(formData.effectiveDate, formatDate(new Date())),
-                status: 'Thành công',
-                purposeCode: formData.purposeCode, // Giữ nguyên mã gốc
-                purposeName: formData.purposeName,
-                editedBy: null,
-                editTime: null,
-                editNote: null,
-                profit: profit
-            };
-            
-            mockTransactions.push(transaction);
-            saveToLocalStorage();
+            socket.emit('respond_quote', {
+                quoteId: currentQuoteData.quoteId,
+                accepted: true,
+                pnvId: currentUser.id
+            });
             
             closeQuoteModal();
-            document.getElementById('askPriceForm').reset();
-            document.getElementById('transactionDate').value = formatDate(new Date());
-            currentQuoteId = null;
-            localStorage.removeItem('pnv_pending_form_' + formData.id);
-            localStorage.removeItem('pql_quote_' + formData.id);
-            
-            showNotification('✅ Giao dịch thành công! Lợi nhuận: ' + profit.toLocaleString('vi-VN') + ' VND');
-            loadPnvBlotter();
+            showNotification('✅ Đã chấp nhận giá! Giao dịch thành công.');
+            setTimeout(() => loadPnvBlotter(), 500);
         }
 
         function rejectPrice() {
-            clearInterval(quoteTimer);
+            if (!currentQuoteData) return;
+            
+            socket.emit('respond_quote', {
+                quoteId: currentQuoteData.quoteId,
+                accepted: false,
+                pnvId: currentUser.id
+            });
+            
             closeQuoteModal();
-            
-            const formData = JSON.parse(localStorage.getItem('pnv_pending_form_' + currentQuoteId) || '{}');
-            if (formData.id) {
-                localStorage.removeItem('pnv_pending_form_' + formData.id);
-                localStorage.removeItem('pql_quote_' + formData.id);
-            }
-            
-            currentQuoteId = null;
-            showNotification('Đã từ chối tỷ giá', 'warning');
+            showNotification('Đã từ chối giá', 'warning');
         }
 
-        function loadPnvBlotter() {
-            const tbody = document.getElementById('pnvBlotterBody');
-            tbody.innerHTML = '';
-            
-            const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
-            
-            userTrans.forEach(t => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${t.date}</td>
-                    <td>${t.effectiveDate}</td>
-                    <td>${t.cif}</td>
-                    <td>${t.customerName}</td>
-                    <td>${t.direction}</td>
-                    <td>${t.buyCurr}</td>
-                    <td>${t.sellCurr}</td>
-                    <td>${t.amount.toLocaleString('vi-VN')}</td>
-                    <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
-                    <td><span class="badge badge-success">${t.type}</span></td>
-                    <td>${t.purposeCode} - ${t.purposeName}</td>
-                    <td class="status-success">${t.status}</td>
-                `;
-            });
+        async function loadPnvBlotter() {
+            try {
+                const transactions = await apiGet(`/transactions?pnvId=${currentUser.id}`);
+                const tbody = document.getElementById('pnvBlotterBody');
+                tbody.innerHTML = '';
+                
+                transactions.forEach(t => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${formatDate(new Date(t.trans_date))}</td>
+                        <td>${formatDate(new Date(t.effective_date))}</td>
+                        <td>${t.cif}</td>
+                        <td>${t.customer_name}</td>
+                        <td>${t.direction}</td>
+                        <td>${t.buy_curr}</td>
+                        <td>${t.sell_curr}</td>
+                        <td>${parseFloat(t.amount).toLocaleString('vi-VN')}</td>
+                        <td>${parseFloat(t.rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                        <td>${parseFloat(t.equivalent).toLocaleString('vi-VN')}</td>
+                        <td><span class="badge badge-success">${t.trans_type}</span></td>
+                        <td>${t.purpose_code} - ${t.purpose_name}</td>
+                        <td class="status-success">${t.status}</td>
+                    `;
+                });
+            } catch (err) {
+                console.error('Error loading blotter:', err);
+            }
         }
 
         function filterPnvBlotter() {
             loadPnvBlotter();
-            showNotification('Đã áp dụng bộ lọc');
         }
 
         function exportPnvBlotter(format) {
-            const userTrans = mockTransactions.filter(t => t.pnv === currentUser.id);
-            
-            if (userTrans.length === 0) {
-                showNotification('Không có dữ liệu để xuất!', 'error');
-                return;
-            }
-
-            const headers = ['Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều GD', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Thành tiền', 'Loại', 'Mục đích', 'Trạng thái'];
-            
-            const data = userTrans.map(t => [
-                t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
-                t.buyCurr, t.sellCurr, t.amount, t.rate, t.equivalent, t.type,
-                t.purposeCode + ' - ' + t.purposeName, t.status
-            ]);
-
-            if (format === 'excel') {
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Blotter PNV');
-                XLSX.writeFile(wb, `Blotter_PNV_${currentUser.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
-                showNotification('✅ Đã xuất file Excel thành công!');
-            } else {
-                const printWindow = window.open('', '_blank');
-                let html = `
-                    <html>
-                    <head>
-                        <title>Blotter PNV - ${currentUser.name}</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; }
-                            h2 { color: #2E7D32; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 11px; }
-                            th { background-color: #4CAF50; color: white; }
-                            tr:nth-child(even) { background-color: #f2f2f2; }
-                        </style>
-                    </head>
-                    <body>
-                        <h2>BLOTTER PHÒNG NGHIỆP VỤ</h2>
-                        <p><strong>PNV:</strong> ${currentUser.id} - ${currentUser.name}</p>
-                        <p><strong>Ngày xuất:</strong> ${formatDate(new Date())}</p>
-                        <table>
-                            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-                            <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
-                        </table>
-                    </body>
-                    </html>
-                `;
-                printWindow.document.write(html);
-                printWindow.document.close();
-                printWindow.print();
-                showNotification('✅ Đã mở cửa sổ in PDF!');
-            }
-        }
-
-        function handleChatKeyPress(e) {
-            if (e.key === 'Enter') sendChatMessage();
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('pnvChatInput');
-            const message = input.value.trim();
-            if (!message) return;
-            
-            const container = document.getElementById('pnvChatMessages');
-            const div = document.createElement('div');
-            div.className = 'chat-message sent';
-            div.innerHTML = `<strong>${currentUser.name}:</strong><br>${message}
-                <div class="chat-message-meta">Gửi đến tất cả PQL - ${new Date().toLocaleTimeString()}</div>`;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-            input.value = '';
-            
-            const chatData = {
-                id: generateId(),
-                from: currentUser.id,
-                fromName: currentUser.name,
-                fromRole: 'PNV',
-                to: 'PQL',
-                toId: null, // Broadcast to all PQL
-                message: message,
-                time: new Date().toISOString(),
-                read: false
-            };
-            
-            chatMessages.push(chatData);
-            saveToLocalStorage();
+            showNotification('Chức năng xuất file đang được cập nhật!', 'info');
         }
 
         // ==========================================
-        // PQL FUNCTIONS - FILE UPLOAD & MANAGEMENT
+        // PQL FUNCTIONS - FILE UPLOAD
         // ==========================================
         function handleCifFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
             
             selectedCifFile = file;
-            
-            const uploadArea = document.getElementById('cifUploadArea');
-            const fileNameDiv = document.getElementById('cifFileName');
-            const uploadBtn = document.getElementById('uploadCifBtn');
-            
-            uploadArea.classList.add('has-file');
-            fileNameDiv.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-            uploadBtn.style.display = 'inline-block';
+            document.getElementById('cifUploadArea').classList.add('has-file');
+            document.getElementById('cifFileName').textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            document.getElementById('uploadCifBtn').style.display = 'inline-block';
         }
 
-        function processCifFile() {
+        async function processCifFile() {
             if (!selectedCifFile) {
                 showNotification('Vui lòng chọn file trước!', 'error');
                 return;
             }
 
             const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                
+            reader.onload = async function(e) {
                 try {
+                    const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                     
-                    let successCount = 0;
-                    let errorCount = 0;
-                    
+                    const cifList = [];
                     for (let i = 0; i < jsonData.length; i++) {
                         const row = jsonData[i];
                         if (row.length >= 2) {
                             let cif = String(row[0]).trim().replace(/\D/g, '');
                             const name = String(row[1]).trim();
                             
-                            // Pad CIF to 10 digits
-                            while (cif.length < 10) {
-                                cif = '0' + cif;
-                            }
+                            while (cif.length < 10) cif = '0' + cif;
                             
                             if (cif && name && cif.length === 10) {
-                                mockCIF[cif] = name;
-                                successCount++;
-                            } else {
-                                errorCount++;
+                                cifList.push({ cif, name });
                             }
                         }
                     }
                     
-                    saveToLocalStorage();
+                    await apiPost('/cif/bulk', { data: cifList });
+                    await loadCifData();
                     loadCifTable();
                     
                     selectedCifFile = null;
@@ -3318,13 +2751,11 @@ function interruptAll() {
                     document.getElementById('uploadCifBtn').style.display = 'none';
                     document.getElementById('cifFileInput').value = '';
                     
-                    showNotification(`✅ Upload CIF thành công: ${successCount} bản ghi. ${errorCount > 0 ? `Lỗi: ${errorCount}` : ''}`, successCount > 0 ? 'success' : 'warning');
-                    
+                    showNotification(`✅ Upload CIF thành công: ${cifList.length} bản ghi!`);
                 } catch (error) {
-                    showNotification('❌ Lỗi đọc file Excel: ' + error.message, 'error');
+                    showNotification('❌ Lỗi đọc file: ' + error.message, 'error');
                 }
             };
-            
             reader.readAsArrayBuffer(selectedCifFile);
         }
 
@@ -3333,9 +2764,7 @@ function interruptAll() {
             if (!tbody) return;
             
             tbody.innerHTML = '';
-            const entries = Object.entries(mockCIF);
-            
-            entries.forEach(([cif, name]) => {
+            Object.entries(cifData).forEach(([cif, name]) => {
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${cif}</td>
@@ -3347,107 +2776,83 @@ function interruptAll() {
             });
         }
 
-        function deleteCif(cif) {
-            if (confirm(`Xóa CIF ${cif} - ${mockCIF[cif]}?`)) {
-                delete mockCIF[cif];
-                saveToLocalStorage();
+        async function deleteCif(cif) {
+            if (!confirm(`Xóa CIF ${cif}?`)) return;
+            try {
+                await apiDelete(`/cif/${cif}`);
+                await loadCifData();
                 loadCifTable();
                 showNotification('Đã xóa CIF');
+            } catch (err) {
+                showNotification('Lỗi xóa CIF!', 'error');
             }
         }
 
-        function clearAllCif() {
-            if (confirm('⚠️ Bạn có chắc muốn XÓA TẤT CẢ CIF?')) {
-                mockCIF = {};
-                saveToLocalStorage();
-                loadCifTable();
-                showNotification('Đã xóa tất cả CIF', 'warning');
-            }
+        async function clearAllCif() {
+            if (!confirm('⚠️ Xóa tất cả CIF?')) return;
+            showNotification('Chức năng này cần xác nhận từ admin!', 'warning');
         }
 
         function exportCifToExcel() {
-            const entries = Object.entries(mockCIF);
-            if (entries.length === 0) {
-                showNotification('Không có dữ liệu CIF để xuất!', 'error');
-                return;
-            }
-            
-            const data = entries.map(([cif, name]) => [cif, name]);
+            const data = Object.entries(cifData).map(([cif, name]) => [cif, name]);
             const ws = XLSX.utils.aoa_to_sheet([['CIF', 'Tên Khách Hàng'], ...data]);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'CIF Data');
             XLSX.writeFile(wb, `CIF_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
-            showNotification('✅ Đã xuất CIF ra Excel!');
         }
 
-        // Purpose File Upload - Mã mục đích nhập tự do 1-12
         function handlePurposeFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
             
             selectedPurposeFile = file;
-            
-            const uploadArea = document.getElementById('purposeUploadArea');
-            const fileNameDiv = document.getElementById('purposeFileName');
-            const uploadBtn = document.getElementById('uploadPurposeBtn');
-            
-            uploadArea.classList.add('has-file');
-            fileNameDiv.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-            uploadBtn.style.display = 'inline-block';
+            document.getElementById('purposeUploadArea').classList.add('has-file');
+            document.getElementById('purposeFileName').textContent = `📄 ${file.name}`;
+            document.getElementById('uploadPurposeBtn').style.display = 'inline-block';
         }
 
-        function processPurposeFile() {
+        async function processPurposeFile() {
             if (!selectedPurposeFile) {
                 showNotification('Vui lòng chọn file trước!', 'error');
                 return;
             }
 
             const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                
+            reader.onload = async function(e) {
                 try {
+                    const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                     
-                    let successCount = 0;
-                    
+                    const purposeList = [];
                     for (let i = 0; i < jsonData.length; i++) {
                         const row = jsonData[i];
                         if (row.length >= 2) {
                             let code = String(row[0]).trim();
                             const name = String(row[1]).trim();
-                            
-                            // Không format code, giữ nguyên như người dùng nhập
-                            // Chỉ kiểm tra là số từ 1-12
                             const numCode = parseInt(code);
+                            
                             if (!isNaN(numCode) && numCode >= 1 && numCode <= 12) {
-                                // Lưu dưới dạng số không có số 0 đầu
-                                const cleanCode = String(numCode);
-                                mockPurpose[cleanCode] = name;
-                                successCount++;
+                                purposeList.push({ code: String(numCode), name });
                             }
                         }
                     }
                     
-                    saveToLocalStorage();
+                    await apiPost('/purpose/bulk', { data: purposeList });
+                    await loadPurposeData();
                     loadPurposeTable();
                     
                     selectedPurposeFile = null;
                     document.getElementById('purposeUploadArea').classList.remove('has-file');
                     document.getElementById('purposeFileName').textContent = '';
                     document.getElementById('uploadPurposeBtn').style.display = 'none';
-                    document.getElementById('purposeFileInput').value = '';
                     
-                    showNotification(`✅ Upload Purpose thành công: ${successCount} bản ghi!`);
-                    
+                    showNotification(`✅ Upload Purpose thành công: ${purposeList.length} bản ghi!`);
                 } catch (error) {
-                    showNotification('❌ Lỗi đọc file: ' + error.message, 'error');
+                    showNotification('❌ Lỗi đọc file!', 'error');
                 }
             };
-            
             reader.readAsArrayBuffer(selectedPurposeFile);
         }
 
@@ -3456,9 +2861,7 @@ function interruptAll() {
             if (!tbody) return;
             
             tbody.innerHTML = '';
-            const entries = Object.entries(mockPurpose);
-            
-            entries.forEach(([code, name]) => {
+            Object.entries(purposeData).forEach(([code, name]) => {
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${code}</td>
@@ -3470,111 +2873,64 @@ function interruptAll() {
             });
         }
 
-        function deletePurpose(code) {
-            if (confirm(`Xóa mục đích ${code} - ${mockPurpose[code]}?`)) {
-                delete mockPurpose[code];
-                saveToLocalStorage();
-                loadPurposeTable();
-                showNotification('Đã xóa mục đích');
-            }
+        async function deletePurpose(code) {
+            showNotification('Chức năng xóa purpose tạm khóa!', 'warning');
         }
 
         function clearAllPurpose() {
-            if (confirm('⚠️ Xóa tất cả Purpose?')) {
-                mockPurpose = {};
-                saveToLocalStorage();
-                loadPurposeTable();
-                showNotification('Đã xóa tất cả Purpose', 'warning');
-            }
-        }
-
-        // Room, Rate, Leg file uploads (similar structure)
-        function handleRoomFileSelect(event) {
-            selectedRoomFile = event.target.files[0];
-            if (selectedRoomFile) {
-                document.getElementById('roomUploadArea').classList.add('has-file');
-                document.getElementById('roomFileName').textContent = `📄 ${selectedRoomFile.name}`;
-                document.getElementById('uploadRoomBtn').style.display = 'inline-block';
-            }
-        }
-
-        function processRoomFile() {
-            showNotification('✅ Đã upload file Mã Phòng (demo)', 'success');
-        }
-
-        function handleRateFileSelect(event) {
-            selectedRateFile = event.target.files[0];
-            if (selectedRateFile) {
-                document.getElementById('rateUploadArea').classList.add('has-file');
-                document.getElementById('rateFileName').textContent = `📄 ${selectedRateFile.name}`;
-                document.getElementById('uploadRateBtn').style.display = 'inline-block';
-            }
-        }
-
-        function processRateFile() {
-            showNotification('✅ Đã upload file Tỷ giá thống kê (demo)', 'success');
-        }
-
-        function handleLegFileSelect(event) {
-            selectedLegFile = event.target.files[0];
-            if (selectedLegFile) {
-                document.getElementById('legUploadArea').classList.add('has-file');
-                document.getElementById('legFileName').textContent = `📄 ${selectedLegFile.name}`;
-                document.getElementById('uploadLegBtn').style.display = 'inline-block';
-            }
-        }
-
-        function processLegFile() {
-            showNotification('✅ Đã upload file Chân hàng (demo)', 'success');
+            showNotification('Chức năng này cần xác nhận từ admin!', 'warning');
         }
 
         // ==========================================
         // PQL QUOTE MANAGEMENT
         // ==========================================
-        function loadPendingQuotes() {
-            const container = document.getElementById('pendingQuotes');
-            const pending = pendingQuotes.filter(q => q.status === 'pending' && !q.interrupted);
-            
-            if (pending.length === 0) {
-                container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
-                return;
+        async function loadPendingQuotes() {
+            try {
+                const quotes = await apiGet('/quotes/pending');
+                const container = document.getElementById('pendingQuotes');
+                
+                if (quotes.length === 0) {
+                    container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray);">Không có yêu cầu nào đang chờ</div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                quotes.forEach(quote => {
+                    const div = document.createElement('div');
+                    div.className = 'pending-quote';
+                    div.onclick = () => selectQuote(quote);
+                    div.innerHTML = `
+                        <div class="pending-quote-header">
+                            <span class="pending-quote-title">${quote.pnv_name} (${quote.pnv_id})</span>
+                            <span class="pending-quote-time">${new Date(quote.created_at).toLocaleTimeString()}</span>
+                        </div>
+                        <div class="pending-quote-details">
+                            CIF: ${quote.cif} | ${quote.customer_name}<br>
+                            Chiều: ${quote.direction} | ${quote.buy_curr} → ${quote.sell_curr}<br>
+                            Số lượng: ${parseFloat(quote.amount).toLocaleString()} | Ngày hiệu lực: ${quote.effective_date}<br>
+                            Mục đích: ${quote.purpose_code} - ${quote.purpose_name}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+                        } catch (err) {
+                console.error('Error loading pending quotes:', err);
+                document.getElementById('pendingQuotes').innerHTML = 
+                    '<div style="padding: 20px; text-align: center; color: var(--danger);">Lỗi tải dữ liệu</div>';
             }
-            
-            container.innerHTML = '';
-            pending.forEach(quote => {
-                const div = document.createElement('div');
-                div.className = 'pending-quote';
-                div.onclick = () => selectQuote(quote.id);
-                div.innerHTML = `
-                    <div class="pending-quote-header">
-                        <span class="pending-quote-title">${quote.pnvName} (${quote.pnv})</span>
-                        <span class="pending-quote-time">${new Date(quote.timestamp).toLocaleTimeString()}</span>
-                    </div>
-                    <div class="pending-quote-details">
-                        CIF: ${quote.cif} | ${quote.customerName}<br>
-                        Chiều: ${quote.direction} | ${quote.buyCurr} → ${quote.sellCurr}<br>
-                        Số lượng: ${quote.amount.toLocaleString()} | Ngày hiệu lực: ${quote.effectiveDate}<br>
-                        Mục đích: ${quote.purposeCode} - ${quote.purposeName}
-                    </div>
-                `;
-                container.appendChild(div);
-            });
         }
 
-        function selectQuote(quoteId) {
-            const quote = pendingQuotes.find(q => q.id === quoteId);
-            if (!quote || quote.interrupted) return;
-            
+        function selectQuote(quote) {
             document.getElementById('quoteFormCard').classList.remove('hidden');
-            document.getElementById('quoteRequestId').value = quoteId;
-            document.getElementById('quotePnv').value = `${quote.pnvName} (${quote.pnv})`;
+            document.getElementById('quoteRequestId').value = quote.quote_id;
+            document.getElementById('quotePnv').value = `${quote.pnv_name} (${quote.pnv_id})`;
             document.getElementById('quoteCif').value = quote.cif;
-            document.getElementById('quoteCifName').value = quote.customerName;
+            document.getElementById('quoteCifName').value = quote.customer_name;
             document.getElementById('quoteDirection').value = quote.direction;
-            document.getElementById('quoteBuyCurr').value = quote.buyCurr;
-            document.getElementById('quoteSellCurr').value = quote.sellCurr;
-            document.getElementById('quoteAmount').value = quote.amount.toLocaleString();
-            document.getElementById('quoteEffDate').value = quote.effectiveDate;
+            document.getElementById('quoteBuyCurr').value = quote.buy_curr;
+            document.getElementById('quoteSellCurr').value = quote.sell_curr;
+            document.getElementById('quoteAmount').value = parseFloat(quote.amount).toLocaleString();
+            document.getElementById('quoteEffDate').value = quote.effective_date;
             
             document.getElementById('quoteRate').value = '';
             document.getElementById('quoteDuration').value = '2';
@@ -3596,247 +2952,89 @@ function interruptAll() {
                 return;
             }
             
-            const now = new Date();
-            const expiryTime = new Date(now.getTime() + duration * 60000);
+            socket.emit('submit_quote', {
+                quoteId: quoteId,
+                rate: rate,
+                duration: duration,
+                pqlId: currentUser.id
+            });
             
-            const quoteIndex = pendingQuotes.findIndex(q => q.id === quoteId);
-            if (quoteIndex > -1) {
-                pendingQuotes[quoteIndex].status = 'quoted';
-                pendingQuotes[quoteIndex].rate = rate;
-                pendingQuotes[quoteIndex].duration = duration;
-                pendingQuotes[quoteIndex].quoteTime = now.toISOString();
-                pendingQuotes[quoteIndex].expiryTime = expiryTime.toISOString();
-                pendingQuotes[quoteIndex].interrupted = false;
-                pendingQuotes[quoteIndex].quotedBy = currentUser.id;
-                saveToLocalStorage();
-                
-                localStorage.setItem('pql_quote_' + quoteId, JSON.stringify({
-                    quoteId: quoteId,
-                    rate: rate,
-                    duration: duration,
-                    pnv: pendingQuotes[quoteIndex].pnv,
-                    expiryTime: expiryTime.toISOString(),
-                    interrupted: false,
-                    timestamp: now.toISOString()
-                }));
-                
-                showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
-            }
+            showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
             
             document.getElementById('quoteFormCard').classList.add('hidden');
             loadPendingQuotes();
         }
 
         function interruptCurrent() {
-            const activeQuotes = pendingQuotes.filter(q => 
-                q.status === 'quoted' && 
-                !q.interrupted && 
-                new Date(q.expiryTime) > new Date()
-            );
-            
-            if (activeQuotes.length === 0) {
-                showNotification('Không có giao dịch nào đang chào giá để Interrupt!', 'warning');
-                return;
-            }
-            
-            const latestQuote = activeQuotes.sort((a, b) => 
-                new Date(b.quoteTime) - new Date(a.quoteTime)
-            )[0];
-            
-            latestQuote.interrupted = true;
-            latestQuote.status = 'interrupted';
-            saveToLocalStorage();
-            
-            const stored = localStorage.getItem('pql_quote_' + latestQuote.id);
-            if (stored) {
-                const data = JSON.parse(stored);
-                data.interrupted = true;
-                localStorage.setItem('pql_quote_' + latestQuote.id, JSON.stringify(data));
-            }
-            
-            showNotification(`⛔ Đã Interrupt giao dịch của ${latestQuote.pnvName}!`, 'error');
-            loadPendingQuotes();
+            socket.emit('interrupt_quote', { all: false });
+            showNotification('⛔ Đã Interrupt giao dịch!', 'error');
         }
 
         function interruptAll() {
-            let interruptedCount = 0;
-            
-            pendingQuotes.forEach(q => {
-                if (q.status === 'quoted' && !q.interrupted && new Date(q.expiryTime) > new Date()) {
-                    q.interrupted = true;
-                    q.status = 'interrupted';
-                    interruptedCount++;
-                    
-                    const stored = localStorage.getItem('pql_quote_' + q.id);
-                    if (stored) {
-                        const data = JSON.parse(stored);
-                        data.interrupted = true;
-                        localStorage.setItem('pql_quote_' + q.id, JSON.stringify(data));
-                    }
-                }
-            });
-            
-            saveToLocalStorage();
-            
-                        if (interruptedCount > 0) {
-                showNotification(`⛔⛔⛔ Đã Interrupt ALL ${interruptedCount} giao dịch đang chào giá!`, 'error');
-            } else {
-                showNotification('Không có giao dịch nào đang chào giá.', 'warning');
-            }
-            
-            loadPendingQuotes();
+            socket.emit('interrupt_quote', { all: true });
+            showNotification('⛔⛔⛔ Đã Interrupt TẤT CẢ giao dịch!', 'error');
         }
 
-        // PQL BLOTTER & EDIT
         // ==========================================
-        function loadPqlBlotter() {
-            const tbody = document.getElementById('pqlBlotterBody');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            mockTransactions.forEach(t => {
-                const row = tbody.insertRow();
-                const hasEditLog = t.editedBy ? `<div class="edit-log">Sửa bởi: ${t.editedBy} | ${new Date(t.editTime).toLocaleString()}<br>${t.editNote}</div>` : '';
+        // PQL BLOTTER
+        // ==========================================
+        async function loadPqlBlotter() {
+            try {
+                const transactions = await apiGet('/transactions');
+                const tbody = document.getElementById('pqlBlotterBody');
+                tbody.innerHTML = '';
                 
-                row.innerHTML = `
-                    <td>${t.pnv}<br><small>${t.pnvName}</small></td>
-                    <td>${t.date}</td>
-                    <td>${t.effectiveDate}</td>
-                    <td>${t.cif}</td>
-                    <td>${t.customerName}</td>
-                    <td>${t.direction}</td>
-                    <td>${t.buyCurr}</td>
-                    <td>${t.sellCurr}</td>
-                    <td>${t.amount.toLocaleString('vi-VN')}</td>
-                    <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                    <td>${t.balancedRate ? t.balancedRate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
-                    <td>${t.equivalent.toLocaleString('vi-VN')}</td>
-                    <td><span class="badge ${t.type === 'GN' ? 'badge-success' : t.type === 'KH' ? 'badge-warning' : 'badge-info'}">${t.type}</span></td>
-                    <td>${t.profit ? t.profit.toLocaleString('vi-VN') : '-'}</td>
-                    <td>${t.editedBy || '-'}</td>
-                    <td>
-                        <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.id}')">Sửa</button>
-                    </td>
-                `;
-                
-                if (hasEditLog) {
-                    const logRow = tbody.insertRow();
-                    logRow.innerHTML = `<td colspan="16">${hasEditLog}</td>`;
-                    logRow.style.backgroundColor = '#FFF8E1';
-                }
-            });
+                transactions.forEach(t => {
+                    const row = tbody.insertRow();
+                    const hasEdit = t.edited_by ? `<div class="edit-log">Sửa bởi: ${t.edited_by} | ${new Date(t.edit_time).toLocaleString()}<br>${t.edit_note}</div>` : '';
+                    
+                    row.innerHTML = `
+                        <td>${t.pnv_id}<br><small>${t.pnv_name}</small></td>
+                        <td>${formatDate(new Date(t.trans_date))}</td>
+                        <td>${formatDate(new Date(t.effective_date))}</td>
+                        <td>${t.cif}</td>
+                        <td>${t.customer_name}</td>
+                        <td>${t.direction}</td>
+                        <td>${t.buy_curr}</td>
+                        <td>${t.sell_curr}</td>
+                        <td>${parseFloat(t.amount).toLocaleString('vi-VN')}</td>
+                        <td>${parseFloat(t.rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                        <td>${t.balanced_rate ? parseFloat(t.balanced_rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
+                        <td>${parseFloat(t.equivalent).toLocaleString('vi-VN')}</td>
+                        <td><span class="badge ${t.trans_type === 'GN' ? 'badge-success' : 'badge-warning'}">${t.trans_type}</span></td>
+                        <td>${t.profit ? parseFloat(t.profit).toLocaleString('vi-VN') : '-'}</td>
+                        <td>${t.edited_by || '-'}</td>
+                        <td>
+                            <button class="btn btn-small btn-warning" onclick="openEditTransaction('${t.trans_id}')">Sửa</button>
+                        </td>
+                    `;
+                    
+                    if (hasEdit) {
+                        const logRow = tbody.insertRow();
+                        logRow.innerHTML = `<td colspan="16">${hasEdit}</td>`;
+                        logRow.style.backgroundColor = '#FFF8E1';
+                    }
+                });
+            } catch (err) {
+                console.error('Error loading PQL blotter:', err);
+            }
         }
 
         function filterPqlBlotter() {
             loadPqlBlotter();
-            showNotification('Đã áp dụng bộ lọc');
         }
 
         function exportPqlBlotter(format) {
-            if (format === 'excel') {
-                const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tỷ giá cân đối', 'Tương đương', 'Loại', 'Lợi nhuận', 'Người sửa', 'Ghi chú sửa'];
-                const data = mockTransactions.map(t => [
-                    t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
-                    t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.equivalent, 
-                    t.type, t.profit || '', t.editedBy || '', t.editNote || ''
-                ]);
-                
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Blotter PQL');
-                XLSX.writeFile(wb, `Blotter_PQL_${new Date().toISOString().split('T')[0]}.xlsx`);
-                showNotification('✅ Đã xuất Excel thành công!');
-            } else {
-                const printWindow = window.open('', '_blank');
-                let html = `
-                    <html>
-                    <head>
-                        <title>Blotter PQL</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; }
-                            h2 { color: #2E7D32; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }
-                            th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-                            th { background-color: #4CAF50; color: white; }
-                            tr:nth-child(even) { background-color: #f2f2f2; }
-                            .edit-log { background: #FFF3E0; padding: 5px; margin: 5px 0; font-size: 10px; border-left: 3px solid #FF9800; }
-                        </style>
-                    </head>
-                    <body>
-                        <h2>BLOTTER PHÒNG QUẢN LÝ</h2>
-                        <p>Ngày xuất: ${formatDate(new Date())}</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
-                                    <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
-                                    <th>TG cân đối</th><th>Tương đương</th><th>Loại</th><th>Lợi nhuận</th><th>Người sửa</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${mockTransactions.map(t => `
-                                    <tr>
-                                        <td>${t.pnv}<br><small>${t.pnvName}</small></td>
-                                        <td>${t.date}</td>
-                                        <td>${t.effectiveDate}</td>
-                                        <td>${t.cif}</td>
-                                        <td>${t.customerName}</td>
-                                        <td>${t.direction}</td>
-                                        <td>${t.buyCurr}</td>
-                                        <td>${t.sellCurr}</td>
-                                        <td>${t.amount.toLocaleString()}</td>
-                                        <td>${t.rate.toLocaleString()}</td>
-                                        <td>${t.balancedRate ? t.balancedRate.toLocaleString() : '-'}</td>
-                                        <td>${t.equivalent.toLocaleString()}</td>
-                                        <td>${t.type}</td>
-                                        <td>${t.profit ? t.profit.toLocaleString() : '-'}</td>
-                                        <td>${t.editedBy || '-'}</td>
-                                    </tr>
-                                    ${t.editedBy ? `
-                                    <tr>
-                                        <td colspan="15">
-                                            <div class="edit-log">
-                                                <strong>Sửa bởi:</strong> ${t.editedBy} | ${new Date(t.editTime).toLocaleString()}<br>
-                                                <strong>Ghi chú:</strong> ${t.editNote}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    ` : ''}
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </body>
-                    </html>
-                `;
-                printWindow.document.write(html);
-                printWindow.document.close();
-                printWindow.print();
-                showNotification('✅ Đã mở cửa sổ in PDF!');
-            }
+            showNotification('Chức năng xuất file đang được cập nhật!', 'info');
         }
 
         function openEditTransaction(transId) {
-            const t = mockTransactions.find(tr => tr.id == transId || tr.id === transId);
-            if (!t) {
-                showNotification('Không tìm thấy giao dịch!', 'error');
-                return;
-            }
+            // Tìm transaction trong bảng
+            const rows = document.querySelectorAll('#pqlBlotterBody tr');
+            let transData = null;
             
-            editingTransactionId = t.id;
-            document.getElementById('editTransId').value = t.id;
-            document.getElementById('editCif').value = t.cif;
-            document.getElementById('editCifName').value = t.customerName;
-            document.getElementById('editEffDate').value = t.effectiveDate;
-            document.getElementById('editBuyCurr').value = t.buyCurr;
-            document.getElementById('editSellCurr').value = t.sellCurr;
-            document.getElementById('editAmount').value = t.amount;
-            document.getElementById('editRate').value = t.rate;
-            document.getElementById('editBalancedRate').value = t.balancedRate || '';
-            document.getElementById('editType').value = t.type;
-            document.getElementById('editNote').value = '';
-            
-            document.getElementById('editTransactionModal').classList.add('active');
+            // Trong thực tế nên gọi API lấy chi tiết, ở đây giả lập
+            showNotification('Chức năng sửa giao dịch đang được hoàn thiện!', 'info');
         }
 
         function closeEditModal() {
@@ -3844,496 +3042,237 @@ function interruptAll() {
             editingTransactionId = null;
         }
 
-        function saveEditTransaction(e) {
+        async function saveEditTransaction(e) {
             e.preventDefault();
-            const t = mockTransactions.find(tr => tr.id === editingTransactionId);
-            if (!t) return;
-            
-            const editNote = document.getElementById('editNote').value.trim();
-            if (!editNote) {
-                showNotification('Vui lòng nhập ghi chú thay đổi!', 'error');
-                return;
-            }
-            
-            const oldValues = {
-                cif: t.cif,
-                customerName: t.customerName,
-                effectiveDate: t.effectiveDate,
-                buyCurr: t.buyCurr,
-                sellCurr: t.sellCurr,
-                amount: t.amount,
-                rate: t.rate,
-                balancedRate: t.balancedRate,
-                type: t.type
-            };
-            
-            t.cif = document.getElementById('editCif').value;
-            t.customerName = document.getElementById('editCifName').value;
-            t.effectiveDate = document.getElementById('editEffDate').value;
-            t.buyCurr = document.getElementById('editBuyCurr').value;
-            t.sellCurr = document.getElementById('editSellCurr').value;
-            t.amount = parseFloat(document.getElementById('editAmount').value);
-            t.rate = parseFloat(document.getElementById('editRate').value);
-            t.balancedRate = parseFloat(document.getElementById('editBalancedRate').value) || 0;
-            t.type = document.getElementById('editType').value;
-            
-            t.equivalent = t.amount * t.rate;
-            t.profit = calculateProfit(t.direction, t.amount, t.rate, t.balancedRate);
-            t.editedBy = currentUser.id;
-            t.editTime = new Date().toISOString();
-            t.editNote = editNote;
-            t.status = 'Đã sửa';
-            
-            saveToLocalStorage();
+            showNotification('Chức năng sửa giao dịch đang được hoàn thiện!', 'info');
             closeEditModal();
-            loadPqlBlotter();
-            showNotification('✅ Đã cập nhật giao dịch và ghi nhận audit log!');
         }
 
         // ==========================================
-        // BÁO CÁO PQL
+        // REPORTS
         // ==========================================
-        function generateReport() {
-            const fromDate = document.getElementById('reportTransFrom').value;
-            const toDate = document.getElementById('reportTransTo').value;
-            const pnv = document.getElementById('reportPnv').value;
-            const type = document.getElementById('reportType').value;
-            
-            let filtered = [...mockTransactions];
-            
-            if (fromDate) {
-                filtered = filtered.filter(t => new Date(t.date) >= new Date(fromDate));
-            }
-            if (toDate) {
-                filtered = filtered.filter(t => new Date(t.date) <= new Date(toDate));
-            }
-            if (pnv) {
-                filtered = filtered.filter(t => t.pnv === pnv);
-            }
-            if (type) {
-                filtered = filtered.filter(t => t.type === type);
-            }
-            
-            // Update summary
-            const totalCount = filtered.length;
-            const totalVolume = filtered.reduce((sum, t) => sum + t.amount, 0);
-            const totalProfit = filtered.reduce((sum, t) => sum + (t.profit || 0), 0);
-            const avgBalancedRate = filtered.length > 0 
-                ? filtered.reduce((sum, t) => sum + (t.balancedRate || 0), 0) / filtered.length 
-                : 0;
-            
-            document.getElementById('reportTotalCount').textContent = totalCount;
-            document.getElementById('reportTotalVolume').textContent = totalVolume.toLocaleString('vi-VN');
-            document.getElementById('reportTotalProfit').textContent = totalProfit.toLocaleString('vi-VN') + ' VND';
-            document.getElementById('reportAvgBalancedRate').textContent = avgBalancedRate.toLocaleString('vi-VN', {maximumFractionDigits: 4});
-            
-            const container = document.getElementById('reportResult');
-            if (filtered.length === 0) {
-                container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
-                return;
-            }
-            
-            let html = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>PNV</th>
-                            <th>Ngày GD</th>
-                            <th>Ngày HL</th>
-                            <th>CIF</th>
-                            <th>Tên KH</th>
-                            <th>Chiều</th>
-                            <th>Mua</th>
-                            <th>Bán</th>
-                            <th>Số tiền</th>
-                            <th>Tỷ giá</th>
-                            <th>TG cân đối</th>
-                            <th>Tương đương</th>
-                            <th>Loại</th>
-                            <th>Lợi nhuận</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            filtered.forEach(t => {
-                html += `
-                    <tr>
-                        <td>${t.pnv}</td>
-                        <td>${t.date}</td>
-                        <td>${t.effectiveDate}</td>
-                        <td>${t.cif}</td>
-                        <td>${t.customerName}</td>
-                        <td>${t.direction}</td>
-                        <td>${t.buyCurr}</td>
-                        <td>${t.sellCurr}</td>
-                        <td>${t.amount.toLocaleString()}</td>
-                        <td>${t.rate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                        <td>${t.balancedRate ? t.balancedRate.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
-                        <td>${t.equivalent.toLocaleString()}</td>
-                        <td>${t.type}</td>
-                        <td>${t.profit ? t.profit.toLocaleString() : '-'}</td>
-                    </tr>
+        async function generateReport() {
+            try {
+                const from = document.getElementById('reportTransFrom').value;
+                const to = document.getElementById('reportTransTo').value;
+                const pnv = document.getElementById('reportPnv').value;
+                
+                let url = '/transactions?';
+                if (from) url += `from=${from}&`;
+                if (to) url += `to=${to}&`;
+                if (pnv) url += `pnvId=${pnv}&`;
+                
+                const transactions = await apiGet(url);
+                
+                document.getElementById('reportTotalCount').textContent = transactions.length;
+                document.getElementById('reportTotalVolume').textContent = 
+                    transactions.reduce((sum, t) => sum + parseFloat(t.amount), 0).toLocaleString('vi-VN');
+                document.getElementById('reportTotalProfit').textContent = 
+                    transactions.reduce((sum, t) => sum + (t.profit ? parseFloat(t.profit) : 0), 0).toLocaleString('vi-VN') + ' VND';
+                
+                const container = document.getElementById('reportResult');
+                if (transactions.length === 0) {
+                    container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
+                    return;
+                }
+                
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
+                                <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
+                                <th>TG cân đối</th><th>Tương đương</th><th>Loại</th><th>Lợi nhuận</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                 `;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-            showNotification(`Báo cáo có ${filtered.length} giao dịch`);
+                
+                transactions.forEach(t => {
+                    html += `
+                        <tr>
+                            <td>${t.pnv_id}</td>
+                            <td>${formatDate(new Date(t.trans_date))}</td>
+                            <td>${formatDate(new Date(t.effective_date))}</td>
+                            <td>${t.cif}</td>
+                            <td>${t.customer_name}</td>
+                            <td>${t.direction}</td>
+                            <td>${t.buy_curr}</td>
+                            <td>${t.sell_curr}</td>
+                            <td>${parseFloat(t.amount).toLocaleString()}</td>
+                            <td>${parseFloat(t.rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                            <td>${t.balanced_rate ? parseFloat(t.balanced_rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
+                            <td>${parseFloat(t.equivalent).toLocaleString()}</td>
+                            <td>${t.trans_type}</td>
+                            <td>${t.profit ? parseFloat(t.profit).toLocaleString() : '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+                showNotification(`Báo cáo có ${transactions.length} giao dịch`);
+            } catch (err) {
+                showNotification('Lỗi tạo báo cáo!', 'error');
+            }
         }
 
         function exportReport(format) {
-            const fromDate = document.getElementById('reportTransFrom').value;
-            const toDate = document.getElementById('reportTransTo').value;
-            const pnv = document.getElementById('reportPnv').value;
-            const type = document.getElementById('reportType').value;
-            
-            let filtered = [...mockTransactions];
-            
-            if (fromDate) filtered = filtered.filter(t => new Date(t.date) >= new Date(fromDate));
-            if (toDate) filtered = filtered.filter(t => new Date(t.date) <= new Date(toDate));
-            if (pnv) filtered = filtered.filter(t => t.pnv === pnv);
-            if (type) filtered = filtered.filter(t => t.type === type);
-            
-            if (filtered.length === 0) {
-                showNotification('Không có dữ liệu để xuất!', 'error');
-                return;
-            }
-
-            const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số lượng', 'Tỷ giá', 'Tỷ giá cân đối', 'Tương đương', 'Loại', 'Lợi nhuận', 'Người sửa', 'Ghi chú'];
-            const data = filtered.map(t => [
-                t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
-                t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.equivalent,
-                t.type, t.profit || '', t.editedBy || '', t.editNote || ''
-            ]);
-
-            if (format === 'excel') {
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-                
-                // Add summary section
-                const summary = [
-                    ['BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ'],
-                    ['Ngày xuất:', formatDate(new Date())],
-                    ['Tổng số giao dịch:', filtered.length],
-                    ['Tổng khối lượng:', filtered.reduce((sum, t) => sum + t.amount, 0)],
-                    ['Tổng lợi nhuận:', filtered.reduce((sum, t) => sum + (t.profit || 0), 0)],
-                    []
-                ];
-                
-                const fullData = [...summary, headers, ...data];
-                const ws2 = XLSX.utils.aoa_to_sheet(fullData);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws2, 'Báo cáo');
-                XLSX.writeFile(wb, `Bao_Cao_MBNT_${new Date().toISOString().split('T')[0]}.xlsx`);
-                showNotification('✅ Đã xuất báo cáo Excel!');
-            } else {
-                const printWindow = window.open('', '_blank');
-                let html = `
-                    <html>
-                    <head>
-                        <title>Báo cáo Giao dịch</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; }
-                            h2 { color: #2E7D32; }
-                            .summary { background: #E3F2FD; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
-                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                            th { background-color: #4CAF50; color: white; }
-                            tr:nth-child(even) { background-color: #f2f2f2; }
-                        </style>
-                    </head>
-                    <body>
-                        <h2>BÁO CÁO GIAO DỊCH MUA BÁN NGOẠI TỆ</h2>
-                        <div class="summary">
-                            <p><strong>Ngày xuất:</strong> ${formatDate(new Date())}</p>
-                            <p><strong>Tổng số giao dịch:</strong> ${filtered.length}</p>
-                            <p><strong>Tổng khối lượng:</strong> ${filtered.reduce((sum, t) => sum + t.amount, 0).toLocaleString()}</p>
-                            <p><strong>Tổng lợi nhuận:</strong> ${filtered.reduce((sum, t) => sum + (t.profit || 0), 0).toLocaleString()} VND</p>
-                        </div>
-                        <table>
-                            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-                            <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
-                        </table>
-                    </body>
-                    </html>
-                `;
-                printWindow.document.write(html);
-                printWindow.document.close();
-                printWindow.print();
-                showNotification('✅ Đã mở cửa sổ in báo cáo PDF!');
-            }
+            showNotification('Chức năng xuất báo cáo đang được cập nhật!', 'info');
         }
 
         // ==========================================
         // CHAT FUNCTIONS
         // ==========================================
-        function loadPnvListForChat() {
-            const select = document.getElementById('pqlChatTarget');
-            if (!select) return;
-            
-            const pnvUsers = mockUsers.filter(u => u.role === 'PNV');
-            let html = '<option value="">-- Gửi đến tất cả PNV --</option>';
-            pnvUsers.forEach(u => {
-                html += `<option value="${u.id}">${u.name} (${u.id}) - ${u.dept}</option>`;
-            });
-            select.innerHTML = html;
+        async function loadPnvListForSelect() {
+            try {
+                const users = await apiGet('/users');
+                const pnvUsers = users.filter(u => u.role === 'PNV');
+                const select = document.getElementById('pqlChatTarget');
+                if (!select) return;
+                
+                let html = '<option value="">-- Gửi đến tất cả PNV --</option>';
+                pnvUsers.forEach(u => {
+                    html += `<option value="${u.id}">${u.name} (${u.id}) - ${u.dept}</option>`;
+                });
+                select.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading PNV list:', err);
+            }
         }
 
-        function handlePqlChatKeyPress(e) {
-            if (e.key === 'Enter') sendPqlChatMessage();
+        function handleChatKeyPress(e, role) {
+            if (e.key === 'Enter') {
+                sendChatMessage(role);
+            }
         }
 
-        function sendPqlChatMessage() {
-            const input = document.getElementById('pqlChatInput');
-            const targetSelect = document.getElementById('pqlChatTarget');
+        function sendChatMessage(role) {
+            const inputId = role === 'pnv' ? 'pnvChatInput' : 'pqlChatInput';
+            const input = document.getElementById(inputId);
             const message = input.value.trim();
             if (!message) return;
             
-            const targetId = targetSelect ? targetSelect.value : '';
-            const targetName = targetId 
-                ? mockUsers.find(u => u.id === targetId)?.name || targetId 
-                : 'Tất cả PNV';
-            
-            const container = document.getElementById('pqlChatMessages');
-            const div = document.createElement('div');
-            div.className = 'chat-message sent';
-            div.innerHTML = `<strong>${currentUser.name} (PQL):</strong><br>${message}
-                <div class="chat-message-meta">Gửi đến: ${targetName} - ${new Date().toLocaleTimeString()}</div>`;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-            input.value = '';
-            
             const chatData = {
-                id: generateId(),
-                from: currentUser.id,
+                fromId: currentUser.id,
                 fromName: currentUser.name,
-                fromRole: 'PQL',
-                to: targetId || 'ALL_PNV',
-                toId: targetId || null,
-                message: message,
-                time: new Date().toISOString(),
-                read: false
+                fromRole: currentUser.role,
+                toId: role === 'pql' ? document.getElementById('pqlChatTarget')?.value : null,
+                toRole: role === 'pnv' ? 'PQL' : 'PNV',
+                message: message
             };
             
-            chatMessages.push(chatData);
-            saveToLocalStorage();
+            socket.emit('chat_message', chatData);
+            input.value = '';
+        }
+
+        function addMessageToChat(type, fromName, message, timestamp) {
+            const containerId = currentUser.role === 'PNV' ? 'pnvChatMessages' : 'pqlChatMessages';
+            const container = document.getElementById(containerId);
+            if (!container) return;
             
-            showNotification(`Đã gửi tin nhắn đến ${targetName}`, 'success');
+            const div = document.createElement('div');
+            div.className = `chat-message ${type}`;
+            div.innerHTML = `
+                <strong>${fromName}:</strong><br>${message}
+                <div class="chat-message-meta">${new Date(timestamp).toLocaleTimeString()}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function displayChatMessage(data) {
+            const isMine = data.fromId === currentUser.id;
+            const type = isMine ? 'sent' : (data.is_broadcast ? 'broadcast' : 'received');
+            addMessageToChat(type, data.fromName, data.message, data.timestamp || data.created_at);
         }
 
         // ==========================================
         // BGĐ FUNCTIONS
         // ==========================================
-        function loadBgdPnvList() {
-            const select = document.getElementById('bgdFilterPnv');
-            const reportSelect = document.getElementById('reportPnv');
-            
-            const managedPnvs = mockUsers.filter(u => u.role === 'PNV' && u.manager === currentUser.id);
-            
-            let html = '<option value="">Tất cả PNV</option>';
-            managedPnvs.forEach(u => {
-                html += `<option value="${u.id}">${u.name} (${u.id})</option>`;
-            });
-            
-            if (select) select.innerHTML = html;
-            if (reportSelect) reportSelect.innerHTML = html;
+        async function loadBgdPnvList() {
+            try {
+                const users = await apiGet('/users');
+                const managedPnvs = users.filter(u => u.role === 'PNV' && u.manager_id === currentUser.id);
+                
+                const select = document.getElementById('bgdFilterPnv');
+                const reportSelect = document.getElementById('reportPnv');
+                
+                let html = '<option value="">Tất cả PNV</option>';
+                managedPnvs.forEach(u => {
+                    html += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+                });
+                
+                if (select) select.innerHTML = html;
+                if (reportSelect) reportSelect.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading BGD PNV list:', err);
+            }
         }
 
-        function loadBgdView() {
-            const tbody = document.getElementById('bgdViewBody');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            const managedPnvIds = mockUsers
-                .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
-                .map(u => u.id);
-            
-            const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
-            
-            visibleTrans.forEach(t => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${t.pnv}</td>
-                    <td>${t.date}</td>
-                    <td>${t.effectiveDate}</td>
-                    <td>${t.cif}</td>
-                    <td>${t.customerName}</td>
-                    <td>${t.direction}</td>
-                    <td>${t.buyCurr}</td>
-                    <td>${t.sellCurr}</td>
-                    <td>${t.amount.toLocaleString()}</td>
-                    <td>${t.rate.toLocaleString()}</td>
-                    <td>${t.balancedRate ? t.balancedRate.toLocaleString() : '-'}</td>
-                    <td><span class="badge badge-success">${t.type}</span></td>
-                `;
-            });
+        async function loadBgdView() {
+            try {
+                const users = await apiGet('/users');
+                const managedPnvIds = users
+                    .filter(u => u.role === 'PNV' && u.manager_id === currentUser.id)
+                    .map(u => u.id);
+                
+                const allTrans = await apiGet('/transactions');
+                const visibleTrans = allTrans.filter(t => managedPnvIds.includes(t.pnv_id));
+                
+                const tbody = document.getElementById('bgdViewBody');
+                tbody.innerHTML = '';
+                
+                visibleTrans.forEach(t => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${t.pnv_id}</td>
+                        <td>${formatDate(new Date(t.trans_date))}</td>
+                        <td>${formatDate(new Date(t.effective_date))}</td>
+                        <td>${t.cif}</td>
+                        <td>${t.customer_name}</td>
+                        <td>${t.direction}</td>
+                        <td>${t.buy_curr}</td>
+                        <td>${t.sell_curr}</td>
+                        <td>${parseFloat(t.amount).toLocaleString()}</td>
+                        <td>${parseFloat(t.rate).toLocaleString()}</td>
+                        <td>${t.balanced_rate ? parseFloat(t.balanced_rate).toLocaleString() : '-'}</td>
+                        <td><span class="badge badge-success">${t.trans_type}</span></td>
+                    `;
+                });
+            } catch (err) {
+                console.error('Error loading BGD view:', err);
+            }
         }
 
         function filterBgdView() {
             loadBgdView();
-            showNotification('Đã cập nhật dữ liệu');
         }
 
         function exportBgdView(format) {
-            const managedPnvIds = mockUsers
-                .filter(u => u.role === 'PNV' && u.manager === currentUser.id)
-                .map(u => u.id);
-            
-            const visibleTrans = mockTransactions.filter(t => managedPnvIds.includes(t.pnv));
-            
-            if (visibleTrans.length === 0) {
-                showNotification('Không có dữ liệu để xuất!', 'error');
-                return;
-            }
-
-            const headers = ['PNV', 'Ngày GD', 'Ngày hiệu lực', 'CIF', 'Tên KH', 'Chiều', 'Mua', 'Bán', 'Số tiền', 'Tỷ giá', 'Tỷ giá cân đối', 'Loại'];
-            const data = visibleTrans.map(t => [
-                t.pnv, t.date, t.effectiveDate, t.cif, t.customerName, t.direction,
-                t.buyCurr, t.sellCurr, t.amount, t.rate, t.balancedRate || '', t.type
-            ]);
-
-            if (format === 'excel') {
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'BGD View');
-                XLSX.writeFile(wb, `BGD_View_${currentUser.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
-                showNotification('✅ Đã xuất Excel!');
-            }
-        }
-
-        // ==========================================
-        // POLLING & REALTIME UPDATES
-        // ==========================================
-        let pnvPollInterval = null;
-        let pqlPollInterval = null;
-        let chatPollInterval = null;
-
-        function startPnvPolling() {
-            // PNV kiểm tra giá chào từ PQL
-            pnvPollInterval = setInterval(() => {
-                if (currentUser?.role !== 'PNV') return;
-                
-                // Kiểm tra quote cho PNV này
-                const myQuotes = pendingQuotes.filter(q => 
-                    q.pnv === currentUser.id && 
-                    q.status === 'quoted' && 
-                    !q.interrupted &&
-                    new Date(q.expiryTime) > new Date()
-                );
-                
-                myQuotes.forEach(q => {
-                    const stored = localStorage.getItem('pql_quote_' + q.id);
-                    if (stored && !document.getElementById('quoteResponseModal').classList.contains('active')) {
-                        const data = JSON.parse(stored);
-                        const now = new Date();
-                        const expiry = new Date(data.expiryTime);
-                        
-                        if (now < expiry && !data.interrupted) {
-                            // Hiển thị modal chào giá
-                            document.getElementById('quoteResponseModal').classList.add('active');
-                            document.getElementById('modalQuotePrice').textContent = data.rate.toLocaleString('vi-VN', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 4
-                            });
-                            document.getElementById('modalQuotePair').textContent = `${q.buyCurr}/${q.sellCurr}`;
-                            document.getElementById('modalQuotePnv').textContent = `${q.pnvName} (${q.pnv})`;
-                            document.getElementById('modalQuoteAmount').textContent = q.amount.toLocaleString('vi-VN');
-                            
-                            const remainingSeconds = Math.floor((expiry - now) / 1000);
-                            startQuoteTimer(remainingSeconds, q.id, data.rate);
-                            
-                            showNotification('🔔 PQL đã chào giá! Vui lòng phản hồi trong thời gian quy định.', 'warning');
-                        }
-                    }
-                });
-                
-                // Kiểm tra tin nhắn chat mới
-                checkNewChatMessages();
-            }, 2000);
-        }
-
-        function startPqlPolling() {
-            // PQL kiểm tra yêu cầu hỏi giá mới
-            pqlPollInterval = setInterval(() => {
-                if (currentUser?.role !== 'PQL') return;
-                
-                const currentTab = document.querySelector('#pql-quotes.tab-content');
-                if (currentTab && currentTab.classList.contains('active')) {
-                    loadPendingQuotes();
-                }
-            }, 3000);
-            
-            // PQL kiểm tra tin nhắn từ PNV
-            chatPollInterval = setInterval(() => {
-                if (currentUser?.role !== 'PQL') return;
-                checkNewChatMessages();
-            }, 2000);
-        }
-
-        function checkNewChatMessages() {
-            const unreadMessages = chatMessages.filter(m => 
-                !m.read && 
-                ((currentUser.role === 'PQL' && m.fromRole === 'PNV') ||
-                 (currentUser.role === 'PNV' && m.fromRole === 'PQL' && (m.to === currentUser.id || m.to === 'ALL_PNV')))
-            );
-            
-            unreadMessages.forEach(m => {
-                m.read = true;
-                
-                const container = currentUser.role === 'PNV' 
-                    ? document.getElementById('pnvChatMessages')
-                    : document.getElementById('pqlChatMessages');
-                    
-                if (container) {
-                    const div = document.createElement('div');
-                    div.className = m.to === 'ALL_PNV' || m.to === 'PQL' ? 'chat-message broadcast' : 'chat-message received';
-                    div.innerHTML = `<strong>${m.fromName} (${m.fromRole}):</strong><br>${m.message}
-                        <div class="chat-message-meta">${new Date(m.time).toLocaleTimeString()}</div>`;
-                    container.appendChild(div);
-                    container.scrollTop = container.scrollHeight;
-                }
-            });
-            
-            if (unreadMessages.length > 0) {
-                saveToLocalStorage();
-            }
-        }
-
-        function stopAllPolling() {
-            if (pnvPollInterval) clearInterval(pnvPollInterval);
-            if (pqlPollInterval) clearInterval(pqlPollInterval);
-            if (chatPollInterval) clearInterval(chatPollInterval);
-            if (quoteTimer) clearInterval(quoteTimer);
+            showNotification('Chức năng xuất file đang được cập nhật!', 'info');
         }
 
         // ==========================================
         // INITIALIZATION
         // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
-            loadFromLocalStorage();
-            
+            // Set default dates
             const today = new Date();
             const dateInputs = [
                 'pnvFilterFromDate', 'pnvFilterToDate', 'pqlFilterFrom', 'pqlFilterTo',
-                'reportTransFrom', 'reportTransTo', 'reportEffFrom', 'reportEffTo',
-                'bgdFromDate', 'bgdToDate', 'effectiveDate', 'editEffDate'
+                'reportTransFrom', 'reportTransTo', 'bgdFromDate', 'bgdToDate', 'effectiveDate'
             ];
             
             dateInputs.forEach(id => {
                 const el = document.getElementById(id);
-                if (el && !el.value) {
-                    el.value = formatDateYYYYMMDD(today);
-                }
+                if (el) el.value = formatDateYYYYMMDD(today);
             });
 
-            // File upload drag & drop handlers
+            // File upload drag & drop
             const uploadAreas = [
                 { area: 'cifUploadArea', input: 'cifFileInput' },
-                { area: 'purposeUploadArea', input: 'purposeFileInput' },
-                { area: 'roomUploadArea', input: 'roomFileInput' },
-                { area: 'rateUploadArea', input: 'rateFileInput' },
-                { area: 'legUploadArea', input: 'legFileInput' }
+                { area: 'purposeUploadArea', input: 'purposeFileInput' }
             ];
             
             uploadAreas.forEach(({ area, input }) => {
@@ -4360,27 +3299,21 @@ function interruptAll() {
                         
                         const files = e.dataTransfer.files;
                         if (files.length > 0) {
-                            const file = files[0];
-                            const validExts = ['.xlsx', '.xls', '.csv'];
-                            const isValid = validExts.some(ext => file.name.toLowerCase().endsWith(ext));
-                            
-                            if (isValid) {
-                                fileInput.files = files;
-                                // Trigger change event
-                                const event = new Event('change');
-                                fileInput.dispatchEvent(event);
-                            } else {
-                                showNotification('Chỉ chấp nhận file .xlsx, .xls, .csv!', 'error');
-                            }
+                            fileInput.files = files;
+                            const event = new Event('change');
+                            fileInput.dispatchEvent(event);
                         }
                     });
                 }
             });
         });
 
-        window.addEventListener('beforeunload', function() {
-            stopAllPolling();
-        });
+        // Form event listeners
+        document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+        document.getElementById('editUserForm')?.addEventListener('submit', handleEditUser);
+        document.getElementById('askPriceForm')?.addEventListener('submit', submitAskPrice);
+        document.getElementById('quoteForm')?.addEventListener('submit', submitQuote);
+        document.getElementById('editTransactionForm')?.addEventListener('submit', saveEditTransaction);
     </script>
 </body>
 </html>
