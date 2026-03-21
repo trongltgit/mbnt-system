@@ -71,6 +71,20 @@
             border-radius: 5px;
         }
 
+        /* FIX 1: Logo fallback khi lỗi */
+        .logo-fallback {
+            height: 50px;
+            width: 120px;
+            background: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-green);
+            font-size: 14px;
+        }
+
         .logo-text {
             display: flex;
             flex-direction: column;
@@ -1068,7 +1082,11 @@
     <!-- Header -->
     <header class="header" id="header">
         <div class="logo-section">
-            <img src="static/Logo.png" alt="Logo Vietcombank" id="brand-logo" onerror="this.style.display='none'">            
+            <!-- FIX 1: Logo với fallback khi lỗi -->
+            <img src="static/Logo.png" alt="Logo Vietcombank" id="brand-logo" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="logo-fallback" style="display: none;">VCB LOGO</div>
+            
             <div class="logo-text">
                 <span class="bank-name">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
                 <span class="branch-name">CHI NHÁNH TP.HCM</span>
@@ -1895,14 +1913,14 @@
                         <option value="PNV-LTT">PGD LTT (LTT)</option>
                         <option value="PNV-TN">DV KHTN (TN)</option>
                         <option value="PNV-T1">DVKHTC1 (T1)</option>
-                        <option value="PNV-T2">DVKHTC2 (T2)</option>
+                                                <option value="PNV-T2">DVKHTC2 (T2)</option>
                         <option value="PQL-KT">PQL - Kế toán (KT)</option>
                         <option value="BGD">Ban Giám đốc (BGĐ)</option>
                     </select>
                 </div>
                 <div class="form-group" id="managerSelect" style="display: none;">
                     <label>Quản lý bởi (BGĐ) <span style="color: var(--danger);">*</span></label>
-                                        <select id="newUserManager" required>
+                    <select id="newUserManager" required>
                         <option value="">Chọn BGĐ quản lý...</option>
                     </select>
                     <small style="color: var(--gray); font-size: 11px;">Bắt buộc chọn khi tạo user PNV</small>
@@ -2868,14 +2886,25 @@
             }
         }
 
+        // FIX 2: Validate currency pair - chỉ cảnh báo khi có giao dịch đang active
+        let activeTradeCheck = null;
+
         async function submitAskPrice(e) {
             e.preventDefault();
             
             const buyCurr = document.getElementById('buyCurrency').value;
             const sellCurr = document.getElementById('sellCurrency').value;
             
+            // Kiểm tra đồng tiền mua/bán không được giống nhau
             if (buyCurr === sellCurr) {
                 showNotification('Đồng tiền mua và bán không được giống nhau!', 'error');
+                return;
+            }
+
+            // Kiểm tra nếu có giao dịch đang chờ với cặp tiền khác
+            if (activeTradeCheck && activeTradeCheck.status === 'pending' && 
+                (activeTradeCheck.buyCurr !== buyCurr || activeTradeCheck.sellCurr !== sellCurr)) {
+                showNotification(`Cảnh báo: Đang có giao dịch ${activeTradeCheck.buyCurr}/${activeTradeCheck.sellCurr} chưa hoàn thành! Vui lòng đóng giao dịch cũ trước.`, 'error');
                 return;
             }
 
@@ -2908,6 +2937,13 @@
                 effectiveDate: document.getElementById('effectiveDate').value
             };
 
+            // Lưu trạng thái giao dịch đang active
+            activeTradeCheck = {
+                ...quoteData,
+                status: 'pending',
+                quoteId: null
+            };
+
             // Gửi qua socket realtime
             socket.emit('ask_price', quoteData);
             
@@ -2921,17 +2957,32 @@
             document.getElementById('sellCurrency').innerHTML = '<option value="">Tự động...</option>';
         }
 
+        // FIX 3: Sửa lỗi undefined trong showQuoteModal - kiểm tra data đầy đủ
         function showQuoteModal(data) {
+            // Kiểm tra data đầy đủ trước khi hiển thị
+            if (!data || !data.rate || !data.buyCurr || !data.sellCurr) {
+                console.error('Invalid quote data:', data);
+                showNotification('Lỗi dữ liệu giá chào!', 'error');
+                return;
+            }
+
             currentQuoteData = data;
+            
+            // Cập nhật activeTradeCheck với quoteId
+            if (activeTradeCheck) {
+                activeTradeCheck.quoteId = data.quoteId;
+            }
+            
             const modal = document.getElementById('quoteResponseModal');
             
+            // FIX: Gán giá trị đúng với kiểm tra null/undefined
             document.getElementById('modalQuotePrice').textContent = parseFloat(data.rate).toLocaleString('vi-VN', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 4
             });
-            document.getElementById('modalQuotePair').textContent = `${data.buyCurr}/${data.sellCurr}`;
-            document.getElementById('modalQuoteAmount').textContent = parseFloat(data.amount).toLocaleString('vi-VN');
-            document.getElementById('modalQuotePql').textContent = data.pqlName || 'PQL';
+            document.getElementById('modalQuotePair').textContent = `${data.buyCurr || 'USD'}/${data.sellCurr || 'VND'}`;
+            document.getElementById('modalQuoteAmount').textContent = data.amount ? parseFloat(data.amount).toLocaleString('vi-VN') : '-';
+            document.getElementById('modalQuotePql').textContent = data.pqlName || data.pqlId || 'PQL';
             
             const expiry = new Date(data.expiryTime);
             startQuoteTimer(expiry, data.quoteId);
@@ -2978,6 +3029,9 @@
                         accepted: false,
                         pnvId: currentUser.id
                     });
+                    
+                    // Reset active trade
+                    activeTradeCheck = null;
                 }
             }, 1000);
         }
@@ -3044,6 +3098,7 @@
             container.scrollTop = container.scrollHeight;
         }
 
+        // FIX 4 & 6: acceptPrice - cập nhật blotter và reset active trade
         function acceptPrice() {
             if (!currentQuoteData) return;
             
@@ -3053,9 +3108,27 @@
                 pnvId: currentUser.id
             });
             
+            // Cập nhật trạng thái giao dịch thành công
+            if (activeTradeCheck && activeTradeCheck.quoteId === currentQuoteData.quoteId) {
+                activeTradeCheck.status = 'success';
+            }
+            
             closeQuoteModal();
             showNotification('✅ Đã chấp nhận giá! Giao dịch thành công.');
-            setTimeout(() => loadPnvBlotter(), 500);
+            
+            // FIX: Load lại blotter ngay lập tức
+            setTimeout(() => {
+                loadPnvBlotter();
+                // Nếu là PQL cũng load lại blotter PQL
+                if (currentUser.role === 'PQL') {
+                    loadPqlBlotter();
+                }
+            }, 500);
+            
+            // Reset active trade sau khi thành công
+            setTimeout(() => {
+                activeTradeCheck = null;
+            }, 1000);
         }
 
         function rejectPrice() {
@@ -3066,6 +3139,9 @@
                 accepted: false,
                 pnvId: currentUser.id
             });
+            
+            // Reset active trade khi từ chối
+            activeTradeCheck = null;
             
             closeQuoteModal();
             showNotification('Đã từ chối giá', 'warning');
@@ -3461,11 +3537,8 @@
                             <span class="pending-quote-time">${new Date(quote.created_at).toLocaleTimeString()}</span>
                         </div>
                         <div class="pending-quote-details">
-                            CIF: ${quote.cif} | ${quote.customer_name}<br>
-                            Chiều: ${quote.direction} | ${quote.buy_curr} → ${quote.sell_curr}<br>
-                            Số lượng: ${parseFloat(quote.amount).toLocaleString()} | Ngày hiệu lực: ${quote.effective_date}<br>
-                            Mục đích: ${quote.purpose_code} - ${quote.purpose_name}
-                        </div>
+                            CIF: ${quote.cif} | ${quote.customer_name}
+                                                </div>
                     `;
                     container.appendChild(div);
                 });
@@ -3509,17 +3582,27 @@
                 return;
             }
             
+            // Lấy thông tin từ form để truyền vào modal
             const quoteData = {
                 quoteId: quoteId,
                 rate: rate,
                 duration: duration,
                 pqlId: currentUser.id,
-                pqlName: currentUser.name
+                pqlName: currentUser.name,
+                pnvId: document.getElementById('quoteRequestId').getAttribute('data-pnv-id') || '',
+                pnvName: document.getElementById('quotePnv').value,
+                cif: document.getElementById('quoteCif').value,
+                customerName: document.getElementById('quoteCifName').value,
+                direction: document.getElementById('quoteDirection').value,
+                buyCurr: document.getElementById('quoteBuyCurr').value,
+                sellCurr: document.getElementById('quoteSellCurr').value,
+                amount: document.getElementById('quoteAmount').value.replace(/,/g, ''),
+                effectiveDate: document.getElementById('quoteEffDate').value
             };
             
             socket.emit('submit_quote', quoteData);
             
-            // Show PQL management modal
+            // Show PQL management modal - KHÔNG đóng khi submit
             showPqlQuoteModal(quoteData);
             
             showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
@@ -3528,22 +3611,38 @@
             loadPendingQuotes();
         }
 
+        // FIX 3: Sửa lỗi undefined trong showPqlQuoteModal
         function showPqlQuoteModal(data) {
+            // Kiểm tra data đầy đủ
+            if (!data || !data.rate) {
+                console.error('Invalid PQL quote data:', data);
+                return;
+            }
+
             currentPqlQuoteData = data;
             const modal = document.getElementById('pqlQuoteModal');
             
-            // Fill data
+            // FIX: Gán giá trị với kiểm tra null/undefined đầy đủ
             document.getElementById('pqlModalQuotePrice').textContent = parseFloat(data.rate).toLocaleString('vi-VN', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 4
             });
-                        document.getElementById('pqlModalPair').textContent = `${data.buyCurr}/${data.sellCurr}`;
-            document.getElementById('pqlModalAmount').textContent = parseFloat(data.amount).toLocaleString('vi-VN');
-            document.getElementById('pqlModalPnv').textContent = `${data.pnvName} (${data.pnvId})`;
-            document.getElementById('pqlModalCif').textContent = data.cif;
+            
+            // FIX: Đảm bảo không hiển thị undefined
+            const buyCurr = data.buyCurr || 'USD';
+            const sellCurr = data.sellCurr || 'VND';
+            document.getElementById('pqlModalPair').textContent = `${buyCurr}/${sellCurr}`;
+            
+            const amount = data.amount ? parseFloat(data.amount).toLocaleString('vi-VN') : '-';
+            document.getElementById('pqlModalAmount').textContent = amount;
+            
+            const pnvName = data.pnvName || data.pnvId || '-';
+            document.getElementById('pqlModalPnv').textContent = pnvName;
+            
+            document.getElementById('pqlModalCif').textContent = data.cif || '-';
             document.getElementById('pqlModalCifName').textContent = data.customerName || '';
-            document.getElementById('pqlModalDirection').textContent = data.direction;
-            document.getElementById('pqlModalEffDate').textContent = data.effectiveDate;
+            document.getElementById('pqlModalDirection').textContent = data.direction || '-';
+            document.getElementById('pqlModalEffDate').textContent = data.effectiveDate || '-';
             
             // Reset chat
             document.getElementById('pqlModalChatMessages').innerHTML = `
@@ -3554,7 +3653,7 @@
             `;
             
             // Start timer
-            const expiry = new Date(Date.now() + data.duration * 60000);
+            const expiry = new Date(Date.now() + (data.duration || 2) * 60000);
             startQuoteTimer(expiry, data.quoteId);
             
             modal.classList.add('active');
@@ -3607,17 +3706,24 @@
             input.value = '';
         }
 
+        // FIX 4 & 5: Withdraw KHÔNG đóng modal, cho phép chào lại giá
         function withdrawQuote() {
             if (!currentPqlQuoteData) return;
             
+            // Gửi thông báo withdraw nhưng KHÔNG đóng modal
             socket.emit('withdraw_quote', {
                 quoteId: currentPqlQuoteData.quoteId,
                 pqlId: currentUser.id
             });
             
-            showNotification('Đã rút lại chào giá', 'info');
-            closePqlQuoteModal();
-            loadPendingQuotes();
+            // Reset giá đã chào để chào lại
+            currentPqlQuoteData.rate = null;
+            
+            // Hiển thị thông báo trong modal
+            showNotification('Đã rút lại giá. Bạn có thể chào giá mới!', 'info');
+            
+            // Cho phép PNV chấp nhận/từ chối sẽ được thông báo qua socket
+            // Modal vẫn mở để PQL có thể chào lại giá
         }
 
         function transferQuote() {
@@ -3672,16 +3778,30 @@
             showNotification(`Đã chuyển giao dịch cho ${targetPql}`, 'success');
         }
 
+        // FIX 5: Interrupt từ modal - giữ modal mở như Withdraw
         function interruptCurrentFromModal() {
-            interruptCurrent();
-            closePqlQuoteModal();
+            if (!currentPqlQuoteData) return;
+            
+            socket.emit('interrupt_quote', { 
+                all: false,
+                quoteId: currentPqlQuoteData.quoteId 
+            });
+            
+            showNotification('⛔ Đã Interrupt giao dịch này!', 'error');
+            
+            // KHÔNG đóng modal - giống như Withdraw
+            // Cho phép PQL chào lại giá nếu cần
         }
 
+        // FIX 5: Interrupt All từ modal - cũng giữ modal mở
         function interruptAllFromModal() {
-            interruptAll();
-            closePqlQuoteModal();
+            socket.emit('interrupt_quote', { all: true });
+            showNotification('⛔⛔⛔ Đã Interrupt TẤT CẢ giao dịch!', 'error');
+            
+            // KHÔNG đóng modal
         }
 
+        // Interrupt từ thanh toolbar
         function interruptCurrent() {
             socket.emit('interrupt_quote', { all: false });
             showNotification('⛔ Đã Interrupt giao dịch!', 'error');
@@ -3955,7 +4075,7 @@
         }
 
         // ==========================================
-        // CHAT FUNCTIONS
+        // CHAT FUNCTIONS - FIX 7: Sửa chat không hoạt động
         // ==========================================
         async function loadPnvListForSelect() {
             try {
@@ -3974,38 +4094,72 @@
             }
         }
 
+        // FIX 7: Sửa hàm handleChatKeyPress - tham số đúng
         function handleChatKeyPress(e, role) {
             if (e.key === 'Enter') {
+                e.preventDefault(); // Ngăn form submit
                 sendChatMessage(role);
             }
         }
 
+        // FIX 7: Sửa hàm sendChatMessage - lấy đúng input và gửi đúng
         function sendChatMessage(role) {
+            // Xác định input ID dựa vào role
             const inputId = role === 'pnv' ? 'pnvChatInput' : 'pqlChatInput';
             const input = document.getElementById(inputId);
+            
+            if (!input) {
+                console.error('Chat input not found:', inputId);
+                return;
+            }
+            
             const message = input.value.trim();
             if (!message) return;
             
-            const targetId = role === 'pql' ? document.getElementById('pqlChatTarget')?.value : null;
+            // Xác định target cho PQL
+            let targetId = null;
+            let toRole = role === 'pnv' ? 'PQL' : 'PNV';
+            
+            if (role === 'pql') {
+                const targetSelect = document.getElementById('pqlChatTarget');
+                if (targetSelect) {
+                    targetId = targetSelect.value;
+                }
+            }
             
             const chatData = {
                 fromId: currentUser.id,
                 fromName: currentUser.name,
                 fromRole: currentUser.role,
                 toId: targetId,
-                toRole: role === 'pnv' ? 'PQL' : 'PNV',
+                toRole: toRole,
                 message: message,
-                isQuoteRelated: false
+                isQuoteRelated: false,
+                timestamp: new Date().toISOString()
             };
             
-            socket.emit('chat_message', chatData);
+            // Gửi qua socket
+            if (socket) {
+                socket.emit('chat_message', chatData);
+                
+                // Hiển thị tin nhắn của mình ngay lập tức
+                const containerId = role === 'pnv' ? 'pnvChatMessages' : 'pqlChatMessages';
+                addMessageToChat(containerId, 'sent', currentUser.name, message, chatData.timestamp);
+            } else {
+                showNotification('Mất kết nối chat!', 'error');
+            }
+            
+            // Xóa input
             input.value = '';
         }
 
-        function addMessageToChat(type, fromName, message, timestamp) {
-            const containerId = currentUser.role === 'PNV' ? 'pnvChatMessages' : 'pqlChatMessages';
+        // FIX 7: Sửa hàm addMessageToChat - thêm containerId
+        function addMessageToChat(containerId, type, fromName, message, timestamp) {
             const container = document.getElementById(containerId);
-            if (!container) return;
+            if (!container) {
+                console.error('Chat container not found:', containerId);
+                return;
+            }
             
             const div = document.createElement('div');
             div.className = `chat-message ${type}`;
@@ -4018,9 +4172,23 @@
         }
 
         function displayChatMessage(data) {
+            // Xác định container dựa vào người nhận
+            let containerId = '';
+            
+            if (currentUser.role === 'PNV') {
+                // PNV nhận tin từ PQL
+                containerId = 'pnvChatMessages';
+            } else if (currentUser.role === 'PQL') {
+                // PQL nhận tin từ PNV
+                containerId = 'pqlChatMessages';
+            }
+            
+            if (!containerId) return;
+            
             const isMine = data.fromId === currentUser.id;
-            const type = isMine ? 'sent' : (data.is_broadcast ? 'broadcast' : 'received');
-            addMessageToChat(type, data.fromName, data.message, data.timestamp || data.created_at);
+            const type = isMine ? 'sent' : (data.toId ? 'received' : 'broadcast');
+            
+            addMessageToChat(containerId, type, data.fromName, data.message, data.timestamp || data.created_at);
         }
 
         // ==========================================
@@ -4105,6 +4273,22 @@
                 if (el) el.value = formatDateYYYYMMDD(today);
             });
 
+            // FIX 7: Gắn event listener cho chat inputs để đảm bảo hoạt động
+            const pnvChatInput = document.getElementById('pnvChatInput');
+            const pqlChatInput = document.getElementById('pqlChatInput');
+            
+            if (pnvChatInput) {
+                pnvChatInput.addEventListener('keypress', function(e) {
+                    handleChatKeyPress(e, 'pnv');
+                });
+            }
+            
+            if (pqlChatInput) {
+                pqlChatInput.addEventListener('keypress', function(e) {
+                    handleChatKeyPress(e, 'pql');
+                });
+            }
+
             // File upload drag & drop
             const uploadAreas = [
                 { area: 'cifUploadArea', input: 'cifFileInput' },
@@ -4145,12 +4329,23 @@
             });
         });
 
-        // Form event listeners
-        document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
-        document.getElementById('editUserForm')?.addEventListener('submit', handleEditUser);
-        document.getElementById('askPriceForm')?.addEventListener('submit', submitAskPrice);
-        document.getElementById('quoteForm')?.addEventListener('submit', submitQuote);
-        document.getElementById('editTransactionForm')?.addEventListener('submit', saveEditTransaction);
+        // Form event listeners - đảm bảo các form hoạt động đúng
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = [
+                { id: 'loginForm', handler: handleLogin },
+                { id: 'editUserForm', handler: handleEditUser },
+                { id: 'askPriceForm', handler: submitAskPrice },
+                { id: 'quoteForm', handler: submitQuote },
+                { id: 'editTransactionForm', handler: saveEditTransaction }
+            ];
+            
+            forms.forEach(({ id, handler }) => {
+                const form = document.getElementById(id);
+                if (form) {
+                    form.addEventListener('submit', handler);
+                }
+            });
+        });
     </script>
 </body>
 </html>
