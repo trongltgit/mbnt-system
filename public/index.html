@@ -596,6 +596,11 @@
             max-width: 800px;
         }
 
+        .modal-content.xlarge {
+            max-width: 900px;
+            width: 95%;
+        }
+
         @keyframes slideUp {
             from { transform: translateY(50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -655,6 +660,7 @@
             display: flex;
             gap: 15px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .filter-section {
@@ -941,6 +947,84 @@
             color: white;
         }
 
+        /* Flash notification styles */
+        .flash-notification {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 3001;
+            cursor: pointer;
+            animation: flashBlink 1s infinite;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 350px;
+        }
+
+        @keyframes flashBlink {
+            0%, 100% { opacity: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+            50% { opacity: 0.8; box-shadow: 0 4px 20px rgba(255,0,0,0.6); }
+        }
+
+        .flash-notification.quote {
+            background: var(--danger);
+            border: 2px solid #ff0000;
+        }
+
+        .flash-notification.chat {
+            background: var(--info);
+            border: 2px solid #0066CC;
+        }
+
+        .flash-notification:hover {
+            animation: none;
+            opacity: 1;
+        }
+
+        /* Quote Modal Tabs */
+        .modal-tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .modal-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+        }
+
+        .modal-tab.active {
+            color: var(--primary-green);
+            border-bottom-color: var(--primary-green);
+        }
+
+        .modal-tab-content {
+            display: none;
+        }
+
+        .modal-tab-content.active {
+            display: block;
+        }
+
+        .chat-messages-modal {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            background: #f5f5f5;
+            margin-bottom: 15px;
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -978,14 +1062,17 @@
     <!-- Connection Status -->
     <div id="connectionStatus" class="connection-status connecting">Đang kết nối...</div>
 
+    <!-- Flash Notification Container -->
+    <div id="flashNotificationContainer"></div>
+
     <!-- Header -->
     <header class="header" id="header">
         <div class="logo-section">
-            <img src="static/Logo.png" alt="Logo Vietcombank" id="brand-logo">            
-            <!-- <div class="logo-text">
+            <img src="static/Logo.png" alt="Logo Vietcombank" id="brand-logo" onerror="this.style.display='none'">            
+            <div class="logo-text">
                 <span class="bank-name">NGÂN HÀNG TMCP NGOẠI THƯƠNG VIỆT NAM</span>
                 <span class="branch-name">CHI NHÁNH TP.HCM</span>
-            </div> -->
+            </div>
         </div>
         
         <div class="page-title" id="pageTitle">GIAO DỊCH MUA BÁN NGOẠI TỆ NỘI BỘ</div>
@@ -1101,7 +1188,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Chiều giao dịch</label>
-                                <select id="transactionType" required onchange="updatePurposeLabel()">
+                                <select id="transactionType" required onchange="updateCurrencyLogic()">
                                     <option value="">Chọn...</option>
                                     <option value="buy">VCB MUA</option>
                                     <option value="sell">VCB BÁN</option>
@@ -1118,7 +1205,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Mã tiền tệ giao dịch</label>
-                                <select id="currencyCode" required>
+                                <select id="currencyCode" required onchange="updateCurrencyLogic()">
                                     <option value="">Chọn...</option>
                                     <option value="USD">USD</option>
                                     <option value="EUR">EUR</option>
@@ -1134,49 +1221,18 @@
                                     <option value="KRW">KRW</option>
                                     <option value="NOK">NOK</option>
                                     <option value="SEK">SEK</option>
-                                    <option value="VND">VND</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Đồng tiền mua</label>
-                                <select id="buyCurrency" required>
-                                    <option value="">Chọn...</option>
-                                    <option value="USD">USD</option>
-                                    <option value="EUR">EUR</option>
-                                    <option value="GBP">GBP</option>
-                                    <option value="JPY">JPY</option>
-                                    <option value="AUD">AUD</option>
-                                    <option value="SGD">SGD</option>
-                                    <option value="THB">THB</option>
-                                    <option value="CAD">CAD</option>
-                                    <option value="CHF">CHF</option>
-                                    <option value="HKD">HKD</option>
-                                    <option value="DKK">DKK</option>
-                                    <option value="KRW">KRW</option>
-                                    <option value="NOK">NOK</option>
-                                    <option value="SEK">SEK</option>
-                                    <option value="VND">VND</option>
+                                <select id="buyCurrency" required readonly style="background-color: #f0f0f0;">
+                                    <option value="">Tự động...</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Đồng tiền bán</label>
-                                <select id="sellCurrency" required>
-                                    <option value="">Chọn...</option>
-                                    <option value="USD">USD</option>
-                                    <option value="EUR">EUR</option>
-                                    <option value="GBP">GBP</option>
-                                    <option value="JPY">JPY</option>
-                                    <option value="AUD">AUD</option>
-                                    <option value="SGD">SGD</option>
-                                    <option value="THB">THB</option>
-                                    <option value="CAD">CAD</option>
-                                    <option value="CHF">CHF</option>
-                                    <option value="HKD">HKD</option>
-                                    <option value="DKK">DKK</option>
-                                    <option value="KRW">KRW</option>
-                                    <option value="NOK">NOK</option>
-                                    <option value="SEK">SEK</option>
-                                    <option value="VND">VND</option>
+                                <select id="sellCurrency" required readonly style="background-color: #f0f0f0;">
+                                    <option value="">Tự động...</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -1409,6 +1465,49 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Upload Customer Assignment (Chân hàng) -->
+                <div class="card">
+                    <div class="card-title">Upload Chân hàng (CIF - PNV Assignment)</div>
+                    <div class="file-upload-area" id="assignmentUploadArea">
+                        <div style="font-size: 48px; margin-bottom: 10px;">👤</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Upload file Chân hàng</div>
+                        <div style="color: var(--gray); font-size: 13px; margin-bottom: 15px;">
+                            Hỗ trợ: .xlsx, .xls, .csv<br>
+                            Sheet 1: Cột A: CIF, Cột B: Mã PNV<br>
+                            <em>Lưu ý: File có thể có nhiều sheet, hệ thống sẽ đọc tất cả các sheet</em>
+                        </div>
+                        <label class="upload-btn">
+                            Chọn file
+                            <input type="file" id="assignmentFileInput" accept=".xlsx,.xls,.csv" onchange="handleAssignmentFileSelect(event)" style="display: none;">
+                        </label>
+                        <div class="file-name" id="assignmentFileName"></div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-small" onclick="processAssignmentFile()" id="uploadAssignmentBtn" style="display: none; width: auto;">
+                            📤 Upload Chân hàng
+                        </button>
+                        <button class="btn btn-small btn-secondary" onclick="exportAssignmentToExcel()" style="width: auto;">
+                            📊 Xuất Chân hàng hiện tại
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="clearAllAssignment()" style="width: auto;">
+                            🗑️ Xóa tất cả Chân hàng
+                        </button>
+                    </div>
+                    <div class="table-container" style="margin-top: 20px; max-height: 300px; overflow-y: auto;">
+                        <table id="assignmentTable">
+                            <thead>
+                                <tr>
+                                    <th>CIF</th>
+                                    <th>Tên KH</th>
+                                    <th>PNV phụ trách</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assignmentTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Tab Chào giá -->
@@ -1577,7 +1676,7 @@
                             <span class="summary-value" id="reportTotalCount">0</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">Tổng khối lượng giao dịch:</span>
+                            <span class="summary-label">Tổng khối lượng giao dịch (USD):</span>
                             <span class="summary-value" id="reportTotalVolume">0</span>
                         </div>
                         <div class="summary-item">
@@ -1802,10 +1901,11 @@
                     </select>
                 </div>
                 <div class="form-group" id="managerSelect" style="display: none;">
-                    <label>Quản lý bởi (BGĐ)</label>
-                    <select id="newUserManager">
+                    <label>Quản lý bởi (BGĐ) <span style="color: var(--danger);">*</span></label>
+                                        <select id="newUserManager" required>
                         <option value="">Chọn BGĐ quản lý...</option>
                     </select>
+                    <small style="color: var(--gray); font-size: 11px;">Bắt buộc chọn khi tạo user PNV</small>
                 </div>
                 <div class="btn-group">
                     <button type="submit" class="btn">Thêm user</button>
@@ -1856,8 +1956,8 @@
                     </select>
                 </div>
                 <div class="form-group" id="editManagerSelect" style="display: none;">
-                    <label>Quản lý bởi BGĐ</label>
-                    <select id="editUserManager">
+                    <label>Quản lý bởi BGĐ <span style="color: var(--danger);">*</span></label>
+                    <select id="editUserManager" required>
                         <option value="">Chọn BGĐ quản lý...</option>
                     </select>
                 </div>
@@ -1871,33 +1971,156 @@
 
     <!-- Quote Response Modal (PNV) -->
     <div class="modal" id="quoteResponseModal">
-        <div class="modal-content">
+        <div class="modal-content xlarge">
             <div class="modal-header">
                 <h3 class="modal-title">🎯 TỶ GIÁ TỪ PQL</h3>
-                <button class="close-btn" onclick="rejectPrice()">&times;</button>
+                <button class="close-btn" onclick="closeQuoteModal()">&times;</button>
             </div>
-            <div class="quote-box" style="margin: 0;">
-                <div class="quote-header">
-                    <span style="font-weight: 600;">Thời gian còn lại:</span>
-                    <span class="quote-timer" id="modalQuoteTimer">02:00</span>
-                </div>
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Cặp tiền: <strong id="modalQuotePair">USD/VND</strong></div>
-                    <div style="font-size: 14px; color: #666;">Số lượng: <strong id="modalQuoteAmount">-</strong></div>
-                </div>
-                <div class="quote-price" id="modalQuotePrice">0.00</div>
-                <div style="text-align: center; color: #666; margin-bottom: 20px; font-size: 13px;">
-                    Vui lòng chấp nhận hoặc từ chối tỷ giá này trong thời gian còn lại
-                </div>
-                <div class="quote-actions">
-                    <button class="btn btn-small btn-success" onclick="acceptPrice()" style="font-size: 16px; padding: 12px 30px;">
-                        ✓ CHẤP NHẬN GIÁ
-                    </button>
-                    <button class="btn btn-small btn-danger" onclick="rejectPrice()" style="font-size: 16px; padding: 12px 30px;">
-                        ✗ TỪ CHỐI GIÁ
-                    </button>
+            
+            <!-- Tabs -->
+            <div class="modal-tabs">
+                <button class="modal-tab active" onclick="switchQuoteModalTab('quote')">Thông tin giá</button>
+                <button class="modal-tab" onclick="switchQuoteModalTab('chat')">Chat với PQL</button>
+            </div>
+
+            <!-- Tab Quote Info -->
+            <div id="quoteModalTab-quote" class="modal-tab-content active">
+                <div class="quote-box" style="margin: 0;">
+                    <div class="quote-header">
+                        <span style="font-weight: 600;">Thời gian còn lại:</span>
+                        <span class="quote-timer" id="modalQuoteTimer">02:00</span>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Cặp tiền: <strong id="modalQuotePair">USD/VND</strong></div>
+                        <div style="font-size: 14px; color: #666;">Số lượng: <strong id="modalQuoteAmount">-</strong></div>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">PQL chào giá: <strong id="modalQuotePql">-</strong></div>
+                    </div>
+                    <div class="quote-price" id="modalQuotePrice">0.00</div>
+                    <div style="text-align: center; color: #666; margin-bottom: 20px; font-size: 13px;">
+                        Vui lòng chấp nhận hoặc từ chối tỷ giá này trong thời gian còn lại
+                    </div>
+                    <div class="quote-actions">
+                        <button class="btn btn-small btn-success" onclick="acceptPrice()" style="font-size: 16px; padding: 12px 30px;">
+                            ✓ CHẤP NHẬN GIÁ
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="rejectPrice()" style="font-size: 16px; padding: 12px 30px;">
+                            ✗ TỪ CHỐI GIÁ
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            <!-- Tab Chat -->
+            <div id="quoteModalTab-chat" class="modal-tab-content">
+                <div class="chat-messages-modal" id="quoteModalChatMessages">
+                    <div class="chat-message system">
+                        <strong>Hệ thống:</strong><br>
+                        Chat trực tiếp với PQL về giao dịch này.
+                    </div>
+                </div>
+                <div class="chat-input-area" style="border: none; padding: 0;">
+                    <input type="text" class="chat-input" id="quoteModalChatInput" 
+                           placeholder="Nhập tin nhắn..." onkeypress="handleQuoteModalChatKeyPress(event)">
+                    <button class="btn chat-send" onclick="sendQuoteModalChatMessage()">Gửi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PQL Quote Management Modal -->
+    <div class="modal" id="pqlQuoteModal">
+        <div class="modal-content xlarge">
+            <div class="modal-header">
+                <h3 class="modal-title">💼 QUẢN LÝ CHÀO GIÁ</h3>
+                <button class="close-btn" onclick="closePqlQuoteModal()">&times;</button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="modal-tabs">
+                <button class="modal-tab active" onclick="switchPqlModalTab('quote')">Thông tin chào giá</button>
+                <button class="modal-tab" onclick="switchPqlModalTab('chat')">Chat với PNV</button>
+            </div>
+
+            <!-- Tab Quote Info -->
+            <div id="pqlModalTab-quote" class="modal-tab-content active">
+                <div class="quote-box" style="margin: 0;">
+                    <div class="quote-header">
+                        <span style="font-weight: 600;">Thời gian còn lại:</span>
+                        <span class="quote-timer" id="pqlModalQuoteTimer">02:00</span>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 5px;">PNV: <strong id="pqlModalPnv">-</strong></div>
+                        <div style="font-size: 14px; color: #666;">Cặp tiền: <strong id="pqlModalPair">USD/VND</strong></div>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">Số lượng: <strong id="pqlModalAmount">-</strong></div>
+                    </div>
+                    <div class="quote-price" id="pqlModalQuotePrice">0.00</div>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <div style="font-size: 13px; color: #666; margin-bottom: 10px;"><strong>Thông tin giao dịch:</strong></div>
+                        <div style="font-size: 13px; color: #333; line-height: 1.8;">
+                            CIF: <span id="pqlModalCif">-</span> | <span id="pqlModalCifName">-</span><br>
+                            Chiều: <span id="pqlModalDirection">-</span><br>
+                            Ngày hiệu lực: <span id="pqlModalEffDate">-</span>
+                        </div>
+                    </div>
+
+                    <div class="quote-actions" style="flex-wrap: wrap;">
+                        <button class="btn btn-small btn-warning" onclick="withdrawQuote()" style="font-size: 14px;">
+                            ↩️ WITHDRAW (Rút lại)
+                        </button>
+                        <button class="btn btn-small btn-info" onclick="transferQuote()" style="font-size: 14px;">
+                            🔄 TRANSFER (Chuyển)
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="interruptCurrentFromModal()" style="font-size: 14px;">
+                            ⛔ INTERRUPT
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="interruptAllFromModal()" style="font-size: 14px;">
+                            ⛔⛔ INTERRUPT ALL
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Chat -->
+            <div id="pqlModalTab-chat" class="modal-tab-content">
+                <div class="chat-messages-modal" id="pqlModalChatMessages">
+                    <div class="chat-message system">
+                        <strong>Hệ thống:</strong><br>
+                        Chat trực tiếp với PNV về giao dịch này.
+                    </div>
+                </div>
+                <div class="chat-input-area" style="border: none; padding: 0;">
+                    <input type="text" class="chat-input" id="pqlModalChatInput" 
+                           placeholder="Nhập tin nhắn..." onkeypress="handlePqlModalChatKeyPress(event)">
+                    <button class="btn chat-send" onclick="sendPqlModalChatMessage()">Gửi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Quote Modal -->
+    <div class="modal" id="transferQuoteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🔄 Chuyển giao dịch cho PQL khác</h3>
+                <button class="close-btn" onclick="closeTransferQuoteModal()">&times;</button>
+            </div>
+            <form onsubmit="handleTransferQuote(event)">
+                <div class="form-group">
+                    <label>Chọn PQL nhận chuyển:</label>
+                    <select id="transferTargetPql" required style="width: 100%; padding: 10px;">
+                        <option value="">-- Chọn PQL --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ghi chú (tùy chọn):</label>
+                    <textarea id="transferNote" rows="3" placeholder="Lý do chuyển giao dịch..."></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeTransferQuoteModal()">Hủy</button>
+                    <button type="submit" class="btn">Xác nhận chuyển</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1992,9 +2215,12 @@
         let currentEditingUserId = null;
         let selectedCifFile = null;
         let selectedPurposeFile = null;
+        let selectedAssignmentFile = null;
         let allUsers = [];
         let cifData = {};
         let purposeData = {};
+        let assignmentData = {}; // CIF -> PNV mapping
+        let currentPqlQuoteData = null; // For PQL modal management
 
         const API_BASE = '';
 
@@ -2021,6 +2247,40 @@
             notif.className = `notification ${type}`;
             notif.classList.add('show');
             setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        function showFlashNotification(message, type = 'quote') {
+            const container = document.getElementById('flashNotificationContainer');
+            const notif = document.createElement('div');
+            notif.className = `flash-notification ${type}`;
+            notif.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">${type === 'quote' ? '🔴' : '🔵'}</span>
+                    <div>
+                        <div style="font-weight: bold; margin-bottom: 3px;">${type === 'quote' ? 'CHÀO GIÁ MỚI' : 'TIN NHẮN MỚI'}</div>
+                        <div style="font-size: 13px;">${message}</div>
+                    </div>
+                </div>
+            `;
+            
+            notif.onclick = () => {
+                notif.remove();
+                if (type === 'quote') {
+                    // Focus to appropriate tab/modal
+                    if (currentUser?.role === 'PNV') {
+                        // PNV already has modal open
+                    } else if (currentUser?.role === 'PQL') {
+                        document.querySelector('[onclick="switchTab(\'pql\', \'quotes\')"]').click();
+                    }
+                }
+            };
+            
+            container.appendChild(notif);
+            
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (notif.parentNode) notif.remove();
+            }, 10000);
         }
 
         function updateConnectionStatus(status) {
@@ -2098,26 +2358,35 @@
             // PNV nhận giá chào từ PQL
             socket.on('price_quote', (data) => {
                 console.log('Received price quote:', data);
+                showFlashNotification(`PQL chào giá ${data.rate} cho ${data.buyCurr}/${data.sellCurr}`, 'quote');
                 showQuoteModal(data);
-            });
-
-            // Quote bị interrupt
-            socket.on('quote_interrupted', (data) => {
-                closeQuoteModal();
-                showNotification('⛔ Giao dịch đã bị PQL Interrupt!', 'error');
             });
 
             // PQL nhận yêu cầu hỏi giá mới
             socket.on('new_quote_request', (data) => {
-                showNotification(`📥 ${data.pnvName} vừa gửi yêu cầu hỏi giá!`, 'info');
+                showFlashNotification(`${data.pnvName} yêu cầu hỏi giá ${data.buyCurr}/${data.sellCurr}`, 'quote');
                 if (currentUser?.role === 'PQL') {
                     loadPendingQuotes();
                 }
             });
 
+            // Quote bị interrupt
+            socket.on('quote_interrupted', (data) => {
+                closeQuoteModal();
+                closePqlQuoteModal();
+                showNotification('⛔ Giao dịch đã bị Interrupt!', 'error');
+            });
+
             // Nhận message chat
             socket.on('new_message', (data) => {
+                const isQuoteRelated = data.isQuoteRelated || false;
+                showFlashNotification(`Tin nhắn từ ${data.fromName}: ${data.message.substring(0, 50)}...`, isQuoteRelated ? 'quote' : 'chat');
                 displayChatMessage(data);
+                
+                // Add to modal chat if open
+                if (isQuoteRelated && currentQuoteData) {
+                    addMessageToQuoteModalChat(data);
+                }
             });
 
             // Unread messages khi đăng nhập lại
@@ -2132,9 +2401,15 @@
             socket.on('quote_responded', (data) => {
                 if (data.accepted) {
                     showNotification(`✅ ${data.pnvId} đã chấp nhận giá!`, 'success');
+                    closePqlQuoteModal();
                 } else {
                     showNotification(`❌ ${data.pnvId} đã từ chối giá`, 'warning');
                 }
+                loadPendingQuotes();
+            });
+
+            socket.on('quote_transferred', (data) => {
+                showNotification(`🔄 Giao dịch được chuyển từ ${data.fromPql} sang ${data.toPql}`, 'info');
                 loadPendingQuotes();
             });
         }
@@ -2180,8 +2455,10 @@
                     document.getElementById('pqlDashboard').style.display = 'block';
                     await loadCifData();
                     await loadPurposeData();
+                    await loadAssignmentData();
                     await loadCifTable();
                     await loadPurposeTable();
+                    await loadAssignmentTable();
                     await loadPendingQuotes();
                     await loadPqlBlotter();
                     await loadPnvListForSelect();
@@ -2261,6 +2538,7 @@
             } else if (dashboard === 'pql' && tabName === 'dataEntry') {
                 loadCifTable();
                 loadPurposeTable();
+                loadAssignmentTable();
             } else if (dashboard === 'pql' && tabName === 'chat') {
                 loadPnvListForSelect();
             }
@@ -2345,13 +2623,29 @@
         function updateUserRole() {
             const dept = document.getElementById('newUserDept').value;
             const managerDiv = document.getElementById('managerSelect');
-            managerDiv.style.display = dept.startsWith('PNV') ? 'block' : 'none';
+            const managerSelect = document.getElementById('newUserManager');
+            
+            if (dept.startsWith('PNV')) {
+                managerDiv.style.display = 'block';
+                managerSelect.required = true;
+            } else {
+                managerDiv.style.display = 'none';
+                managerSelect.required = false;
+            }
         }
 
         function updateEditUserRole() {
             const dept = document.getElementById('editUserDept').value;
             const managerDiv = document.getElementById('editManagerSelect');
-            managerDiv.style.display = dept.startsWith('PNV') ? 'block' : 'none';
+            const managerSelect = document.getElementById('editUserManager');
+            
+            if (dept.startsWith('PNV')) {
+                managerDiv.style.display = 'block';
+                managerSelect.required = true;
+            } else {
+                managerDiv.style.display = 'none';
+                managerSelect.required = false;
+            }
         }
 
         async function handleAddUser(e) {
@@ -2360,6 +2654,11 @@
             const name = document.getElementById('newUserName').value.trim();
             const dept = document.getElementById('newUserDept').value;
             const managerId = document.getElementById('newUserManager').value;
+
+            if (dept.startsWith('PNV') && !managerId) {
+                showNotification('Vui lòng chọn BGĐ quản lý cho PNV!', 'error');
+                return;
+            }
 
             try {
                 await apiPost('/users', {
@@ -2384,13 +2683,19 @@
             if (!currentEditingUserId) return;
             
             const dept = document.getElementById('editUserDept').value;
+            const managerId = document.getElementById('editUserManager').value;
+            
+            if (dept.startsWith('PNV') && !managerId) {
+                showNotification('Vui lòng chọn BGĐ quản lý cho PNV!', 'error');
+                return;
+            }
             
             try {
                 await apiPut(`/users/${currentEditingUserId}`, {
                     name: document.getElementById('editUserName').value,
                     dept: dept,
                     role: dept.split('-')[0],
-                    managerId: dept.startsWith('PNV') ? document.getElementById('editUserManager').value : null
+                    managerId: dept.startsWith('PNV') ? managerId : null
                 });
                 
                 closeEditUserModal();
@@ -2435,9 +2740,19 @@
 
         async function loadPurposeData() {
             try {
-                purposeData = await apiGet('/purpose');
+                const purposeBuy = await apiGet('/purpose?type=buy');
+                const purposeSell = await apiGet('/purpose?type=sell');
+                purposeData = { buy: purposeBuy, sell: purposeSell };
             } catch (err) {
                 console.error('Error loading purpose:', err);
+            }
+        }
+
+        async function loadAssignmentData() {
+            try {
+                assignmentData = await apiGet('/assignment');
+            } catch (err) {
+                console.error('Error loading assignment:', err);
             }
         }
 
@@ -2482,9 +2797,37 @@
             }
         }
 
+        // MBNT Logic: Mã tiền tệ giao dịch tự động xác định đồng tiền mua/bán
+        function updateCurrencyLogic() {
+            const transactionType = document.getElementById('transactionType').value;
+            const currencyCode = document.getElementById('currencyCode').value;
+            const buySelect = document.getElementById('buyCurrency');
+            const sellSelect = document.getElementById('sellCurrency');
+            
+            if (!transactionType || !currencyCode) return;
+            
+            // Reset options
+            const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'SGD', 'THB', 'CAD', 'CHF', 'HKD', 'DKK', 'KRW', 'NOK', 'SEK', 'VND'];
+            
+            buySelect.innerHTML = '';
+            sellSelect.innerHTML = '';
+            
+            if (transactionType === 'buy') {
+                // VCB MUA: Mua ngoại tệ (currencyCode), bán VND
+                buySelect.innerHTML = `<option value="${currencyCode}" selected>${currencyCode}</option>`;
+                sellSelect.innerHTML = `<option value="VND" selected>VND</option>`;
+            } else {
+                // VCB BÁN: Bán ngoại tệ (currencyCode), mua VND
+                buySelect.innerHTML = `<option value="VND" selected>VND</option>`;
+                sellSelect.innerHTML = `<option value="${currencyCode}" selected>${currencyCode}</option>`;
+            }
+            
+            updatePurposeLabel();
+        }
+
         function updatePurposeLabel() {
             const type = document.getElementById('transactionType').value;
-            document.getElementById('purposeCodeLabel').textContent = type === 'buy' ? 'Mã nguồn (1-11)' : 'Mã mục đích (1-12)';
+            document.getElementById('purposeCodeLabel').textContent = type === 'buy' ? 'Mã nguồn (1-12)' : 'Mã mục đích (1-12)';
             document.getElementById('purposeNameLabel').textContent = type === 'buy' ? 'Tên nguồn' : 'Tên mục đích';
         }
 
@@ -2503,9 +2846,9 @@
             }
             
             const displayCode = String(numCode);
-            const dataSource = type === 'buy' ? purposeData : purposeData;
+            const dataSource = type === 'buy' ? purposeData.buy : purposeData.sell;
             
-            if (dataSource[displayCode]) {
+            if (dataSource && dataSource[displayCode]) {
                 nameInput.value = dataSource[displayCode];
                 nameInput.style.color = 'var(--ocean-blue)';
             } else {
@@ -2574,6 +2917,8 @@
             document.getElementById('transactionDate').value = formatDate(new Date());
             document.getElementById('customerName').value = '';
             document.getElementById('purposeName').value = '';
+            document.getElementById('buyCurrency').innerHTML = '<option value="">Tự động...</option>';
+            document.getElementById('sellCurrency').innerHTML = '<option value="">Tự động...</option>';
         }
 
         function showQuoteModal(data) {
@@ -2586,9 +2931,18 @@
             });
             document.getElementById('modalQuotePair').textContent = `${data.buyCurr}/${data.sellCurr}`;
             document.getElementById('modalQuoteAmount').textContent = parseFloat(data.amount).toLocaleString('vi-VN');
+            document.getElementById('modalQuotePql').textContent = data.pqlName || 'PQL';
             
             const expiry = new Date(data.expiryTime);
             startQuoteTimer(expiry, data.quoteId);
+            
+            // Reset chat tab
+            document.getElementById('quoteModalChatMessages').innerHTML = `
+                <div class="chat-message system">
+                    <strong>Hệ thống:</strong><br>
+                    Chat trực tiếp với PQL về giao dịch này.
+                </div>
+            `;
             
             modal.classList.add('active');
             showNotification('🔔 PQL đã chào giá! Vui lòng phản hồi.', 'warning');
@@ -2596,6 +2950,7 @@
 
         function startQuoteTimer(expiryTime, quoteId) {
             const timerDisplay = document.getElementById('modalQuoteTimer');
+            const pqlTimerDisplay = document.getElementById('pqlModalQuoteTimer');
             
             if (quoteTimerInterval) {
                 clearInterval(quoteTimerInterval);
@@ -2605,10 +2960,17 @@
                 const now = new Date();
                 const remaining = Math.ceil((expiryTime - now) / 1000);
                 
+                const mins = Math.floor(Math.max(0, remaining) / 60);
+                const secs = Math.max(0, remaining) % 60;
+                const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                if (timerDisplay) timerDisplay.textContent = timeStr;
+                if (pqlTimerDisplay) pqlTimerDisplay.textContent = timeStr;
+                
                 if (remaining <= 0) {
                     clearInterval(quoteTimerInterval);
-                    timerDisplay.textContent = '00:00';
                     closeQuoteModal();
+                    closePqlQuoteModal();
                     showNotification('⏰ Tỷ giá đã hết hiệu lực!', 'error');
                     
                     socket.emit('respond_quote', {
@@ -2616,12 +2978,7 @@
                         accepted: false,
                         pnvId: currentUser.id
                     });
-                    return;
                 }
-                
-                const mins = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }, 1000);
         }
 
@@ -2632,6 +2989,59 @@
                 quoteTimerInterval = null;
             }
             currentQuoteData = null;
+        }
+
+        function switchQuoteModalTab(tab) {
+            document.querySelectorAll('#quoteResponseModal .modal-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#quoteResponseModal .modal-tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`quoteModalTab-${tab}`).classList.add('active');
+        }
+
+        function handleQuoteModalChatKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendQuoteModalChatMessage();
+            }
+        }
+
+        function sendQuoteModalChatMessage() {
+            const input = document.getElementById('quoteModalChatInput');
+            const message = input.value.trim();
+            if (!message || !currentQuoteData) return;
+            
+            const chatData = {
+                fromId: currentUser.id,
+                fromName: currentUser.name,
+                fromRole: currentUser.role,
+                toId: currentQuoteData.pqlId,
+                toRole: 'PQL',
+                message: message,
+                isQuoteRelated: true,
+                quoteId: currentQuoteData.quoteId
+            };
+            
+            socket.emit('chat_message', chatData);
+            
+            // Add to own chat
+            const div = document.createElement('div');
+            div.className = 'chat-message sent';
+            div.innerHTML = `<strong>Bạn:</strong><br>${message}`;
+            document.getElementById('quoteModalChatMessages').appendChild(div);
+            document.getElementById('quoteModalChatMessages').scrollTop = document.getElementById('quoteModalChatMessages').scrollHeight;
+            
+            input.value = '';
+        }
+
+        function addMessageToQuoteModalChat(data) {
+            const container = document.getElementById('quoteModalChatMessages');
+            if (!container) return;
+            
+            const div = document.createElement('div');
+            div.className = 'chat-message received';
+            div.innerHTML = `<strong>${data.fromName}:</strong><br>${data.message}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
         }
 
         function acceptPrice() {
@@ -2722,23 +3132,28 @@
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                     
                     const cifList = [];
-                    for (let i = 0; i < jsonData.length; i++) {
-                        const row = jsonData[i];
-                        if (row.length >= 2) {
-                            let cif = String(row[0]).trim().replace(/\D/g, '');
-                            const name = String(row[1]).trim();
-                            
-                            while (cif.length < 10) cif = '0' + cif;
-                            
-                            if (cif && name && cif.length === 10) {
-                                cifList.push({ cif, name });
+                    
+                    // Read all sheets
+                    workbook.SheetNames.forEach(sheetName => {
+                        const sheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                        
+                        for (let i = 0; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            if (row.length >= 2) {
+                                let cif = String(row[0]).trim().replace(/\D/g, '');
+                                const name = String(row[1]).trim();
+                                
+                                while (cif.length < 10) cif = '0' + cif;
+                                
+                                if (cif && name && cif.length === 10) {
+                                    cifList.push({ cif, name });
+                                }
                             }
                         }
-                    }
+                    });
                     
                     await apiPost('/cif/bulk', { data: cifList });
                     await loadCifData();
@@ -2821,24 +3236,39 @@
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                     
-                    const purposeList = [];
-                    for (let i = 0; i < jsonData.length; i++) {
-                        const row = jsonData[i];
-                        if (row.length >= 2) {
-                            let code = String(row[0]).trim();
-                            const name = String(row[1]).trim();
-                            const numCode = parseInt(code);
-                            
-                            if (!isNaN(numCode) && numCode >= 1 && numCode <= 12) {
-                                purposeList.push({ code: String(numCode), name });
+                    const purposeBuyList = [];
+                    const purposeSellList = [];
+                    
+                    // Read all sheets - Sheet 1: Buy/Source, Sheet 2: Sell/Purpose
+                    workbook.SheetNames.forEach((sheetName, index) => {
+                        const sheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                        
+                        const isBuySheet = sheetName.toLowerCase().includes('nguồn') || 
+                                          sheetName.toLowerCase().includes('source') ||
+                                          sheetName.toLowerCase().includes('buy') ||
+                                          index === 0;
+                        
+                        for (let i = 0; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            if (row.length >= 2) {
+                                let code = String(row[0]).trim();
+                                const name = String(row[1]).trim();
+                                const numCode = parseInt(code);
+                                
+                                if (!isNaN(numCode) && numCode >= 1 && numCode <= 12) {
+                                    if (isBuySheet) {
+                                        purposeBuyList.push({ code: String(numCode), name });
+                                    } else {
+                                        purposeSellList.push({ code: String(numCode), name });
+                                    }
+                                }
                             }
                         }
-                    }
+                    });
                     
-                    await apiPost('/purpose/bulk', { data: purposeList });
+                    await apiPost('/purpose/bulk', { buy: purposeBuyList, sell: purposeSellList });
                     await loadPurposeData();
                     loadPurposeTable();
                     
@@ -2847,7 +3277,7 @@
                     document.getElementById('purposeFileName').textContent = '';
                     document.getElementById('uploadPurposeBtn').style.display = 'none';
                     
-                    showNotification(`✅ Upload Purpose thành công: ${purposeList.length} bản ghi!`);
+                    showNotification(`✅ Upload Purpose thành công: Mua ${purposeBuyList.length}, Bán ${purposeSellList.length} bản ghi!`);
                 } catch (error) {
                     showNotification('❌ Lỗi đọc file!', 'error');
                 }
@@ -2860,24 +3290,151 @@
             if (!tbody) return;
             
             tbody.innerHTML = '';
-            Object.entries(purposeData).forEach(([code, name]) => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${code}</td>
-                    <td>${name}</td>
-                    <td>
-                        <button class="btn btn-small btn-danger" onclick="deletePurpose('${code}')">Xóa</button>
-                    </td>
-                `;
-            });
+            
+            // Display buy purposes
+            if (purposeData.buy) {
+                Object.entries(purposeData.buy).forEach(([code, name]) => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${code} (Mua)</td>
+                        <td>${name}</td>
+                        <td>
+                            <button class="btn btn-small btn-danger" onclick="deletePurpose('${code}', 'buy')">Xóa</button>
+                        </td>
+                    `;
+                });
+            }
+            
+            // Display sell purposes
+            if (purposeData.sell) {
+                Object.entries(purposeData.sell).forEach(([code, name]) => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${code} (Bán)</td>
+                        <td>${name}</td>
+                        <td>
+                            <button class="btn btn-small btn-danger" onclick="deletePurpose('${code}', 'sell')">Xóa</button>
+                        </td>
+                    `;
+                });
+            }
         }
 
-        async function deletePurpose(code) {
+        async function deletePurpose(code, type) {
             showNotification('Chức năng xóa purpose tạm khóa!', 'warning');
         }
 
         function clearAllPurpose() {
             showNotification('Chức năng này cần xác nhận từ admin!', 'warning');
+        }
+
+        // Assignment (Chân hàng) Functions
+        function handleAssignmentFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            selectedAssignmentFile = file;
+            document.getElementById('assignmentUploadArea').classList.add('has-file');
+            document.getElementById('assignmentFileName').textContent = `📄 ${file.name}`;
+            document.getElementById('uploadAssignmentBtn').style.display = 'inline-block';
+        }
+
+        async function processAssignmentFile() {
+            if (!selectedAssignmentFile) {
+                showNotification('Vui lòng chọn file trước!', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const assignmentList = [];
+                    
+                    // Read all sheets
+                    workbook.SheetNames.forEach(sheetName => {
+                        const sheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                        
+                        for (let i = 0; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            if (row.length >= 2) {
+                                let cif = String(row[0]).trim().replace(/\D/g, '');
+                                const pnvId = String(row[1]).trim();
+                                
+                                while (cif.length < 10) cif = '0' + cif;
+                                
+                                if (cif && pnvId && cif.length === 10) {
+                                    assignmentList.push({ cif, pnvId });
+                                }
+                            }
+                        }
+                    });
+                    
+                    await apiPost('/assignment/bulk', { data: assignmentList });
+                    await loadAssignmentData();
+                    loadAssignmentTable();
+                    
+                    selectedAssignmentFile = null;
+                    document.getElementById('assignmentUploadArea').classList.remove('has-file');
+                    document.getElementById('assignmentFileName').textContent = '';
+                    document.getElementById('uploadAssignmentBtn').style.display = 'none';
+                    document.getElementById('assignmentFileInput').value = '';
+                    
+                    showNotification(`✅ Upload Chân hàng thành công: ${assignmentList.length} bản ghi!`);
+                } catch (error) {
+                    showNotification('❌ Lỗi đọc file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(selectedAssignmentFile);
+        }
+
+        function loadAssignmentTable() {
+            const tbody = document.getElementById('assignmentTableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            Object.entries(assignmentData).forEach(([cif, pnvId]) => {
+                const cifName = cifData[cif] || 'Không xác định';
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${cif}</td>
+                    <td>${cifName}</td>
+                    <td>${pnvId}</td>
+                    <td>
+                        <button class="btn btn-small btn-danger" onclick="deleteAssignment('${cif}')">Xóa</button>
+                    </td>
+                `;
+            });
+        }
+
+        async function deleteAssignment(cif) {
+            if (!confirm(`Xóa phân công CIF ${cif}?`)) return;
+            try {
+                await apiDelete(`/assignment/${cif}`);
+                await loadAssignmentData();
+                loadAssignmentTable();
+                showNotification('Đã xóa phân công');
+            } catch (err) {
+                showNotification('Lỗi xóa phân công!', 'error');
+            }
+        }
+
+        async function clearAllAssignment() {
+            if (!confirm('⚠️ Xóa tất cả phân công?')) return;
+            showNotification('Chức năng này cần xác nhận từ admin!', 'warning');
+        }
+
+        function exportAssignmentToExcel() {
+            const data = Object.entries(assignmentData).map(([cif, pnvId]) => {
+                return [cif, cifData[cif] || '', pnvId];
+            });
+            const ws = XLSX.utils.aoa_to_sheet([['CIF', 'Tên KH', 'PNV phụ trách'], ...data]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Assignment Data');
+            XLSX.writeFile(wb, `Assignment_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
         }
 
         // ==========================================
@@ -2912,7 +3469,7 @@
                     `;
                     container.appendChild(div);
                 });
-                        } catch (err) {
+            } catch (err) {
                 console.error('Error loading pending quotes:', err);
                 document.getElementById('pendingQuotes').innerHTML = 
                     '<div style="padding: 20px; text-align: center; color: var(--danger);">Lỗi tải dữ liệu</div>';
@@ -2920,6 +3477,7 @@
         }
 
         function selectQuote(quote) {
+            // Show quote form for initial quote
             document.getElementById('quoteFormCard').classList.remove('hidden');
             document.getElementById('quoteRequestId').value = quote.quote_id;
             document.getElementById('quotePnv').value = `${quote.pnv_name} (${quote.pnv_id})`;
@@ -2951,17 +3509,177 @@
                 return;
             }
             
-            socket.emit('submit_quote', {
+            const quoteData = {
                 quoteId: quoteId,
                 rate: rate,
                 duration: duration,
-                pqlId: currentUser.id
-            });
+                pqlId: currentUser.id,
+                pqlName: currentUser.name
+            };
+            
+            socket.emit('submit_quote', quoteData);
+            
+            // Show PQL management modal
+            showPqlQuoteModal(quoteData);
             
             showNotification(`✅ Đã chào giá ${rate.toLocaleString('vi-VN')} cho ${duration} phút!`, 'success');
             
             document.getElementById('quoteFormCard').classList.add('hidden');
             loadPendingQuotes();
+        }
+
+        function showPqlQuoteModal(data) {
+            currentPqlQuoteData = data;
+            const modal = document.getElementById('pqlQuoteModal');
+            
+            // Fill data
+            document.getElementById('pqlModalQuotePrice').textContent = parseFloat(data.rate).toLocaleString('vi-VN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 4
+            });
+                        document.getElementById('pqlModalPair').textContent = `${data.buyCurr}/${data.sellCurr}`;
+            document.getElementById('pqlModalAmount').textContent = parseFloat(data.amount).toLocaleString('vi-VN');
+            document.getElementById('pqlModalPnv').textContent = `${data.pnvName} (${data.pnvId})`;
+            document.getElementById('pqlModalCif').textContent = data.cif;
+            document.getElementById('pqlModalCifName').textContent = data.customerName || '';
+            document.getElementById('pqlModalDirection').textContent = data.direction;
+            document.getElementById('pqlModalEffDate').textContent = data.effectiveDate;
+            
+            // Reset chat
+            document.getElementById('pqlModalChatMessages').innerHTML = `
+                <div class="chat-message system">
+                    <strong>Hệ thống:</strong><br>
+                    Chat trực tiếp với PNV về giao dịch này.
+                </div>
+            `;
+            
+            // Start timer
+            const expiry = new Date(Date.now() + data.duration * 60000);
+            startQuoteTimer(expiry, data.quoteId);
+            
+            modal.classList.add('active');
+        }
+
+        function closePqlQuoteModal() {
+            document.getElementById('pqlQuoteModal').classList.remove('active');
+            currentPqlQuoteData = null;
+        }
+
+        function switchPqlModalTab(tab) {
+            document.querySelectorAll('#pqlQuoteModal .modal-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#pqlQuoteModal .modal-tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`pqlModalTab-${tab}`).classList.add('active');
+        }
+
+        function handlePqlModalChatKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendPqlModalChatMessage();
+            }
+        }
+
+        function sendPqlModalChatMessage() {
+            const input = document.getElementById('pqlModalChatInput');
+            const message = input.value.trim();
+            if (!message || !currentPqlQuoteData) return;
+            
+            const chatData = {
+                fromId: currentUser.id,
+                fromName: currentUser.name,
+                fromRole: currentUser.role,
+                toId: currentPqlQuoteData.pnvId,
+                toRole: 'PNV',
+                message: message,
+                isQuoteRelated: true,
+                quoteId: currentPqlQuoteData.quoteId
+            };
+            
+            socket.emit('chat_message', chatData);
+            
+            // Add to own chat
+            const div = document.createElement('div');
+            div.className = 'chat-message sent';
+            div.innerHTML = `<strong>Bạn:</strong><br>${message}`;
+            document.getElementById('pqlModalChatMessages').appendChild(div);
+            document.getElementById('pqlModalChatMessages').scrollTop = document.getElementById('pqlModalChatMessages').scrollHeight;
+            
+            input.value = '';
+        }
+
+        function withdrawQuote() {
+            if (!currentPqlQuoteData) return;
+            
+            socket.emit('withdraw_quote', {
+                quoteId: currentPqlQuoteData.quoteId,
+                pqlId: currentUser.id
+            });
+            
+            showNotification('Đã rút lại chào giá', 'info');
+            closePqlQuoteModal();
+            loadPendingQuotes();
+        }
+
+        function transferQuote() {
+            if (!currentPqlQuoteData) return;
+            
+            // Load PQL list for transfer
+            loadPQLListForTransfer();
+            document.getElementById('transferQuoteModal').classList.add('active');
+        }
+
+        async function loadPQLListForTransfer() {
+            try {
+                const users = await apiGet('/users');
+                const pqlUsers = users.filter(u => u.role === 'PQL' && u.id !== currentUser.id);
+                const select = document.getElementById('transferTargetPql');
+                
+                let html = '<option value="">-- Chọn PQL --</option>';
+                pqlUsers.forEach(u => {
+                    html += `<option value="${u.id}">${u.name} (${u.id})</option>`;
+                });
+                select.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading PQL list:', err);
+            }
+        }
+
+        function closeTransferQuoteModal() {
+            document.getElementById('transferQuoteModal').classList.remove('active');
+        }
+
+        async function handleTransferQuote(e) {
+            e.preventDefault();
+            if (!currentPqlQuoteData) return;
+            
+            const targetPql = document.getElementById('transferTargetPql').value;
+            const note = document.getElementById('transferNote').value;
+            
+            if (!targetPql) {
+                showNotification('Vui lòng chọn PQL nhận chuyển!', 'error');
+                return;
+            }
+            
+            socket.emit('transfer_quote', {
+                quoteId: currentPqlQuoteData.quoteId,
+                fromPql: currentUser.id,
+                toPql: targetPql,
+                note: note
+            });
+            
+            closeTransferQuoteModal();
+            closePqlQuoteModal();
+            showNotification(`Đã chuyển giao dịch cho ${targetPql}`, 'success');
+        }
+
+        function interruptCurrentFromModal() {
+            interruptCurrent();
+            closePqlQuoteModal();
+        }
+
+        function interruptAllFromModal() {
+            interruptAll();
+            closePqlQuoteModal();
         }
 
         function interruptCurrent() {
@@ -2985,7 +3703,12 @@
                 
                 transactions.forEach(t => {
                     const row = tbody.insertRow();
-                    const hasEdit = t.edited_by ? `<div class="edit-log">Sửa bởi: ${t.edited_by} | ${new Date(t.edit_time).toLocaleString()}<br>${t.edit_note}</div>` : '';
+                    const hasEdit = t.edited_by ? `
+                        <div class="edit-log">
+                            <strong>Sửa bởi:</strong> ${t.edited_by} | ${new Date(t.edit_time).toLocaleString()}<br>
+                            <strong>Lý do:</strong> ${t.edit_note || 'Không ghi chú'}
+                        </div>
+                    ` : '';
                     
                     row.innerHTML = `
                         <td>${t.pnv_id}<br><small>${t.pnv_name}</small></td>
@@ -2998,7 +3721,9 @@
                         <td>${t.sell_curr}</td>
                         <td>${parseFloat(t.amount).toLocaleString('vi-VN')}</td>
                         <td>${parseFloat(t.rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                        <td>${t.balanced_rate ? parseFloat(t.balanced_rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
+                        <td contenteditable="true" onblur="updateBalancedRate('${t.trans_id}', this)" style="background: #fffde7; cursor: pointer;">
+                            ${t.balanced_rate ? parseFloat(t.balanced_rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}
+                        </td>
                         <td>${parseFloat(t.equivalent).toLocaleString('vi-VN')}</td>
                         <td><span class="badge ${t.trans_type === 'GN' ? 'badge-success' : 'badge-warning'}">${t.trans_type}</span></td>
                         <td>${t.profit ? parseFloat(t.profit).toLocaleString('vi-VN') : '-'}</td>
@@ -3019,6 +3744,26 @@
             }
         }
 
+        async function updateBalancedRate(transId, cell) {
+            const newValue = parseFloat(cell.textContent.replace(/[^\d.-]/g, ''));
+            if (isNaN(newValue)) {
+                showNotification('Giá trị không hợp lệ!', 'error');
+                return;
+            }
+            
+            try {
+                await apiPut(`/transactions/${transId}/balanced-rate`, {
+                    balancedRate: newValue,
+                    editedBy: currentUser.id,
+                    editTime: new Date().toISOString()
+                });
+                showNotification('Đã cập nhật tỷ giá cân đối');
+                loadPqlBlotter();
+            } catch (err) {
+                showNotification('Lỗi cập nhật!', 'error');
+            }
+        }
+
         function filterPqlBlotter() {
             loadPqlBlotter();
         }
@@ -3027,13 +3772,27 @@
             showNotification('Chức năng xuất file đang được cập nhật!', 'info');
         }
 
-        function openEditTransaction(transId) {
-            // Tìm transaction trong bảng
-            const rows = document.querySelectorAll('#pqlBlotterBody tr');
-            let transData = null;
-            
-            // Trong thực tế nên gọi API lấy chi tiết, ở đây giả lập
-            showNotification('Chức năng sửa giao dịch đang được hoàn thiện!', 'info');
+        async function openEditTransaction(transId) {
+            try {
+                const trans = await apiGet(`/transactions/${transId}`);
+                editingTransactionId = transId;
+                
+                document.getElementById('editTransId').value = transId;
+                document.getElementById('editCif').value = trans.cif;
+                document.getElementById('editCifName').value = trans.customer_name;
+                document.getElementById('editEffDate').value = trans.effective_date.split('T')[0];
+                document.getElementById('editBuyCurr').value = trans.buy_curr;
+                document.getElementById('editSellCurr').value = trans.sell_curr;
+                document.getElementById('editAmount').value = trans.amount;
+                document.getElementById('editRate').value = trans.rate;
+                document.getElementById('editBalancedRate').value = trans.balanced_rate || '';
+                document.getElementById('editType').value = trans.trans_type || 'GN';
+                document.getElementById('editNote').value = '';
+                
+                document.getElementById('editTransactionModal').classList.add('active');
+            } catch (err) {
+                showNotification('Lỗi tải thông tin giao dịch!', 'error');
+            }
         }
 
         function closeEditModal() {
@@ -3043,12 +3802,39 @@
 
         async function saveEditTransaction(e) {
             e.preventDefault();
-            showNotification('Chức năng sửa giao dịch đang được hoàn thiện!', 'info');
-            closeEditModal();
+            
+            const note = document.getElementById('editNote').value.trim();
+            if (!note) {
+                showNotification('Vui lòng nhập lý do chỉnh sửa!', 'error');
+                return;
+            }
+            
+            try {
+                await apiPut(`/transactions/${editingTransactionId}`, {
+                    cif: document.getElementById('editCif').value,
+                    customerName: document.getElementById('editCifName').value,
+                    effectiveDate: document.getElementById('editEffDate').value,
+                    buyCurr: document.getElementById('editBuyCurr').value,
+                    sellCurr: document.getElementById('editSellCurr').value,
+                    amount: parseFloat(document.getElementById('editAmount').value),
+                    rate: parseFloat(document.getElementById('editRate').value),
+                    balancedRate: parseFloat(document.getElementById('editBalancedRate').value) || null,
+                    transType: document.getElementById('editType').value,
+                    editNote: note,
+                    editedBy: currentUser.id,
+                    editTime: new Date().toISOString()
+                });
+                
+                closeEditModal();
+                loadPqlBlotter();
+                showNotification('Đã cập nhật giao dịch!');
+            } catch (err) {
+                showNotification('Lỗi cập nhật giao dịch!', 'error');
+            }
         }
 
         // ==========================================
-        // REPORTS
+        // REPORTS - Đúng công thức sheet 05.BAN và 06.MUA
         // ==========================================
         async function generateReport() {
             try {
@@ -3063,52 +3849,100 @@
                 
                 const transactions = await apiGet(url);
                 
-                document.getElementById('reportTotalCount').textContent = transactions.length;
-                document.getElementById('reportTotalVolume').textContent = 
-                    transactions.reduce((sum, t) => sum + parseFloat(t.amount), 0).toLocaleString('vi-VN');
-                document.getElementById('reportTotalProfit').textContent = 
-                    transactions.reduce((sum, t) => sum + (t.profit ? parseFloat(t.profit) : 0), 0).toLocaleString('vi-VN') + ' VND';
-                
-                const container = document.getElementById('reportResult');
-                if (transactions.length === 0) {
-                    container.innerHTML = '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
-                    return;
-                }
-                
-                let html = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
-                                <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
-                                <th>TG cân đối</th><th>Tương đương</th><th>Loại</th><th>Lợi nhuận</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
+                // Tính toán theo công thức đúng
+                let totalCount = transactions.length;
+                let totalVolumeUSD = 0;
+                let totalProfit = 0;
                 
                 transactions.forEach(t => {
-                    html += `
-                        <tr>
-                            <td>${t.pnv_id}</td>
-                            <td>${formatDate(new Date(t.trans_date))}</td>
-                            <td>${formatDate(new Date(t.effective_date))}</td>
-                            <td>${t.cif}</td>
-                            <td>${t.customer_name}</td>
-                            <td>${t.direction}</td>
-                            <td>${t.buy_curr}</td>
-                            <td>${t.sell_curr}</td>
-                            <td>${parseFloat(t.amount).toLocaleString()}</td>
-                            <td>${parseFloat(t.rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                            <td>${t.balanced_rate ? parseFloat(t.balanced_rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
-                            <td>${parseFloat(t.equivalent).toLocaleString()}</td>
-                            <td>${t.trans_type}</td>
-                            <td>${t.profit ? parseFloat(t.profit).toLocaleString() : '-'}</td>
-                        </tr>
-                    `;
+                    // Tổng khối lượng: Quy đổi về USD nếu là ngoại tệ khác
+                    let volumeInUSD = parseFloat(t.amount);
+                    if (t.buy_curr !== 'USD' && t.sell_curr !== 'USD') {
+                        // Giả sử tỷ giá quy đổi, trong thực tế cần API tỷ giá
+                        volumeInUSD = parseFloat(t.amount) / parseFloat(t.rate);
+                    }
+                    totalVolumeUSD += volumeInUSD;
+                    
+                    // Lợi nhuận: (Tỷ giá cân đối - Tỷ giá giao dịch) * Số lượng
+                    if (t.balanced_rate && t.rate) {
+                        const profit = (parseFloat(t.balanced_rate) - parseFloat(t.rate)) * parseFloat(t.amount);
+                        totalProfit += profit;
+                    }
                 });
                 
-                html += '</tbody></table>';
+                document.getElementById('reportTotalCount').textContent = totalCount;
+                document.getElementById('reportTotalVolume').textContent = totalVolumeUSD.toLocaleString('vi-VN', {maximumFractionDigits: 2}) + ' USD';
+                document.getElementById('reportTotalProfit').textContent = totalProfit.toLocaleString('vi-VN', {maximumFractionDigits: 0}) + ' VND';
+                
+                // Hiển thị chi tiết theo loại BAN và MUA
+                const container = document.getElementById('reportResult');
+                
+                // Phân loại giao dịch
+                const banTrans = transactions.filter(t => t.direction === 'VCB BÁN');
+                const muaTrans = transactions.filter(t => t.direction === 'VCB MUA');
+                
+                let html = `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: var(--primary-green); margin-bottom: 15px;">📊 BÁO CÁO GIAO DỊCH</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div style="background: #E3F2FD; padding: 15px; border-radius: 8px;">
+                                <h4 style="color: var(--ocean-blue); margin-bottom: 10px;">VCB BÁN (05.BAN)</h4>
+                                <p>Số lượng giao dịch: <strong>${banTrans.length}</strong></p>
+                                <p>Tổng khối lượng: <strong>${banTrans.reduce((sum, t) => sum + parseFloat(t.amount), 0).toLocaleString('vi-VN')}</strong></p>
+                            </div>
+                            <div style="background: #E8F5E9; padding: 15px; border-radius: 8px;">
+                                <h4 style="color: var(--primary-green); margin-bottom: 10px;">VCB MUA (06.MUA)</h4>
+                                <p>Số lượng giao dịch: <strong>${muaTrans.length}</strong></p>
+                                <p>Tổng khối lượng: <strong>${muaTrans.reduce((sum, t) => sum + parseFloat(t.amount), 0).toLocaleString('vi-VN')}</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                if (transactions.length === 0) {
+                    html += '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
+                } else {
+                    html += `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
+                                    <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
+                                    <th>TG cân đối</th><th>Tương đương</th><th>Loại</th><th>Lợi nhuận</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    transactions.forEach(t => {
+                        const profit = t.balanced_rate && t.rate ? 
+                            ((parseFloat(t.balanced_rate) - parseFloat(t.rate)) * parseFloat(t.amount)).toLocaleString('vi-VN', {maximumFractionDigits: 0}) : 
+                            '-';
+                        
+                        html += `
+                            <tr>
+                                <td>${t.pnv_id}</td>
+                                <td>${formatDate(new Date(t.trans_date))}</td>
+                                <td>${formatDate(new Date(t.effective_date))}</td>
+                                <td>${t.cif}</td>
+                                <td>${t.customer_name}</td>
+                                <td>${t.direction}</td>
+                                <td>${t.buy_curr}</td>
+                                <td>${t.sell_curr}</td>
+                                <td>${parseFloat(t.amount).toLocaleString()}</td>
+                                <td>${parseFloat(t.rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                                <td>${t.balanced_rate ? parseFloat(t.balanced_rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
+                                <td>${parseFloat(t.equivalent).toLocaleString()}</td>
+                                <td>${t.trans_type}</td>
+                                <td>${profit}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += '</tbody></table>';
+                }
+                
                 container.innerHTML = html;
                 showNotification(`Báo cáo có ${transactions.length} giao dịch`);
             } catch (err) {
@@ -3152,13 +3986,16 @@
             const message = input.value.trim();
             if (!message) return;
             
+            const targetId = role === 'pql' ? document.getElementById('pqlChatTarget')?.value : null;
+            
             const chatData = {
                 fromId: currentUser.id,
                 fromName: currentUser.name,
                 fromRole: currentUser.role,
-                toId: role === 'pql' ? document.getElementById('pqlChatTarget')?.value : null,
+                toId: targetId,
                 toRole: role === 'pnv' ? 'PQL' : 'PNV',
-                message: message
+                message: message,
+                isQuoteRelated: false
             };
             
             socket.emit('chat_message', chatData);
@@ -3271,7 +4108,8 @@
             // File upload drag & drop
             const uploadAreas = [
                 { area: 'cifUploadArea', input: 'cifFileInput' },
-                { area: 'purposeUploadArea', input: 'purposeFileInput' }
+                { area: 'purposeUploadArea', input: 'purposeFileInput' },
+                { area: 'assignmentUploadArea', input: 'assignmentFileInput' }
             ];
             
             uploadAreas.forEach(({ area, input }) => {
