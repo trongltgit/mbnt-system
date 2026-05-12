@@ -1686,41 +1686,27 @@
             <!-- Tab Báo cáo -->
             <div id="pql-reports" class="tab-content">
                 <div class="card">
-                    <div class="card-title">Báo cáo giao dịch</div>
-                    
-                    <div class="report-summary">
-                        <div class="summary-item">
-                            <span class="summary-label">Tổng số giao dịch:</span>
-                            <span class="summary-value" id="reportTotalCount">0</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Tổng khối lượng giao dịch (USD):</span>
-                            <span class="summary-value" id="reportTotalVolume">0</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Tổng lợi nhuận:</span>
-                            <span class="summary-value" id="reportTotalProfit">0 VND</span>
-                        </div>
-                    </div>
+                    <div class="card-title">BÁO CÁO GIAO DỊCH MUA/BÁN NGOẠI TỆ</div>
 
+                    <!-- Filter -->
                     <div class="filter-section">
                         <div class="report-grid">
                             <div class="form-group">
-                                <label>Ngày giao dịch từ</label>
+                                <label>Từ ngày</label>
                                 <input type="date" id="reportTransFrom">
                             </div>
                             <div class="form-group">
-                                <label>Ngày giao dịch đến</label>
+                                <label>Đến ngày</label>
                                 <input type="date" id="reportTransTo">
                             </div>
                             <div class="form-group">
-                                <label>Mã PNV</label>
-                                <select id="reportPnv">
+                                <label>Phòng QL</label>
+                                <select id="reportDept">
                                     <option value="">Tất cả</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Loại giao dịch</label>
+                                <label>Loại GD</label>
                                 <select id="reportType">
                                     <option value="">Tất cả</option>
                                     <option value="GN">GN (Giao ngay)</option>
@@ -1728,14 +1714,41 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="btn-group">
-                            <button class="btn btn-small" onclick="generateReport()" style="width: auto;">Xem báo cáo</button>
-                            <button class="btn btn-small btn-secondary" onclick="exportReport('excel')" style="width: auto;">Xuất Excel</button>
-                            <button class="btn btn-small btn-secondary" onclick="exportReport('pdf')" style="width: auto;">Xuất PDF</button>
+                        <div class="btn-group" style="margin-top:10px;">
+                            <button class="btn btn-small" onclick="generateReport()" style="width:auto;">🔍 Xem báo cáo</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportBCKDNT()" style="width:auto;">📥 Xuất Excel (BC KDNT)</button>
                         </div>
                     </div>
-                    <div id="reportResult" class="table-container" style="margin-top: 20px;">
-                        <div style="padding: 40px; text-align: center; color: var(--gray);">
+
+                    <!-- Summary cards -->
+                    <div class="report-summary" id="reportSummary" style="display:none; margin-top:15px;">
+                        <div class="summary-item">
+                            <span class="summary-label">Tổng GD:</span>
+                            <span class="summary-value" id="reportTotalCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Tổng MUA (VCB MUA):</span>
+                            <span class="summary-value" id="reportTotalMua">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Tổng BÁN (VCB BÁN):</span>
+                            <span class="summary-value" id="reportTotalBan">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Tổng lãi:</span>
+                            <span class="summary-value" id="reportTotalProfit">0 VND</span>
+                        </div>
+                    </div>
+
+                    <!-- Sub-tabs for 06.MUA / 05.BAN / Tổng hợp -->
+                    <div class="modal-tabs" id="reportSubTabs" style="display:none; margin-top:15px;">
+                        <button class="modal-tab active" onclick="switchReportTab('mua')">06.MUA – KH Mua NT</button>
+                        <button class="modal-tab" onclick="switchReportTab('ban')">05.BAN – KH Bán NT</button>
+                        <button class="modal-tab" onclick="switchReportTab('summary')">07.Tổng hợp doanh số</button>
+                    </div>
+
+                    <div id="reportResult" style="margin-top:10px; overflow-x:auto;">
+                        <div style="padding:40px;text-align:center;color:var(--gray);">
                             Vui lòng chọn điều kiện lọc và nhấn "Xem báo cáo"
                         </div>
                     </div>
@@ -3956,123 +3969,291 @@
         // ==========================================
         // REPORTS - Đúng công thức sheet 05.BAN và 06.MUA
         // ==========================================
+        // ==========================================
+        // REPORTS – BC KDNT (05.BAN, 06.MUA, 07.Tổng hợp)
+        // ==========================================
+        let reportData = { mua: [], ban: [] };
+        let activeReportTab = 'mua';
+
+        function switchReportTab(tab) {
+            activeReportTab = tab;
+            document.querySelectorAll('#reportSubTabs .modal-tab').forEach((b, i) => {
+                b.classList.toggle('active', ['mua','ban','summary'][i] === tab);
+            });
+            renderReportTab(tab);
+        }
+
         async function generateReport() {
             try {
                 const from = document.getElementById('reportTransFrom').value;
-                const to = document.getElementById('reportTransTo').value;
-                const pnv = document.getElementById('reportPnv').value;
-                
+                const to   = document.getElementById('reportTransTo').value;
+                const dept = document.getElementById('reportDept').value;
+                const type = document.getElementById('reportType').value;
+
                 let url = '/transactions?';
                 if (from) url += `from=${from}&`;
-                if (to) url += `to=${to}&`;
-                if (pnv) url += `pnvId=${pnv}&`;
-                
+                if (to)   url += `to=${to}&`;
+                if (dept) url += `dept=${encodeURIComponent(dept)}&`;
+
                 const transactions = await apiGet(url);
-                
-                // Tính toán theo công thức đúng
-                let totalCount = transactions.length;
-                let totalVolumeUSD = 0;
-                let totalProfit = 0;
-                
-                transactions.forEach(t => {
-                    // Tổng khối lượng: Quy đổi về USD nếu là ngoại tệ khác
-                    let volumeInUSD = parseFloat(t.amount);
-                    if (t.buy_curr !== 'USD' && t.sell_curr !== 'USD') {
-                        // Giả sử tỷ giá quy đổi, trong thực tế cần API tỷ giá
-                        volumeInUSD = parseFloat(t.amount) / parseFloat(t.rate);
-                    }
-                    totalVolumeUSD += volumeInUSD;
-                    
-                    // Lợi nhuận: (Tỷ giá cân đối - Tỷ giá giao dịch) * Số lượng
-                    if (t.balanced_rate && t.rate) {
-                        const profit = (parseFloat(t.balanced_rate) - parseFloat(t.rate)) * parseFloat(t.amount);
-                        totalProfit += profit;
-                    }
+                const filtered = type ? transactions.filter(t => t.trans_type === type) : transactions;
+
+                // KH MUA NT = VCB BÁN (direction BÁN)
+                // KH BÁN NT = VCB MUA (direction MUA)
+                reportData.ban = filtered.filter(t => t.direction === 'BÁN');
+                reportData.mua = filtered.filter(t => t.direction === 'MUA');
+
+                const totalProfit = filtered.reduce((s, t) => s + (parseFloat(t.profit) || 0), 0);
+
+                document.getElementById('reportTotalCount').textContent  = filtered.length;
+                document.getElementById('reportTotalMua').textContent    = `${reportData.mua.length} GD`;
+                document.getElementById('reportTotalBan').textContent    = `${reportData.ban.length} GD`;
+                document.getElementById('reportTotalProfit').textContent = fmtVND(totalProfit) + ' VND';
+                document.getElementById('reportSummary').style.display  = 'flex';
+                document.getElementById('reportSubTabs').style.display  = 'flex';
+
+                activeReportTab = 'mua';
+                document.querySelectorAll('#reportSubTabs .modal-tab').forEach((b, i) => {
+                    b.classList.toggle('active', i === 0);
                 });
-                
-                document.getElementById('reportTotalCount').textContent = totalCount;
-                document.getElementById('reportTotalVolume').textContent = totalVolumeUSD.toLocaleString('vi-VN', {maximumFractionDigits: 2}) + ' USD';
-                document.getElementById('reportTotalProfit').textContent = totalProfit.toLocaleString('vi-VN', {maximumFractionDigits: 0}) + ' VND';
-                
-                // Hiển thị chi tiết theo loại BAN và MUA
-                const container = document.getElementById('reportResult');
-                
-                // Phân loại giao dịch
-                const banTrans = transactions.filter(t => t.direction === 'VCB BÁN');
-                const muaTrans = transactions.filter(t => t.direction === 'VCB MUA');
-                
-                let html = `
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="color: var(--primary-green); margin-bottom: 15px;">📊 BÁO CÁO GIAO DỊCH</h3>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                            <div style="background: #E3F2FD; padding: 15px; border-radius: 8px;">
-                                <h4 style="color: var(--ocean-blue); margin-bottom: 10px;">VCB BÁN (05.BAN)</h4>
-                                <p>Số lượng giao dịch: <strong>${banTrans.length}</strong></p>
-                                <p>Tổng khối lượng: <strong>${banTrans.reduce((sum, t) => sum + parseFloat(t.amount), 0).toLocaleString('vi-VN')}</strong></p>
-                            </div>
-                            <div style="background: #E8F5E9; padding: 15px; border-radius: 8px;">
-                                <h4 style="color: var(--primary-green); margin-bottom: 10px;">VCB MUA (06.MUA)</h4>
-                                <p>Số lượng giao dịch: <strong>${muaTrans.length}</strong></p>
-                                <p>Tổng khối lượng: <strong>${muaTrans.reduce((sum, t) => sum + parseFloat(t.amount), 0).toLocaleString('vi-VN')}</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                if (transactions.length === 0) {
-                    html += '<div style="padding: 20px; text-align: center;">Không có dữ liệu</div>';
-                } else {
-                    html += `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>PNV</th><th>Ngày GD</th><th>Ngày HL</th><th>CIF</th><th>Tên KH</th>
-                                    <th>Chiều</th><th>Mua</th><th>Bán</th><th>Số lượng</th><th>Tỷ giá</th>
-                                    <th>TG cân đối</th><th>Tương đương</th><th>Loại</th><th>Lợi nhuận</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-                    
-                    transactions.forEach(t => {
-                        const profit = t.balanced_rate && t.rate ? 
-                            ((parseFloat(t.balanced_rate) - parseFloat(t.rate)) * parseFloat(t.amount)).toLocaleString('vi-VN', {maximumFractionDigits: 0}) : 
-                            '-';
-                        
-                        html += `
-                            <tr>
-                                <td>${t.pnv_id}</td>
-                                <td>${formatDate(new Date(t.trans_date))}</td>
-                                <td>${formatDate(new Date(t.effective_date))}</td>
-                                <td>${t.cif}</td>
-                                <td>${t.customer_name}</td>
-                                <td>${t.direction}</td>
-                                <td>${t.buy_curr}</td>
-                                <td>${t.sell_curr}</td>
-                                <td>${parseFloat(t.amount).toLocaleString()}</td>
-                                <td>${parseFloat(t.rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                                <td>${t.balanced_rate ? parseFloat(t.balanced_rate).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 4}) : '-'}</td>
-                                <td>${parseFloat(t.equivalent).toLocaleString()}</td>
-                                <td>${t.trans_type}</td>
-                                <td>${profit}</td>
-                            </tr>
-                        `;
-                    });
-                    
-                    html += '</tbody></table>';
-                }
-                
-                container.innerHTML = html;
-                showNotification(`Báo cáo có ${transactions.length} giao dịch`);
+                renderReportTab('mua');
+                showNotification(`Báo cáo: ${filtered.length} giao dịch`);
             } catch (err) {
                 showNotification('Lỗi tạo báo cáo!', 'error');
+                console.error(err);
             }
         }
 
-        function exportReport(format) {
-            showNotification('Chức năng xuất báo cáo đang được cập nhật!', 'info');
+        function fmtVND(v) {
+            return Math.round(v).toLocaleString('vi-VN');
         }
+        function fmtRate(v) {
+            return parseFloat(v).toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+        }
+        function fmtAmt(v) {
+            return parseFloat(v).toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function groupByDept(transactions) {
+            const groups = {};
+            transactions.forEach(t => {
+                const dept = t.phong_ql || t.pnv_dept || t.pnv_name || 'Không xác định';
+                if (!groups[dept]) groups[dept] = [];
+                groups[dept].push(t);
+            });
+            return groups;
+        }
+
+        function renderReportTab(tab) {
+            const container = document.getElementById('reportResult');
+            if (tab === 'summary') {
+                renderSummaryReport(container);
+                return;
+            }
+            const list = tab === 'mua' ? reportData.mua : reportData.ban;
+            const title = tab === 'mua'
+                ? 'KHÁCH HÀNG MUA NGOẠI TỆ (VCB BÁN – 06.MUA)'
+                : 'KHÁCH HÀNG BÁN NGOẠI TỆ (VCB MUA – 05.BAN)';
+
+            if (list.length === 0) {
+                container.innerHTML = `<div style="padding:30px;text-align:center;color:var(--gray);">Không có dữ liệu ${title}</div>`;
+                return;
+            }
+
+            const groups = groupByDept(list);
+            let grandTotal = 0;
+            let stt = 1;
+
+            let html = `
+                <div style="font-weight:700;font-size:15px;color:#c00;margin-bottom:8px;padding:4px 0;border-bottom:2px solid #c00;">${title}</div>
+                <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                <tr style="background:#1a5276;color:#fff;">
+                    <th style="padding:6px 4px;text-align:center;width:30px;">STT</th>
+                    <th style="padding:6px 4px;">Phòng QL</th>
+                    <th style="padding:6px 4px;width:40px;">Loại GD</th>
+                    <th style="padding:6px 4px;">CF_NO (CIF)</th>
+                    <th style="padding:6px 4px;">Tên khách hàng</th>
+                    <th style="padding:6px 4px;width:45px;">Loại tiền</th>
+                    <th style="padding:6px 4px;text-align:right;">Số tiền</th>
+                    <th style="padding:6px 4px;text-align:right;">TG mua</th>
+                    <th style="padding:6px 4px;text-align:right;">TG bán</th>
+                    <th style="padding:6px 4px;text-align:right;">C/lệch</th>
+                    <th style="padding:6px 4px;text-align:right;">Lãi (VND)</th>
+                    <th style="padding:6px 4px;text-align:center;">MĐ</th>
+                    <th style="padding:6px 4px;">Tên Mục đích / Nguồn</th>
+                </tr>
+                </thead>
+                <tbody>`;
+
+            let deptIdx = 0;
+            for (const [dept, rows] of Object.entries(groups)) {
+                deptIdx++;
+                const deptProfit = rows.reduce((s, t) => s + (parseFloat(t.profit) || 0), 0);
+                grandTotal += deptProfit;
+                let deptStt = 1;
+
+                rows.forEach(t => {
+                    const isMua = t.direction === 'MUA'; // VCB mua = KH bán
+                    const tgMua = isMua ? fmtRate(t.rate) : fmtRate(t.balanced_rate || t.rate);
+                    const tgBan = isMua ? fmtRate(t.balanced_rate || t.rate) : fmtRate(t.rate);
+                    const clech = isMua
+                        ? fmtRate((parseFloat(t.balanced_rate || t.rate) - parseFloat(t.rate)).toFixed(2))
+                        : fmtRate((parseFloat(t.rate) - parseFloat(t.balanced_rate || t.rate)).toFixed(2));
+                    const laiVnd = fmtVND(Math.abs(parseFloat(t.profit) || 0));
+                    const fcy = t.buy_curr !== 'VND' ? t.buy_curr : t.sell_curr;
+
+                    html += `<tr style="background:${deptStt % 2 === 0 ? '#f9f9f9' : '#fff'};">
+                        <td style="padding:4px;text-align:center;">${deptIdx}.${deptStt}</td>
+                        <td style="padding:4px;">${dept}</td>
+                        <td style="padding:4px;text-align:center;">${t.trans_type || 'GN'}</td>
+                        <td style="padding:4px;font-family:monospace;">${t.cif}</td>
+                        <td style="padding:4px;">${t.customer_name}</td>
+                        <td style="padding:4px;text-align:center;">${fcy}</td>
+                        <td style="padding:4px;text-align:right;">${fmtAmt(t.amount)}</td>
+                        <td style="padding:4px;text-align:right;">${tgMua}</td>
+                        <td style="padding:4px;text-align:right;">${tgBan}</td>
+                        <td style="padding:4px;text-align:right;">${clech}</td>
+                        <td style="padding:4px;text-align:right;color:#1a5276;font-weight:600;">${laiVnd}</td>
+                        <td style="padding:4px;text-align:center;">${t.purpose_code || ''}</td>
+                        <td style="padding:4px;font-size:11px;">${t.purpose_name || ''}</td>
+                    </tr>`;
+                    deptStt++;
+                    stt++;
+                });
+
+                // Department subtotal
+                html += `<tr style="background:#d6eaf8;font-weight:700;">
+                    <td colspan="10" style="padding:4px 6px;text-align:right;">${dept} Total</td>
+                    <td style="padding:4px;text-align:right;color:#c00;">${fmtVND(deptProfit)}</td>
+                    <td colspan="2"></td>
+                </tr>`;
+            }
+
+            // Grand total
+            html += `<tr style="background:#1a5276;color:#fff;font-weight:700;">
+                <td colspan="10" style="padding:6px;text-align:right;">Grand Total</td>
+                <td style="padding:6px;text-align:right;">${fmtVND(grandTotal)}</td>
+                <td colspan="2"></td>
+            </tr>`;
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderSummaryReport(container) {
+            const all = [...reportData.mua, ...reportData.ban];
+            if (all.length === 0) {
+                container.innerHTML = `<div style="padding:30px;text-align:center;color:var(--gray);">Không có dữ liệu</div>`;
+                return;
+            }
+            const groups = groupByDept(all);
+            let html = `
+                <div style="font-weight:700;font-size:15px;color:#c00;margin-bottom:8px;padding:4px 0;border-bottom:2px solid #c00;">07.BC DOANH SỐ – THỰC HIỆN KẾ HOẠCH DOANH SỐ MBNT</div>
+                <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                <tr style="background:#1a5276;color:#fff;">
+                    <th style="padding:6px 4px;">Phòng QL</th>
+                    <th style="padding:6px 4px;text-align:right;">Số GD MUA</th>
+                    <th style="padding:6px 4px;text-align:right;">Số GD BÁN</th>
+                    <th style="padding:6px 4px;text-align:right;">Tổng GD</th>
+                    <th style="padding:6px 4px;text-align:right;">DS MUA (FCY)</th>
+                    <th style="padding:6px 4px;text-align:right;">DS BÁN (FCY)</th>
+                    <th style="padding:6px 4px;text-align:right;">Lãi MUA (VND)</th>
+                    <th style="padding:6px 4px;text-align:right;">Lãi BÁN (VND)</th>
+                    <th style="padding:6px 4px;text-align:right;color:#FFD700;">Tổng lãi (VND)</th>
+                </tr>
+                </thead><tbody>`;
+
+            let gtMuaGD=0, gtBanGD=0, gtMuaAmt=0, gtBanAmt=0, gtMuaLai=0, gtBanLai=0;
+            let idx = 0;
+            for (const [dept, rows] of Object.entries(groups)) {
+                const muaRows = rows.filter(r => r.direction === 'MUA');
+                const banRows = rows.filter(r => r.direction === 'BÁN');
+                const muaAmt  = muaRows.reduce((s,t) => s + parseFloat(t.amount), 0);
+                const banAmt  = banRows.reduce((s,t) => s + parseFloat(t.amount), 0);
+                const muaLai  = muaRows.reduce((s,t) => s + (parseFloat(t.profit)||0), 0);
+                const banLai  = banRows.reduce((s,t) => s + (parseFloat(t.profit)||0), 0);
+                gtMuaGD += muaRows.length; gtBanGD += banRows.length;
+                gtMuaAmt += muaAmt; gtBanAmt += banAmt;
+                gtMuaLai += muaLai; gtBanLai += banLai;
+                html += `<tr style="background:${idx++ % 2 === 0 ? '#fff':'#f0f8ff'};">
+                    <td style="padding:4px;font-weight:600;">${dept}</td>
+                    <td style="padding:4px;text-align:right;">${muaRows.length}</td>
+                    <td style="padding:4px;text-align:right;">${banRows.length}</td>
+                    <td style="padding:4px;text-align:right;font-weight:600;">${rows.length}</td>
+                    <td style="padding:4px;text-align:right;">${fmtAmt(muaAmt)}</td>
+                    <td style="padding:4px;text-align:right;">${fmtAmt(banAmt)}</td>
+                    <td style="padding:4px;text-align:right;">${fmtVND(muaLai)}</td>
+                    <td style="padding:4px;text-align:right;">${fmtVND(banLai)}</td>
+                    <td style="padding:4px;text-align:right;font-weight:700;color:#1a5276;">${fmtVND(muaLai+banLai)}</td>
+                </tr>`;
+            }
+            const totalLai = gtMuaLai + gtBanLai;
+            html += `<tr style="background:#1a5276;color:#fff;font-weight:700;">
+                <td style="padding:6px;">TỔNG CỘNG</td>
+                <td style="padding:6px;text-align:right;">${gtMuaGD}</td>
+                <td style="padding:6px;text-align:right;">${gtBanGD}</td>
+                <td style="padding:6px;text-align:right;">${gtMuaGD+gtBanGD}</td>
+                <td style="padding:6px;text-align:right;">${fmtAmt(gtMuaAmt)}</td>
+                <td style="padding:6px;text-align:right;">${fmtAmt(gtBanAmt)}</td>
+                <td style="padding:6px;text-align:right;">${fmtVND(gtMuaLai)}</td>
+                <td style="padding:6px;text-align:right;">${fmtVND(gtBanLai)}</td>
+                <td style="padding:6px;text-align:right;">${fmtVND(totalLai)}</td>
+            </tr></tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function exportBCKDNT() {
+            const all = [...reportData.mua, ...reportData.ban];
+            if (all.length === 0) { showNotification('Không có dữ liệu để xuất!', 'error'); return; }
+
+            // Build CSV content
+            const header = ['Loại BC','STT','Phòng QL','Loại GD','CIF','Tên KH','Loại tiền','Số tiền','TG mua','TG bán','C/lệch','Lãi (VND)','Mã MĐ','Tên Mục đích/Nguồn','Ngày GD','Ngày HL'];
+            const rows = [];
+
+            const buildRows = (list, label) => {
+                const groups = groupByDept(list);
+                let deptIdx = 0;
+                for (const [dept, drows] of Object.entries(groups)) {
+                    deptIdx++;
+                    drows.forEach((t, i) => {
+                        const isMua = t.direction === 'MUA';
+                        const tgMua = isMua ? t.rate : (t.balanced_rate || t.rate);
+                        const tgBan = isMua ? (t.balanced_rate || t.rate) : t.rate;
+                        const clech = Math.abs(parseFloat(tgBan) - parseFloat(tgMua)).toFixed(2);
+                        const fcy = t.buy_curr !== 'VND' ? t.buy_curr : t.sell_curr;
+                        rows.push([label, `${deptIdx}.${i+1}`, dept, t.trans_type||'GN', t.cif, t.customer_name,
+                            fcy, t.amount, tgMua, tgBan, clech, Math.round(Math.abs(parseFloat(t.profit)||0)),
+                            t.purpose_code||'', t.purpose_name||'',
+                            t.trans_date ? t.trans_date.split('T')[0] : '',
+                            t.effective_date ? t.effective_date.split('T')[0] : ''
+                        ]);
+                    });
+                    const deptProfit = drows.reduce((s,t) => s + (parseFloat(t.profit)||0), 0);
+                    rows.push([label, `${dept} Total`, '', '', '', '', '', '', '', '', '', Math.round(deptProfit), '', '', '', '']);
+                }
+            };
+
+            buildRows(reportData.ban, '06.MUA – KH Mua NT');
+            buildRows(reportData.mua, '05.BAN – KH Bán NT');
+
+            const csvLines = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+            const csv = '\uFEFF' + csvLines.join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const today = new Date().toLocaleDateString('vi-VN').replace(/\//g,'_');
+            a.href = url;
+            a.download = `BC_KDNT_${today}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('✅ Đã xuất file BC KDNT!');
+        }
+
+        // Legacy alias kept for any remaining onclick refs
+        function exportReport(format) { exportBCKDNT(); }
+
+
 
         // ==========================================
         // CHAT FUNCTIONS - FIX 7: Sửa chat không hoạt động
@@ -4200,7 +4381,6 @@
                 const managedPnvs = users.filter(u => u.role === 'PNV' && u.manager_id === currentUser.id);
                 
                 const select = document.getElementById('bgdFilterPnv');
-                const reportSelect = document.getElementById('reportPnv');
                 
                 let html = '<option value="">Tất cả PNV</option>';
                 managedPnvs.forEach(u => {
@@ -4208,7 +4388,16 @@
                 });
                 
                 if (select) select.innerHTML = html;
-                if (reportSelect) reportSelect.innerHTML = html;
+
+                // Populate dept dropdown for report
+                const deptSelect = document.getElementById('reportDept');
+                if (deptSelect) {
+                    const depts = [...new Set(users.filter(u => u.role === 'PNV').map(u => u.dept).filter(Boolean))].sort();
+                    let deptHtml = '<option value="">Tất cả</option>';
+                    depts.forEach(d => { deptHtml += `<option value="${d}">${d}</option>`; });
+                    deptSelect.innerHTML = deptHtml;
+                }
+
             } catch (err) {
                 console.error('Error loading BGD PNV list:', err);
             }
