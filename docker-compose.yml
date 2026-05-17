@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: mbnt_postgres
+    environment:
+      POSTGRES_USER: mbnt_user
+      POSTGRES_PASSWORD: mbnt_password
+      POSTGRES_DB: mbnt_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mbnt_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mbnt_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mbnt_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mbnt_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mbnt_app
+    environment:
+      DATABASE_URL: postgresql://mbnt_user:mbnt_password@postgres:5432/mbnt_db
+      SECRET_KEY: your-secret-key-change-in-production
+      DEBUG: "False"
+      HOST: 0.0.0.0
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - uploads_data:/app/uploads
+    networks:
+      - mbnt_network
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_data:
+
+networks:
+  mbnt_network:
+    driver: bridge
