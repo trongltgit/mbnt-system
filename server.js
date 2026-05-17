@@ -532,6 +532,44 @@ io.on('connection', (socket) => {
 
 // REST API Routes
 
+// ========== MIGRATION 001 - THÊM TẠM, CHẠY XONG XÓA ==========
+app.get('/run-migration-001', async (req, res) => {
+    try {
+        // Step 1: Add column
+        await pool.query(`
+            ALTER TABLE users 
+            ADD COLUMN IF NOT EXISTS managed_by_bgd VARCHAR(50)
+        `);
+        
+        // Step 2: Add comment
+        await pool.query(`
+            COMMENT ON COLUMN users.managed_by_bgd 
+            IS 'ID của BGD quản lý user này. Chỉ áp dụng cho PNV users.'
+        `);
+        
+        // Step 3: Verify
+        const result = await pool.query(`
+            SELECT column_name, data_type, is_nullable 
+            FROM information_schema.columns 
+            WHERE table_name = 'users' AND column_name = 'managed_by_bgd'
+        `);
+        
+        res.json({
+            success: true,
+            message: 'Migration 001 completed - managed_by_bgd column added',
+            column: result.rows[0] || null
+        });
+        
+    } catch (err) {
+        console.error('Migration error:', err);
+        res.status(500).json({ 
+            success: false, 
+            error: err.message 
+        });
+    }
+});
+// ========== KẾT THÚC MIGRATION 001 ==========
+
 // Login
 app.post('/api/login', async (req, res) => {
     try {
