@@ -2697,7 +2697,8 @@
                     name,
                     dept,
                     role: dept.split('-')[0],
-                    managerId: dept.startsWith('PNV') ? managerId : null
+                    managerId: dept.startsWith('PNV') ? managerId : null,
+                    managedByBgd: dept.startsWith('PNV') ? managerId : null
                 });
                 
                 closeAddUserModal();
@@ -2726,7 +2727,8 @@
                     name: document.getElementById('editUserName').value,
                     dept: dept,
                     role: dept.split('-')[0],
-                    managerId: dept.startsWith('PNV') ? managerId : null
+                    managerId: dept.startsWith('PNV') ? managerId : null,
+                    managedByBgd: dept.startsWith('PNV') ? managerId : null
                 });
                 
                 closeEditUserModal();
