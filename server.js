@@ -40,6 +40,7 @@ async function initDB() {
                 role VARCHAR(20) NOT NULL,
                 password VARCHAR(100) NOT NULL,
                 manager_id VARCHAR(50),
+                managed_by_bgd VARCHAR(50),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -260,6 +261,60 @@ io.on('connection', (socket) => {
         } catch (err) {
             console.error('Error in ask_price:', err);
             socket.emit('quote_error', { error: err.message });
+        }
+    });
+
+    // PQL withdraws price quote
+    socket.on('withdraw_quote', async (data) => {
+        try {
+            const { quoteId, pqlId } = data;
+            
+            await pool.query(`
+                UPDATE quotes 
+                SET status = 'withdrawn', interrupted = TRUE
+                WHERE quote_id = $1
+            `, [quoteId]);
+
+            // Notify PNV
+            const quote = await pool.query('SELECT pnv_id FROM quotes WHERE quote_id = $1', [quoteId]);
+            const pnvId = quote.rows[0]?.pnv_id;
+            const pnvSocket = connectedUsers.get(pnvId);
+            if (pnvSocket) {
+                io.to(pnvSocket).emit('quote_withdrawn', { quoteId, pqlId });
+            }
+
+            console.log(`🔄 Quote ${quoteId} withdrawn by ${pqlId}`);
+        } catch (err) {
+            console.error('Error in withdraw_quote:', err);
+        }
+    });
+
+    // PQL transfers quote to another PQL user
+    socket.on('transfer_quote', async (data) => {
+        try {
+            const { quoteId, fromPqlId, toPqlId } = data;
+            
+            await pool.query(`
+                UPDATE quotes 
+                SET pql_id = $1, status = 'quoted'
+                WHERE quote_id = $2
+            `, [toPqlId, quoteId]);
+
+            // Notify the new PQL user
+            const toPqlSocket = connectedUsers.get(toPqlId);
+            if (toPqlSocket) {
+                const quote = await pool.query('SELECT * FROM quotes WHERE quote_id = $1', [quoteId]);
+                const q = quote.rows[0];
+                io.to(toPqlSocket).emit('quote_transferred_to_me', {
+                    quoteId,
+                    fromPqlId,
+                    quote: q
+                });
+            }
+
+            console.log(`📨 Quote ${quoteId} transferred from ${fromPqlId} to ${toPqlId}`);
+        } catch (err) {
+            console.error('Error in transfer_quote:', err);
         }
     });
 
@@ -503,7 +558,7 @@ app.post('/api/login', async (req, res) => {
 // Get all users (admin)
 app.get('/api/users', async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, name, dept, role, manager_id FROM users ORDER BY id');
+        const result = await pool.query('SELECT id, name, dept, role, manager_id, managed_by_bgd FROM users ORDER BY id');
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -513,11 +568,11 @@ app.get('/api/users', async (req, res) => {
 // Create user (admin)
 app.post('/api/users', async (req, res) => {
     try {
-        const { id, name, dept, role, password, managerId } = req.body;
+        const { id, name, dept, role, password, managerId, managedByBgd } = req.body;
         await pool.query(`
-            INSERT INTO users (id, name, dept, role, password, manager_id)
-            VALUES ($1, $2, $3, $4, $5, $6)
-        `, [id, name, dept, role, password || 'Vcb@1234', managerId]);
+            INSERT INTO users (id, name, dept, role, password, manager_id, managed_by_bgd)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [id, name, dept, role, password || 'Vcb@1234', managerId, managedByBgd || null]);
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -527,11 +582,11 @@ app.post('/api/users', async (req, res) => {
 // Update user
 app.put('/api/users/:id', async (req, res) => {
     try {
-        const { name, dept, role, managerId } = req.body;
+        const { name, dept, role, managerId, managedByBgd } = req.body;
         await pool.query(`
-            UPDATE users SET name = $1, dept = $2, role = $3, manager_id = $4
-            WHERE id = $5
-        `, [name, dept, role, managerId, req.params.id]);
+            UPDATE users SET name = $1, dept = $2, role = $3, manager_id = $4, managed_by_bgd = $5
+            WHERE id = $6
+        `, [name, dept, role, managerId, managedByBgd || null, req.params.id]);
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -808,7 +863,15 @@ app.get('/api/purpose', async (req, res) => {
     }
 });
 
-
+// Delete purpose
+app.delete('/api/purpose/:code', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM purpose_data WHERE code = $1', [req.params.code]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // Get chat history
 app.get('/api/chat/history', async (req, res) => {
