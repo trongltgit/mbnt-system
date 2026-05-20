@@ -10,6 +10,7 @@ class UserRole(str, enum.Enum):
     PNV = "pnv"  # Phòng Nghiệp Vụ
     PQL = "pql"  # Phòng Quản Lý
     BGD = "bgd"  # Ban Giám Đốc
+    PGD = "pgd"  # Phó Giám Đốc
 
 class TransactionType(str, enum.Enum):
     GN = "GN"   # Giao Ngay (Immediate)
@@ -23,6 +24,7 @@ class TransactionDirection(str, enum.Enum):
 class MessageType(str, enum.Enum):
     QUOTATION = "quotation"  # Chào giá (red notification)
     CHAT = "chat"            # Chat (green notification)
+    QA = "qa"                # Q&A - Hỏi đáp (NEW)
 
 class TransactionStatus(str, enum.Enum):
     PENDING = "pending"           # Đang chờ
@@ -126,6 +128,8 @@ class Transaction(Base):
     # Quotation details
     buy_rate = Column(Float, nullable=True)  # Tỷ giá mua
     sell_rate = Column(Float, nullable=True)  # Tỷ giá bán
+    system_buy_rate = Column(Float, nullable=True)  # 🆕 Tỷ giá hệ thống mua (PQL chỉnh sửa)
+    system_sell_rate = Column(Float, nullable=True)  # 🆕 Tỷ giá hệ thống bán
     quoted_rate = Column(Float, nullable=True)  # Tỷ giá chào
     quoted_at = Column(DateTime, nullable=True)  # Thời gian chào giá
     quote_validity_minutes = Column(Integer, default=5)  # Phút hiệu lực
@@ -176,7 +180,7 @@ class QuotationHistory(Base):
     def __repr__(self):
         return f"<QuotationHistory {self.transaction_id} - {self.buy_rate}/{self.sell_rate}>"
 
-# Transaction Edit Log
+# Transaction Edit Log - CHỈNH SỬA LỚN 🔧
 class TransactionEdit(Base):
     __tablename__ = "transaction_edits"
     
@@ -186,24 +190,39 @@ class TransactionEdit(Base):
     field_name = Column(String(50))
     old_value = Column(String(255), nullable=True)
     new_value = Column(String(255), nullable=True)
+    # 🆕 Thêm chi tiết chỉnh sửa:
+    reason = Column(String(500), nullable=True)  # Lý do chỉnh sửa
+    change_type = Column(String(20))  # "system_rate", "profit", "manual"
     edited_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships
     transaction = relationship("Transaction", back_populates="edits")
     edited_user = relationship("User", foreign_keys=[edited_by], back_populates="edits")
 
-# Messages/Chat Table
+# Messages/Chat Table - CHỈNH SỬA LỚN 🔧
 class Message(Base):
     __tablename__ = "messages"
     
     id = Column(Integer, primary_key=True, index=True)
     sender_id = Column(Integer, ForeignKey("users.id"))
+    # 🆕 Thêm thông tin người nhận:
+    recipient_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # Người nhận chính
+    recipient_ids = Column(String(255), nullable=True)  # CSV của user IDs nhận khác
     recipient_department = Column(String(50), nullable=True)  # Phòng nhận
-    recipient_ids = Column(String(255), nullable=True)  # CSV của user IDs nhận
+    recipient_name = Column(String(100), nullable=True)  # 🆕 Tên người nhận
+    recipient_role = Column(String(20), nullable=True)  # 🆕 Vai trò người nhận
+    
     transaction_id = Column(Integer, ForeignKey("transactions.id"), nullable=True)
     
-    message_type = Column(String(20), default=MessageType.CHAT.value)  # quotation/chat
+    message_type = Column(String(20), default=MessageType.CHAT.value)  # quotation/chat/qa
     content = Column(Text)
+    
+    # 🆕 Thêm Q&A tracking:
+    question_content = Column(Text, nullable=True)  # Nội dung câu hỏi ban đầu
+    answer_content = Column(Text, nullable=True)  # Nội dung câu trả lời
+    is_answered = Column(Boolean, default=False)  # Đã trả lời chưa?
+    answered_at = Column(DateTime, nullable=True)  # Thời gian trả lời
+    
     is_read = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     
@@ -212,7 +231,7 @@ class Message(Base):
     transaction = relationship("Transaction", back_populates="messages")
     
     def __repr__(self):
-        return f"<Message from {self.sender_id} - {self.message_type}>"
+        return f"<Message from {self.sender_id} to {self.recipient_id} - {self.message_type}>"
 
 # Exchange Rate Balance Table (Tỷ giá cân đối)
 class ExchangeRateBalance(Base):
@@ -261,3 +280,19 @@ class AuditLog(Base):
     
     def __repr__(self):
         return f"<AuditLog {self.action} on {self.resource_type}>"
+
+# 🆕 Backup Log - để tracking khi delete database
+class BackupLog(Base):
+    __tablename__ = "backup_logs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    backup_type = Column(String(20))  # "full", "partial", "manual"
+    backup_path = Column(String(500))
+    backup_size = Column(Integer)  # bytes
+    records_backed_up = Column(Integer)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    notes = Column(Text, nullable=True)
+    
+    def __repr__(self):
+        return f"<BackupLog {self.backup_type} - {self.created_at}>"
